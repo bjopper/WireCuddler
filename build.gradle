@@ -1,0 +1,80 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+defaultTasks 'clean','nxjCompile', 'nxjLink'
+
+sourceCompatibility = 1.5
+version = '1.0'
+nxj_home=System.getenv("NXJ_HOME")
+
+println project.name
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    dependencies {
+        compile fileTree (dir: nxj_home+'/lib/pc', includes: ['*.jar'])
+        compile fileTree (dir: nxj_home+'/lib/pc/3rdparty', includes: ['*.jar'])
+        compile fileTree (dir: nxj_home+'/lib/nxt', includes: ['*.jar'])
+    }
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+task hello {
+    doLast {
+        println 'Hello world!'
+    }
+}
+
+
+task nxjCompile(dependsOn: hello) << {
+    new File('build/').mkdir()
+    def filelist = ""
+    FileTree tree = fileTree(dir: 'src', include: '**/*.java', exclude: '**/*test*/**')
+    tree.each {File file ->
+        // println file
+        filelist += " " + file
+    }
+    new ByteArrayOutputStream().withStream { os ->
+        def result = exec {
+            executable = 'cmd'
+            args=['/c',nxj_home+'\\bin\\nxjc.bat -d '+project.buildDir+' '+filelist]
+            standardOutput=os
+        }
+        def outputAsString = os.toString()
+        println outputAsString
+    }
+}
+
+
+
+task nxjLink(dependsOn: nxjCompile) << {
+    new ByteArrayOutputStream().withStream { os ->
+        def result = exec {
+            executable = 'cmd'
+            args=['/c', nxj_home+'\\bin\\nxjlink.bat -gr -cp '+project.buildDir+' -o '+project.buildDir+'\\'+project.name+'.nxj -od '+project.buildDir+'\\'+project.name+'.nxd dk.bjop.wirecuddler.WireCuddler']
+            standardOutput=os
+        }
+        def outputAsString = os.toString()
+        println outputAsString
+    }
+}
+
+task nxjUpload(dependsOn: nxjLink) << {
+    FileTree tree = fileTree(dir: 'build', include: '**/*.nxj', exclude: '**/*test*/**')
+    def filelist = ""
+    tree.each {File file ->
+        // println file
+        filelist += " " + file
+    }
+    new ByteArrayOutputStream().withStream { os ->
+        def result = exec {
+            executable = 'cmd'
+            args=['/c', nxj_home+'\\bin\\nxjupload.bat -r '+filelist]
+            standardOutput=os
+        }
+        def outputAsString = os.toString()
+        println outputAsString
+    }
+}

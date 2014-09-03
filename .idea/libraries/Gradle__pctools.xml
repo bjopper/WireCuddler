@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: pctools">
+    <CLASSES>
+      <root url="jar://C:/Tools/leJOS_NXJ/lib/pc/pctools.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,38 @@
+<component name="libraryTable">
+  <library name="lejos0.9b">
+    <CLASSES>
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/nxt/classes.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/bcel.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/bluecove-gpl.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/bluecove.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/commons-cli.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/jcommon.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/jfreechart.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/stax-api-1.0.1.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/charting.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/jtools.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/pccomm.jar!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/pctools.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/nxt/classes-src.zip!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/bcel-src.zip!/bcel-5.2/src/java" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/bluecove-gpl-src.zip!/bluecove-gpl-2.1.0/src/main/java" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/bluecove-gpl-src.zip!/bluecove-gpl-2.1.0/src/test/java" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/bluecove-src.zip!/bluecove-2.1.0/src/main/java" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/bluecove-src.zip!/bluecove-2.1.0/src/test/java" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/commons-cli-src.zip!/commons-cli-1.2-src/src/java" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/commons-cli-src.zip!/commons-cli-1.2-src/src/test" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/jcommon-src.zip!/jcommon-1.0.16/source" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/jfreechart-src.zip!/jfreechart-1.0.13/swt" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/jfreechart-src.zip!/jfreechart-1.0.13/tests" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/jfreechart-src.zip!/jfreechart-1.0.13/source" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/3rdparty/jfreechart-src.zip!/jfreechart-1.0.13/experimental" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/charting-src.zip!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/jtools-src.zip!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/pccomm-src.zip!/" />
+      <root url="jar://C:/Program Files (x86)/leJOS NXJ/lib/pc/pctools-src.zip!/" />
+    </SOURCES>
+  </library>
+</component>
