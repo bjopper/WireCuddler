@@ -110,7 +110,6 @@ public class WireCuddler {
         logger.stopLogging();
 
 
-
 //        RConsole.println("\n Stop RConsole test. ");
 //        RConsole.close();cyg
 //        Button.waitForAnyPress();
