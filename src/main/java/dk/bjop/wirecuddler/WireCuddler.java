@@ -19,7 +19,8 @@ public class WireCuddler {
     static NXTDataLogger logger = new NXTDataLogger();
     static LogColumn m1Tacho = new LogColumn("M1 tacho count", LogColumn.DT_INTEGER);
     static LogColumn function = new LogColumn("Perfect math", LogColumn.DT_INTEGER);
-    static LogColumn[] columnDefs = new LogColumn[] { m1Tacho, function };
+    static LogColumn xxx = new LogColumn("xxx", LogColumn.DT_INTEGER);
+    static LogColumn[] columnDefs = new LogColumn[] { m1Tacho, function, xxx };
 
     public static void main(String[] args) throws InterruptedException, IOException {
         LCD.drawString("Waiting for ", 0, 2);
@@ -85,10 +86,11 @@ public class WireCuddler {
             }
 
             int m1Acc = m1.getAcceleration();
-            int nextPos = getExpectedTachoPosAtTimeT((System.currentTimeMillis()-startTime) + 1000,speed);
+            int nextPos = getExpectedTachoPosAtTimeT((System.currentTimeMillis()-startTime)+1000,speed);
             int currPos = m1.getTachoCount();
             int diff = nextPos-currPos;
-            m1.setAcceleration(diff-m1Acc);
+            int whereWeShouldBeRightNow = getExpectedTachoPosAtTimeT(System.currentTimeMillis()-startTime,speed);
+            m1.setAcceleration(100);
             /*if (currPos < nextPos) m1.setAcceleration(diff-m1Acc);
             else m1.setAcceleration(m1.getAcceleration()-100);*/
 
@@ -101,7 +103,8 @@ public class WireCuddler {
             }*/
 
             logger.writeLog(m1.getTachoCount());
-            logger.writeLog(getExpectedTachoPosAtTimeT(System.currentTimeMillis()-startTime,speed));
+            logger.writeLog(whereWeShouldBeRightNow);
+            logger.writeLog(m1.getRotationSpeed());
             logger.finishLine();
             startCount++;
             Delay.msDelay(1000 - (System.currentTimeMillis()-loopTimeStart));
