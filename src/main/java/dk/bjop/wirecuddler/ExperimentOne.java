@@ -1,5 +1,6 @@
 package dk.bjop.wirecuddler;
 
+import dk.bjop.wirecuddler.util.Constants;
 import lejos.addon.gps.GPSListener;
 import lejos.nxt.MotorPort;
 import lejos.nxt.NXTRegulatedMotor;
@@ -64,16 +65,16 @@ public class ExperimentOne extends Thread {
     }
 
     public int cmToTacho(float lengthCm) {
-        double barrelRevs = lengthCm / GPS.wireBarrelCircumference;
-        double motorRevs = barrelRevs / GPS.gearing;
+        double barrelRevs = lengthCm / Constants.wireBarrelCircumference;
+        double motorRevs = barrelRevs / Constants.gearing;
         int tachoCount = (int)motorRevs * 360;
         return tachoCount;
     }
 
     public float tachoToCm(int tachoCount) {
         float motorRevs = tachoCount/360;
-        float barrelRevs = motorRevs * GPS.gearing;
-        float length = barrelRevs * GPS.wireBarrelCircumference;
+        float barrelRevs = motorRevs * Constants.gearing;
+        float length = barrelRevs * Constants.wireBarrelCircumference;
         return length;
     }
 

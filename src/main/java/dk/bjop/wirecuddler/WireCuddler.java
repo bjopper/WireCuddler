@@ -1,5 +1,6 @@
 package dk.bjop.wirecuddler;
 
+import dk.bjop.wirecuddler.util.Utils;
 import lejos.nxt.*;
 import lejos.nxt.Button;
 import lejos.nxt.comm.Bluetooth;
@@ -19,8 +20,10 @@ public class WireCuddler {
     static NXTDataLogger logger = new NXTDataLogger();
     static LogColumn m1Tacho = new LogColumn("M1 tacho count", LogColumn.DT_INTEGER);
     static LogColumn function = new LogColumn("Perfect math", LogColumn.DT_INTEGER);
-    static LogColumn xxx = new LogColumn("xxx", LogColumn.DT_INTEGER);
-    static LogColumn[] columnDefs = new LogColumn[] { m1Tacho, function, xxx };
+    static LogColumn error = new LogColumn("xxx", LogColumn.DT_INTEGER);
+    static LogColumn[] columnDefs = new LogColumn[] { m1Tacho, function, error };
+
+    static int motorDirection=0;
 
     public static void main(String[] args) throws InterruptedException, IOException {
         LCD.drawString("Waiting for ", 0, 2);
@@ -46,95 +49,189 @@ public class WireCuddler {
         logger.startRealtimeLog(connection);
         logger.setColumns(columnDefs);  // must be after startRealtimeLog()
 
-        LCD.clear();
         Sound.beep();
-        LCD.drawString("Press orange btn", 0, 4);
-        LCD.drawString("to start.", 0, 5);
-        Button.ENTER.waitForPressAndRelease();
+        //Button.ENTER.waitForPressAndRelease();
         LCD.clear();
 
         LCD.drawString("Press and hold", 0, 5);
         LCD.drawString("dark gray ESCAPE", 0, 6);
         LCD.drawString("button to stop.", 0, 7);
 
-        int startCount = 42;
-
-
-//        RConsole.openUSB(5000);  //.open();
-//        RConsole.println("Start RConsole test ");
-
-
-
+        //MovementPath path1 = new MovementPathImpl();
+        MovementPath path1 = new MovementPathSinusImpl(24);
+        //MovementPath path1 = new MovementPathSinus2Impl();
 
         NXTRegulatedMotor m1 = new NXTRegulatedMotor(MotorPort.A);
-        m1.setAcceleration(0);
-        m1.setSpeed(0);
-        m1.rotate(360*100,true);
+
+
+
+        doPathTest(m1, path1);
+
+
+        logger.stopLogging();
+    }
+
+    private static void doPathTest(NXTRegulatedMotor m, MovementPath path) {
         boolean speedIsSet = false;
-        int acc = 0;
         long startTime = System.currentTimeMillis();
         float speed= 5f;
-        while (!Button.ESCAPE.isDown()) {
+
+        int adjustIntervalMillis = 500;
+        int lookAheadMillis = 1000;
+
+        long errorSum = 0;
+        int obsCount = 0;
+
+        while (!Button.ESCAPE.isDown() && !path.isMovementFinished(System.currentTimeMillis() - startTime)) {
             long loopTimeStart = System.currentTimeMillis();
-            //m1.setAcceleration(acc);
 
             if (!speedIsSet) {
-                m1.setSpeed(900);
-                m1.rotate(360*100,true);
-                //m1.forward();
+                m.setAcceleration(0);
+                m.setSpeed(m.getMaxSpeed());
+                motorForward(m);
                 speedIsSet=true;
             }
 
-            int m1Acc = m1.getAcceleration();
-            int nextPos = getExpectedTachoPosAtTimeT((System.currentTimeMillis()-startTime)+1000,speed);
-            int currPos = m1.getTachoCount();
-            int diff = nextPos-currPos;
-            int whereWeShouldBeRightNow = getExpectedTachoPosAtTimeT(System.currentTimeMillis()-startTime,speed);
-            m1.setAcceleration(100);
-            /*if (currPos < nextPos) m1.setAcceleration(diff-m1Acc);
-            else m1.setAcceleration(m1.getAcceleration()-100);*/
+            int curAcc = m.getAcceleration();
+            int nextPerfectPos = path.getExpectedTachoPosAtTimeT((System.currentTimeMillis() - startTime) + lookAheadMillis, speed);
+            int currPos = m.getTachoCount();
+            int perfectCurPos = path.getExpectedTachoPosAtTimeT(System.currentTimeMillis() - startTime, speed);
+            int error = perfectCurPos - currPos;
 
-            /*if (m1.getTachoCount() > 360*50) {
-                m1.setAcceleration(5);
-                m1.setSpeed(10);
+            errorSum += Math.pow(Math.max(perfectCurPos, currPos) - Math.min(perfectCurPos, currPos),2);
+            obsCount++;
+
+            // NOTE!!! When setting the acceleration I do not time into account, but relies on the fact that acc is deg/s/s
+
+
+            float errAdjustWeight = 2.5f;
+            float errCorrection = 0;//Math.round(error*errAdjustWeight);
+            //Utils.println(""+errCorrection);
+            float multiplier = 1.5f;
+
+            if (nextPerfectPos < perfectCurPos) {
+                motorBackward(m);
+
+                int diff = nextPerfectPos-currPos;
+                if (m.getRotationSpeed() < diff) {
+                    //Utils.println("BACKWARD: Setting speed to ZERO! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
+                    m.setAcceleration(Math.round(((m.getRotationSpeed()-diff )*multiplier)+errCorrection));
+                    m.setSpeed(1);
+                }
+                else {
+                    //Utils.println("BACKWARD: Setting speed to MAX! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
+                    m.setAcceleration(Math.round(((diff-m.getRotationSpeed())*multiplier)+errCorrection));
+                    m.setSpeed(m.getMaxSpeed());
+                }
             }
             else {
-                acc += 10;
-            }*/
+                motorForward(m);
 
-            logger.writeLog(m1.getTachoCount());
-            logger.writeLog(whereWeShouldBeRightNow);
-            logger.writeLog(m1.getRotationSpeed());
+                int diff = nextPerfectPos-currPos;
+                if (m.getRotationSpeed() > diff) {
+                    //Utils.println("FORWARD: Setting speed to ZERO! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
+                    m.setAcceleration(Math.round(((m.getRotationSpeed()-diff)*multiplier)+errCorrection));
+                    m.setSpeed(1);
+                }
+                else {
+                    //Utils.println("FORWARD: Setting speed to MAX! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
+                    m.setAcceleration(Math.round(((diff-m.getRotationSpeed())*multiplier)+errCorrection));
+                    m.setSpeed(m.getMaxSpeed());
+                }
+            }
+
+            logger.writeLog(m.getTachoCount());
+            logger.writeLog(perfectCurPos);
+            logger.writeLog(error);
             logger.finishLine();
-            startCount++;
-            Delay.msDelay(1000 - (System.currentTimeMillis()-loopTimeStart));
+            Delay.msDelay(adjustIntervalMillis - (System.currentTimeMillis()-loopTimeStart));
         }
 
-        logger.stopLogging();
+        if (path.isMovementFinished(System.currentTimeMillis() - startTime)) {
+            Utils.println("Error of the " + obsCount + " observations: " + (errorSum/obsCount));
+        }
 
-
-//        RConsole.println("\n Stop RConsole test. ");
-//        RConsole.close();cyg
-//        Button.waitForAnyPress();
-
-        int x = 100/0; // test remote exception dumps
     }
 
-    public static int getExpectedTachoPosAtTimeT(long elapsedTimeMillis, float speedCmSec) {
-        // a = vandret sidelængde top
-        // b = lodret sidelængde nedad (konstant)
-        // c = hypotenusen
 
-        float a = (elapsedTimeMillis / 1000f) * speedCmSec;
-        float b = 50;
-        float c = (float) Math.sqrt(Math.pow(a,2) + Math.pow(b, 2));
-        return cmToTacho(c-b); // we subtract b as we are only interested in the diff
+    //tacho-distance to target
+
+    // Er vi over eller under target lige nu?
+            /*if (currPos <= perfectCurPos) {
+                // We're below or on target
+
+                // Going up or down?
+                if (nextPerfectPos > currPos) {
+                    // We need to go up
+
+                    // are we currently going up?
+                    if (isForward()) {
+                        // Yep, we're currently going up
+
+                        if (m1.getSpeed())
+                    }
+                }
+
+            }
+            else {
+                // We're above
+            }*/
+
+
+
+            /*if (nextPerfectPos > currPos) {
+                int diff = nextPerfectPos-currPos;
+                if (m1.getRotationSpeed() > diff) {
+                    m1.setAcceleration(m1.getRotationSpeed()-diff);
+                    m1.setSpeed(0);
+
+                }
+                else {
+                    m1.setAcceleration(diff-m1.getRotationSpeed());
+                    m1.setSpeed(m1.getMaxSpeed());
+                }
+            }
+            else {
+                int diff = currPos - nextPerfectPos;
+                if (m1.getRotationSpeed() > diff) {
+                    m1.setAcceleration(m1.getRotationSpeed()-diff);
+                    m1.setSpeed(0);
+
+                }
+                else {
+                    m1.setAcceleration(diff-m1.getRotationSpeed());
+                    m1.setSpeed(m1.getMaxSpeed());
+                }
+
+            }*/
+
+    private static void motorForward(NXTRegulatedMotor m) {
+        m.forward();
+        motorDirection = 1;
     }
 
-    public static int cmToTacho(float lengthCm) {
-        double barrelRevs = lengthCm / GPS.wireBarrelCircumference;
-        double motorRevs = barrelRevs * GPS.gearing;
-        int tachoCount = (int) (motorRevs * 360f);
-        return tachoCount;
+    private static void motorBackward(NXTRegulatedMotor m) {
+        m.backward();
+        motorDirection = -1;
     }
+
+    private static void motorFlt(NXTRegulatedMotor m) {
+        m.flt();
+        motorDirection = 0;
+    }
+
+    private static void motorStop(NXTRegulatedMotor m) {
+        m.stop();
+        motorDirection = 0;
+    }
+
+    private static boolean isForward() {
+        return motorDirection == 1;
+    }
+
+    private static boolean isBackward() {
+        return motorDirection == -1;
+    }
+
+
 }
