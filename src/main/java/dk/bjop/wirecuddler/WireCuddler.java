@@ -67,6 +67,8 @@ public class WireCuddler {
 
         doPathTest(m1, path1);
 
+        LCD.clear();
+        LCD.drawString("DONE!!!", 0, 3);
 
         logger.stopLogging();
     }
@@ -76,7 +78,7 @@ public class WireCuddler {
         long startTime = System.currentTimeMillis();
         float speed= 5f;
 
-        int adjustIntervalMillis = 500;
+        int adjustIntervalMillis = 250;
         int lookAheadMillis = 1000;
 
         long errorSum = 0;
@@ -107,7 +109,7 @@ public class WireCuddler {
             float errAdjustWeight = 2.5f;
             float errCorrection = 0;//Math.round(error*errAdjustWeight);
             //Utils.println(""+errCorrection);
-            float multiplier = 1.5f;
+            float multiplier = 1.8f;
 
             if (nextPerfectPos < perfectCurPos) {
                 motorBackward(m);
@@ -144,12 +146,16 @@ public class WireCuddler {
             logger.writeLog(perfectCurPos);
             logger.writeLog(error);
             logger.finishLine();
-            Delay.msDelay(adjustIntervalMillis - (System.currentTimeMillis()-loopTimeStart));
+            long loopTime = System.currentTimeMillis()-loopTimeStart;
+            if (loopTime > adjustIntervalMillis) Utils.println("LOOP FLAW! Lootime exceeded the interval");
+            Delay.msDelay(adjustIntervalMillis - loopTime);
         }
 
         if (path.isMovementFinished(System.currentTimeMillis() - startTime)) {
             Utils.println("Error of the " + obsCount + " observations: " + (errorSum/obsCount));
         }
+
+
 
     }
 
