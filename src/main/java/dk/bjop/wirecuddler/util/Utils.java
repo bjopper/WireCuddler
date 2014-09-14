@@ -8,6 +8,7 @@ import lejos.nxt.comm.RConsole;
  */
 public class Utils {
 
+
     public static int cmToTacho(float lengthCm) {
         double barrelRevs = lengthCm / Constants.wireBarrelCircumference;
         double motorRevs = barrelRevs * Constants.gearing;
@@ -15,9 +16,17 @@ public class Utils {
         return tachoCount;
     }
 
+    public float tachoToCm(int tachoCount) {
+        float motorRevs = tachoCount/360f;
+        float barrelRevs = motorRevs * Constants.gearing;
+        float length = barrelRevs * Constants.wireBarrelCircumference;
+        return length;
+    }
+
     public static void println(String s) {
         if (RConsole.isOpen()) {
             RConsole.println(s);
         }
     }
+
 }

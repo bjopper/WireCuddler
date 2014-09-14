@@ -1,7 +1,5 @@
 package dk.bjop.wirecuddler;
 
-import dk.bjop.wirecuddler.util.Utils;
-
 /**
  * Created by bpeterse on 10-09-2014.
  *
@@ -29,7 +27,7 @@ public class MovementPathSinusImpl implements MovementPath {
         }
 
         long adjustedTime = elapsedTimeMillis - initialRaiseTime*1000;
-        return (int) (Math.sin(Math.toRadians((adjustedTime * speed)/1000)) * scale) + (int)scale;
+        return (int) (Math.sin(Math.toRadians((adjustedTime * speed)/1000f)) * scale) + (int)scale;
     }
 
     @Override

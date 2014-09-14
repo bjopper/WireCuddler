@@ -26,8 +26,8 @@ public class MovementPathSinus2Impl implements MovementPath {
         }
 
         long adjustedTime = elapsedTimeMillis - initialRaiseTime*1000;
-        int newSpeed= speed + (int)(adjustedTime/4000);
-        return (int) (Math.sin(Math.toRadians((adjustedTime * newSpeed)/1000)) * scale) + (int)scale;
+        int newSpeed= speed + (int)(adjustedTime/4000f);
+        return (int) (Math.sin(Math.toRadians((adjustedTime * newSpeed)/1000f)) * scale) + (int)scale;
     }
 
     @Override

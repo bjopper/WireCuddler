@@ -1,7 +1,6 @@
 package dk.bjop.wirecuddler;
 
 import dk.bjop.wirecuddler.util.Constants;
-import lejos.addon.gps.GPSListener;
 import lejos.nxt.MotorPort;
 import lejos.nxt.NXTRegulatedMotor;
 

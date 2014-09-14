@@ -23,7 +23,7 @@ dependencies {
 
 task hello {
     doLast {
-        println 'Hello world!'
+        println 'Building and uploading NXT Wirecuddler...'
     }
 }
 
