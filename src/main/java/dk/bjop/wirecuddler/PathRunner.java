@@ -91,7 +91,7 @@ public class PathRunner extends Thread{
         long pathMoveStarttime = System.currentTimeMillis();
 
         while (!Button.ESCAPE.isDown() && !path.isMovementFinished(System.currentTimeMillis() - pathMoveStarttime)) {
-
+            long loopTimeStart = System.currentTimeMillis();
 
             if (!speedIsSet) {
                 m.setAcceleration(0);
@@ -154,7 +154,7 @@ public class PathRunner extends Thread{
             logger.writeLog(error);
             logger.finishLine();
 
-            long loopTime = System.currentTimeMillis()-pathMoveStarttime;
+            long loopTime = System.currentTimeMillis()-loopTimeStart;
             if (loopTime > adjustIntervalMillis) Utils.println("LOOP FLAW! Looptime exceeded the interval");
             sleepx(adjustIntervalMillis - loopTime);
         }
