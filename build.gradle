@@ -21,14 +21,14 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-task hello {
+task init {
     doLast {
         println 'Building and uploading NXT Wirecuddler...'
     }
 }
 
 
-task nxjCompile(dependsOn: hello) << {
+task nxjCompile(dependsOn: init) << {
     new File('build/').mkdir()
     def filelist = ""
     FileTree tree = fileTree(dir: 'src', include: '**/*.java', exclude: '**/*test*/**')

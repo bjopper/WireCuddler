@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.motor;
 
 import dk.bjop.wirecuddler.util.Utils;
 import lejos.nxt.Button;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /**
  * Created by bpeterse on 13-09-2014.
  */
-public class PathRunner extends Thread{
+public class MotorPathController extends Thread{
 
     static NXTDataLogger logger = new NXTDataLogger();
     static LogColumn m1Tacho = new LogColumn("M1 tacho count", LogColumn.DT_INTEGER);
@@ -33,13 +33,13 @@ public class PathRunner extends Thread{
     int lookAheadMillis = 1000; // TODO Increase this to ~1100+ when we have to perform very quick accelerations/decellerations - we need an algorithm to do this automatically!
     float accMultiplier = 1.8f;
 
-    ArrayList<MovementPath> pathList = new ArrayList<MovementPath>();
+    ArrayList<MotorPath> pathList = new ArrayList<MotorPath>();
 
-    public PathRunner(NXTRegulatedMotor m) {
+    public MotorPathController(NXTRegulatedMotor m) {
         this.m=m;
     }
 
-    public void addMovementPath(MovementPath mp) {
+    public void addMovementPath(MotorPath mp) {
        pathList.add(mp);
     }
 
@@ -80,7 +80,7 @@ public class PathRunner extends Thread{
         Utils.println("PathRunner ending...");
     }
 
-    private void followPath(MovementPath path) {
+    private void followPath(MotorPath path) {
 
         // We track an SSE-like error of each move
         long errorSum = 0;

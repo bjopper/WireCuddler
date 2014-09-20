@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.motor;
 
 /**
  * Created by bpeterse on 10-09-2014.
@@ -6,16 +6,16 @@ package dk.bjop.wirecuddler;
  * Std sine-curve
  * A speed of 12 is good.
  */
-public class MovementPathSinus3Impl implements MovementPath {
+public class MotorPathSinus3Impl implements MotorPath {
 
     double speed = 12; //Degrees pr second
     double scale = 700;
     int initialRaiseTime = 5; // sec
     long moveTimeSec = 60;
 
-    public MovementPathSinus3Impl() {}
+    public MotorPathSinus3Impl() {}
 
-    public MovementPathSinus3Impl(int speedDegSec) {
+    public MotorPathSinus3Impl(int speedDegSec) {
         this.speed = speedDegSec;
     }
 

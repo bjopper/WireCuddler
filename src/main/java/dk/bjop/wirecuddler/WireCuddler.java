@@ -1,5 +1,6 @@
 package dk.bjop.wirecuddler;
 
+import dk.bjop.wirecuddler.motor.*;
 import dk.bjop.wirecuddler.util.Utils;
 import lejos.nxt.*;
 import java.io.IOException;
@@ -33,13 +34,13 @@ public class WireCuddler {
         //MovementPath path1 = new MovementPathSinus2Impl();
 
 
-        PathRunner pr = new PathRunner(new NXTRegulatedMotor(MotorPort.A));
-        pr.addMovementPath(new MovementPathImpl());
-        pr.addMovementPath(new MovementPathSinusImpl(10));
-        pr.addMovementPath(new MovementPathSinus3Impl(24));
-        pr.addMovementPath(new MovementPathSinusImpl(40));
-        pr.addMovementPath(new MovementPathSinus3Impl(60));
-        pr.addMovementPath(new MovementPathSinus2Impl());
+        MotorPathController pr = new MotorPathController(new NXTRegulatedMotor(MotorPort.A));
+        pr.addMovementPath(new MotorPathImpl());
+        pr.addMovementPath(new MotorPathSinusImpl(10));
+        pr.addMovementPath(new MotorPathSinus3Impl(24));
+        pr.addMovementPath(new MotorPathSinusImpl(40));
+        pr.addMovementPath(new MotorPathSinus3Impl(60));
+        pr.addMovementPath(new MotorPathSinus2Impl());
         pr.start();
         pr.join();
 

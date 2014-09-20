@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.motor;
 
 import lejos.nxt.NXTRegulatedMotor;
 
@@ -10,7 +10,12 @@ public class MotorSyncController {
     NXTRegulatedMotor m2;
     NXTRegulatedMotor m3;
 
-    public MotorSyncController() {
+    MotorPathController p1;
+    MotorPathController p2;
+    MotorPathController p3;
+
+
+    public MotorSyncController(NXTRegulatedMotor... motors) {
 
     }
 }

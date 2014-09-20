@@ -1,9 +1,9 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.motor;
 
 /**
  * Created by bpeterse on 10-09-2014.
  */
-public interface MovementPath {
+public interface MotorPath {
     public int getExpectedTachoPosAtTimeT(long elapsedTimeMillis, float speedCmSec);
     public boolean isMovementFinished(long elapsedTimeMillis);
 }

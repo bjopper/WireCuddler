@@ -1,11 +1,11 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.motor;
 
 import dk.bjop.wirecuddler.util.Utils;
 
 /**
  * Created by bpeterse on 10-09-2014.
  */
-public class MovementPathImpl implements MovementPath {
+public class MotorPathImpl implements MotorPath {
 
     long moveTimeSec = 20;
 
