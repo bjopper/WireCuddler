@@ -11,6 +11,7 @@ import lejos.util.LogColumn;
 import lejos.util.NXTDataLogger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by bpeterse on 13-09-2014.
@@ -26,17 +27,20 @@ public class PathRunner extends Thread{
     NXTRegulatedMotor m;
 
     float speed= 5f;
+
+    // The 3 params below are central to tuning the ability to follow a line precisely. Espceially the latter two !
     int adjustIntervalMillis = 250;
     int lookAheadMillis = 1000; // TODO Increase this to ~1100+ when we have to perform very quick accelerations/decellerations - we need an algorithm to do this automatically!
+    float accMultiplier = 1.8f;
 
-    MovementPath path = null;
+    ArrayList<MovementPath> pathList = new ArrayList<MovementPath>();
 
     public PathRunner(NXTRegulatedMotor m) {
         this.m=m;
     }
 
-    public void setMovementPath(MovementPath mp) {
-        this.path=mp;
+    public void addMovementPath(MovementPath mp) {
+       pathList.add(mp);
     }
 
     public void run() {
@@ -61,20 +65,15 @@ public class PathRunner extends Thread{
         LCD.drawString("dark gray ESCAPE", 0, 6);
         LCD.drawString("button to stop.", 0, 7);
 
-        while (!Button.ESCAPE.isDown()) {
-            long loopTimeStart = System.currentTimeMillis();
+        while (!Button.ESCAPE.isDown() && !pathList.isEmpty()) {
 
             // Before each new path we reset motor state
             m.setAcceleration(0);
             m.setSpeed(m.getMaxSpeed());
             m.forward();
+            m.resetTachoCount();
 
-            if (path != null) {
-                MovementPath p = path;
-                path = null;
-                followPath(p);
-            }
-            else break;
+            followPath(pathList.remove(0));
         }
 
         logger.stopLogging();
@@ -82,7 +81,6 @@ public class PathRunner extends Thread{
     }
 
     private void followPath(MovementPath path) {
-        boolean speedIsSet = false;
 
         // We track an SSE-like error of each move
         long errorSum = 0;
@@ -90,17 +88,11 @@ public class PathRunner extends Thread{
 
         long pathMoveStarttime = System.currentTimeMillis();
 
+        m.setAcceleration(0);
+        m.setSpeed(0);
+
         while (!Button.ESCAPE.isDown() && !path.isMovementFinished(System.currentTimeMillis() - pathMoveStarttime)) {
             long loopTimeStart = System.currentTimeMillis();
-
-            if (!speedIsSet) {
-                m.setAcceleration(0);
-                m.setSpeed(m.getMaxSpeed());
-                m.forward();
-                speedIsSet=true;
-            }
-
-            int curAcc = m.getAcceleration();
 
             int nextPerfectPos = path.getExpectedTachoPosAtTimeT((System.currentTimeMillis() - pathMoveStarttime) + lookAheadMillis, speed);
             int currPos = m.getTachoCount();
@@ -110,44 +102,51 @@ public class PathRunner extends Thread{
             errorSum += Math.pow(Math.max(perfectCurPos, currPos) - Math.min(perfectCurPos, currPos),2);
             obsCount++;
 
-            // NOTE!!! When setting the acceleration I do not time into account, but relies on the fact that acc is deg/s/s
-
-
             float errAdjustWeight = 2.5f;
             float errCorrection = 0;//Math.round(error*errAdjustWeight);
             //Utils.println(""+errCorrection);
-            float multiplier = 1.8f;
 
+            int diff = 0;
+            int acc = 0;
             if (nextPerfectPos < perfectCurPos) {
                 m.backward();
 
-                int diff = nextPerfectPos-currPos;
+                diff = nextPerfectPos-currPos;
                 if (m.getRotationSpeed() < diff) {
                     //Utils.println("BACKWARD: Setting speed to ZERO! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
-                    m.setAcceleration(Math.round(((m.getRotationSpeed()-diff )*multiplier)+errCorrection));
+                    acc = Math.round(((m.getRotationSpeed()-diff )*accMultiplier)+errCorrection);
+                    m.setAcceleration(acc);
                     m.setSpeed(1);
                 }
                 else {
                     //Utils.println("BACKWARD: Setting speed to MAX! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
-                    m.setAcceleration(Math.round(((diff-m.getRotationSpeed())*multiplier)+errCorrection));
+                    acc = Math.round(((diff-m.getRotationSpeed())*accMultiplier)+errCorrection);
+                    m.setAcceleration(acc);
                     m.setSpeed(m.getMaxSpeed());
                 }
             }
             else {
                 m.forward();
 
-                int diff = nextPerfectPos-currPos;
+                diff = nextPerfectPos-currPos;
                 if (m.getRotationSpeed() > diff) {
                     //Utils.println("FORWARD: Setting speed to ZERO! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
-                    m.setAcceleration(Math.round(((m.getRotationSpeed()-diff)*multiplier)+errCorrection));
+                    acc = Math.round(((m.getRotationSpeed()-diff)*accMultiplier)+errCorrection);
+                    m.setAcceleration(acc);
                     m.setSpeed(1);
                 }
                 else {
                     //Utils.println("FORWARD: Setting speed to MAX! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
-                    m.setAcceleration(Math.round(((diff-m.getRotationSpeed())*multiplier)+errCorrection));
+                    acc = Math.round(((diff-m.getRotationSpeed())*accMultiplier)+errCorrection);
+                    m.setAcceleration(acc);
                     m.setSpeed(m.getMaxSpeed());
                 }
             }
+
+            //Utils.println("DIFF: " + diff + "  ACC: " + acc + "  ERR: "+error+"  SPEED: " + m.getRotationSpeed());
+
+            lookAheadMillis = 1000 + Math.abs(acc)/4;
+
 
             logger.writeLog(m.getTachoCount());
             logger.writeLog(perfectCurPos);
@@ -159,6 +158,8 @@ public class PathRunner extends Thread{
             sleepx(adjustIntervalMillis - loopTime);
         }
 
+        m.setAcceleration(100);
+        m.setSpeed(0);
         m.stop();
         m.flt();
         m.resetTachoCount();
