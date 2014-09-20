@@ -16,6 +16,6 @@ public class MotorSyncController {
 
 
     public MotorSyncController(NXTRegulatedMotor... motors) {
-
+      //  p1 = new MotorPathController()
     }
 }
