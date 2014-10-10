@@ -21,8 +21,10 @@ public class TriangleMeasurer implements SwitchListener{
     static final int SWITCH_1 = 1;
     static final int SWITCH_2 = 2;
 
-    int acc = 50;
-    float speed = 150;
+    int acc = 100;
+    float speed = 250;
+
+    boolean forward = true;
 
     public TriangleMeasurer() {
 
@@ -57,9 +59,10 @@ public class TriangleMeasurer implements SwitchListener{
     @Override
     public void switchPressed(int switchID) {
         if (switchID == SWITCH_1) {
-            m1.stop();
-            m2.stop();
-            m3.stop();
+            m1.flt();
+            m2.flt();
+            m3.flt();
+            forward = !forward;
         }
 
 
@@ -79,7 +82,8 @@ public class TriangleMeasurer implements SwitchListener{
 
             motors[motorIndex].setAcceleration(acc);
             motors[motorIndex].setSpeed(speed);
-            motors[motorIndex].forward();
+            if (forward) motors[motorIndex].forward();
+            else motors[motorIndex].backward();
 
         }
     }
