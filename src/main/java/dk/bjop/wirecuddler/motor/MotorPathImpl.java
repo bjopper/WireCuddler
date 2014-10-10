@@ -8,9 +8,10 @@ import dk.bjop.wirecuddler.util.Utils;
 public class MotorPathImpl implements MotorPath {
 
     long moveTimeSec = 20;
+    float speedCmSec = 5;
 
     @Override
-    public int getExpectedTachoPosAtTimeT(long elapsedTimeMillis, float speedCmSec) {
+    public int getExpectedTachoPosAtTimeT(long elapsedTimeMillis, int controllerID) {
         // a = vandret sidelængde top
         // b = lodret sidelængde nedad (konstant)
         // c = hypotenusen

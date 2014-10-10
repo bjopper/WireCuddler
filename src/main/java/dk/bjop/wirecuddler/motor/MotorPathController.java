@@ -18,11 +18,10 @@ import java.util.ArrayList;
  */
 public class MotorPathController extends Thread{
 
-    static NXTDataLogger logger = new NXTDataLogger();
-    static LogColumn m1Tacho = new LogColumn("M1 tacho count", LogColumn.DT_INTEGER);
-    static LogColumn function = new LogColumn("Perfect math", LogColumn.DT_INTEGER);
-    static LogColumn error = new LogColumn("xxx", LogColumn.DT_INTEGER);
-    static LogColumn[] columnDefs = new LogColumn[] { m1Tacho, function, error };
+
+    int id; // 1,2 or 3 - one for each motor
+
+
 
     NXTRegulatedMotor m;
 
@@ -35,7 +34,8 @@ public class MotorPathController extends Thread{
 
     ArrayList<MotorPath> pathList = new ArrayList<MotorPath>();
 
-    public MotorPathController(NXTRegulatedMotor m) {
+    public MotorPathController(NXTRegulatedMotor m, int id) {
+        this.id = id;
         this.m=m;
     }
 
@@ -44,26 +44,7 @@ public class MotorPathController extends Thread{
     }
 
     public void run() {
-        LCD.drawString("Waiting for ", 0, 2);
-        LCD.drawString("bluetooth con to", 0, 3);
-        LCD.drawString("PC to log data.", 0, 4);
-        LCD.drawString("Launch NXT Chart", 0, 5);
-        LCD.drawString("Logger & click", 0, 6);
-        LCD.drawString("the Connect btn.", 0, 7);
-        NXTConnection connection = Bluetooth.waitForConnection();
-        try {
-            logger.startRealtimeLog(connection);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        logger.setColumns(columnDefs);  // must be after startRealtimeLog()
 
-        Sound.beep();
-
-        LCD.clear();
-        LCD.drawString("Press and hold", 0, 5);
-        LCD.drawString("dark gray ESCAPE", 0, 6);
-        LCD.drawString("button to stop.", 0, 7);
 
         while (!Button.ESCAPE.isDown() && !pathList.isEmpty()) {
 
@@ -76,8 +57,8 @@ public class MotorPathController extends Thread{
             followPath(pathList.remove(0));
         }
 
-        logger.stopLogging();
-        Utils.println("PathRunner ending...");
+
+        println("PathRunner ending...");
     }
 
     private void followPath(MotorPath path) {
@@ -94,9 +75,9 @@ public class MotorPathController extends Thread{
         while (!Button.ESCAPE.isDown() && !path.isMovementFinished(System.currentTimeMillis() - pathMoveStarttime)) {
             long loopTimeStart = System.currentTimeMillis();
 
-            int nextPerfectPos = path.getExpectedTachoPosAtTimeT((System.currentTimeMillis() - pathMoveStarttime) + lookAheadMillis, speed);
+            int nextPerfectPos = path.getExpectedTachoPosAtTimeT((System.currentTimeMillis() - pathMoveStarttime) + lookAheadMillis, getControllerID());
             int currPos = m.getTachoCount();
-            int perfectCurPos = path.getExpectedTachoPosAtTimeT(System.currentTimeMillis() - pathMoveStarttime, speed);
+            int perfectCurPos = path.getExpectedTachoPosAtTimeT(System.currentTimeMillis() - pathMoveStarttime, getControllerID());
             int error = perfectCurPos - currPos;
 
             errorSum += Math.pow(Math.max(perfectCurPos, currPos) - Math.min(perfectCurPos, currPos),2);
@@ -104,7 +85,7 @@ public class MotorPathController extends Thread{
 
             float errAdjustWeight = 2.5f;
             float errCorrection = 0;//Math.round(error*errAdjustWeight);
-            //Utils.println(""+errCorrection);
+            //println(""+errCorrection);
 
             int diff = 0;
             int acc = 0;
@@ -113,13 +94,13 @@ public class MotorPathController extends Thread{
 
                 diff = nextPerfectPos-currPos;
                 if (m.getRotationSpeed() < diff) {
-                    //Utils.println("BACKWARD: Setting speed to ZERO! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
+                    //println("BACKWARD: Setting speed to ZERO! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
                     acc = Math.round(((m.getRotationSpeed()-diff )*accMultiplier)+errCorrection);
                     m.setAcceleration(acc);
                     m.setSpeed(1);
                 }
                 else {
-                    //Utils.println("BACKWARD: Setting speed to MAX! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
+                    //println("BACKWARD: Setting speed to MAX! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
                     acc = Math.round(((diff-m.getRotationSpeed())*accMultiplier)+errCorrection);
                     m.setAcceleration(acc);
                     m.setSpeed(m.getMaxSpeed());
@@ -130,31 +111,32 @@ public class MotorPathController extends Thread{
 
                 diff = nextPerfectPos-currPos;
                 if (m.getRotationSpeed() > diff) {
-                    //Utils.println("FORWARD: Setting speed to ZERO! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
+                    //println("FORWARD: Setting speed to ZERO! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
                     acc = Math.round(((m.getRotationSpeed()-diff)*accMultiplier)+errCorrection);
                     m.setAcceleration(acc);
                     m.setSpeed(1);
                 }
                 else {
-                    //Utils.println("FORWARD: Setting speed to MAX! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
+                    //println("FORWARD: Setting speed to MAX! (RS: " +m1.getRotationSpeed()+" DIFF: " + diff + " ACC: " + (diff-m1.getRotationSpeed()) + ")");
                     acc = Math.round(((diff-m.getRotationSpeed())*accMultiplier)+errCorrection);
                     m.setAcceleration(acc);
                     m.setSpeed(m.getMaxSpeed());
                 }
             }
 
-            //Utils.println("DIFF: " + diff + "  ACC: " + acc + "  ERR: "+error+"  SPEED: " + m.getRotationSpeed());
+            //println("DIFF: " + diff + "  ACC: " + acc + "  ERR: "+error+"  SPEED: " + m.getRotationSpeed());
 
             lookAheadMillis = 1000 + Math.abs(acc)/4;
 
 
-            logger.writeLog(m.getTachoCount());
+            /*logger.writeLog(m.getTachoCount());
             logger.writeLog(perfectCurPos);
             logger.writeLog(error);
-            logger.finishLine();
+            logger.finishLine();*/
+            MotorSyncController.log(getControllerID(), m.getTachoCount(), perfectCurPos, error);
 
             long loopTime = System.currentTimeMillis()-loopTimeStart;
-            if (loopTime > adjustIntervalMillis) Utils.println("LOOP FLAW! Looptime exceeded the interval");
+            if (loopTime > adjustIntervalMillis) println("LOOP FLAW! Looptime exceeded the interval");
             sleepx(adjustIntervalMillis - loopTime);
         }
 
@@ -165,8 +147,12 @@ public class MotorPathController extends Thread{
         m.resetTachoCount();
 
         if (path.isMovementFinished(System.currentTimeMillis() - pathMoveStarttime)) {
-            Utils.println("Error of the " + obsCount + " observations: " + (errorSum/obsCount));
+            println("Error of the " + obsCount + " observations: " + (errorSum/obsCount));
         }
+    }
+
+    public int getControllerID() {
+        return id;
     }
 
     private void sleepx(long sleeptime)  {
@@ -176,4 +162,8 @@ public class MotorPathController extends Thread{
             e.printStackTrace();
         }
     }
+    
+    public void println(String s) {
+        println("["+getControllerID()+"] "+s);
+    } 
 }

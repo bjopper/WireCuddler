@@ -19,7 +19,7 @@ public class MotorPathSinus2Impl implements MotorPath {
     }
 
     @Override
-    public int getExpectedTachoPosAtTimeT(long elapsedTimeMillis, float speedCmSec) {
+    public int getExpectedTachoPosAtTimeT(long elapsedTimeMillis, int controllerID) {
         if (elapsedTimeMillis < initialRaiseTime*1000) {
             double increment = scale / (double)initialRaiseTime;
             return (int)Math.round(increment * (elapsedTimeMillis/1000f));

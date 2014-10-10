@@ -1,5 +1,6 @@
 package dk.bjop.wirecuddler;
 
+import dk.bjop.wirecuddler.calibration.TriangleMeasurer;
 import dk.bjop.wirecuddler.motor.*;
 import dk.bjop.wirecuddler.util.Utils;
 import lejos.nxt.*;
@@ -34,15 +35,25 @@ public class WireCuddler {
         //MovementPath path1 = new MovementPathSinus2Impl();
 
 
-        MotorPathController pr = new MotorPathController(new NXTRegulatedMotor(MotorPort.A));
-        pr.addMovementPath(new MotorPathImpl());
+        //MotorPathController p1 = new MotorPathController(new NXTRegulatedMotor(MotorPort.A), 1);
+        //MotorPathController p2 = new MotorPathController(new NXTRegulatedMotor(MotorPort.B), 2);
+
+        //MotorSyncController syncController = new MotorSyncController(p1, p2);
+        //syncController.go();
+
+        TriangleMeasurer t = new TriangleMeasurer();
+        t.measure();
+        Thread.sleep(120000);
+
+
+       /* pr.addMovementPath(new MotorPathImpl());
         pr.addMovementPath(new MotorPathSinusImpl(10));
         pr.addMovementPath(new MotorPathSinus3Impl(24));
         pr.addMovementPath(new MotorPathSinusImpl(40));
         pr.addMovementPath(new MotorPathSinus3Impl(60));
         pr.addMovementPath(new MotorPathSinus2Impl());
         pr.start();
-        pr.join();
+        pr.join();*/
 
         Utils.println("Main program done...");
         LCD.clear();
