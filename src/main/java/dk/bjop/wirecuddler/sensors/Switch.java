@@ -1,5 +1,6 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.sensors;
 
+import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
 
@@ -31,11 +32,12 @@ public class Switch extends Thread {
             listeners.remove(listener);
     }
 
+
     public void run() {
         boolean pressed = false;
 
 
-        while (true) {
+        while (!Button.ESCAPE.isDown()) {
 
             if (ts.isPressed()) {
                 if (!pressed) {

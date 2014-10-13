@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.sensors;
 
 /**
  * Created by bpeterse on 09-10-2014.

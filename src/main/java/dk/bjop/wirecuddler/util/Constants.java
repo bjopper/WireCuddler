@@ -8,12 +8,19 @@ public class Constants {
     public static final double wireBarrelCircumference =5.1d; // in CM
     public static final int gearing =3; // 1:3
 
-    // Basic measurements. Should be obtained from calibration
-    public static double p1p2distCm = 190;
-    public static double p1p3distCm = 140;
-    public static double p2p3distCm = 190;
-    public static double p1p2heightDiffCm = 0;
-    public static double p1p3heightDiffCm = 0;
+    // Basic measurements and settings.
+    // TODO Should be obtained from calibration where possible....
+    // Given these we can compute the geometry of the triangular area the three points span.
+    public static double p1p2distCm = 196;
+    public static double p1p3distCm = 144;
+    public static double p2p3distCm = 196;
+    public static final double p1p2heightDiffCm = 0;
+    public static final double p1p3heightDiffCm = 0;
+    public static final int restPoint = 1; // The point at which we rest the CuddlePoint when cuddler is off. ATTENTION! The restpoint must have a trigger associated with it!!!!
+    public static final int[] baseLine = new int[]{2,3}; // First point is origo. Second point is located on positive part of x-axis
+    public static final int[] overloadProtectedMotors = new int[]{1,2}; // These motors have sensors that protect from tension overloading
+
+
 
     public static final XYZCoord[] trianglePoints;
 

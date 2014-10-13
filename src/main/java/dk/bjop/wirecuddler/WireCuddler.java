@@ -42,8 +42,9 @@ public class WireCuddler {
         //syncController.go();
 
         TriangleMeasurer t = new TriangleMeasurer();
-        t.measure();
-        Thread.sleep(120000);
+       // t.start();
+        t.moveToRestPoint();
+        //t.join();
 
 
        /* pr.addMovementPath(new MotorPathImpl());
