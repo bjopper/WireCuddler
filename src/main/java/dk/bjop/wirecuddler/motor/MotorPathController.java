@@ -1,16 +1,7 @@
 package dk.bjop.wirecuddler.motor;
 
-import dk.bjop.wirecuddler.util.Utils;
 import lejos.nxt.Button;
-import lejos.nxt.LCD;
-import lejos.nxt.NXTRegulatedMotor;
-import lejos.nxt.Sound;
-import lejos.nxt.comm.Bluetooth;
-import lejos.nxt.comm.NXTConnection;
-import lejos.util.LogColumn;
-import lejos.util.NXTDataLogger;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -23,7 +14,7 @@ public class MotorPathController extends Thread{
 
 
 
-    NXTRegulatedMotor m;
+    NXTCuddleMotor m;
 
     float speed= 5f;
 
@@ -34,7 +25,7 @@ public class MotorPathController extends Thread{
 
     ArrayList<MotorPath> pathList = new ArrayList<MotorPath>();
 
-    public MotorPathController(NXTRegulatedMotor m, int id) {
+    public MotorPathController(NXTCuddleMotor m, int id) {
         this.id = id;
         this.m=m;
     }

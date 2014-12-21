@@ -9,18 +9,20 @@ import lejos.nxt.comm.RConsole;
 public class Utils {
 
 
-    public static int cmToTacho(float lengthCm) {
-        double barrelRevs = lengthCm / Constants.wireBarrelCircumference;
+    public static int cmToTacho(double lengthCm) {
+        /*double barrelRevs = lengthCm / Constants.wireBarrelCircumference;
         double motorRevs = barrelRevs * Constants.gearing;
         int tachoCount = (int) (motorRevs * 360f);
-        return tachoCount;
+        return tachoCount;*/
+        return (int) Math.round(lengthCm * Constants.tachosPrCm);
     }
 
-    public double tachoToCm(int tachoCount) {
-        double motorRevs = tachoCount/360f;
+    public static double tachoToCm(int tachoCount) {
+        /*double motorRevs = tachoCount/360f;
         double barrelRevs = motorRevs * Constants.gearing;
         double length = barrelRevs * Constants.wireBarrelCircumference;
-        return length;
+        return length;*/
+        return tachoCount * Constants.cmPrTacho;
     }
 
     public static void println(String s) {
@@ -95,5 +97,32 @@ public class Utils {
         return new XYZCoord[] { new XYZCoord(0, 0, 0),
                 new XYZCoord(Math.cos(Math.toRadians(p1AngleDeg))*p1p2distXcm, p1p2heightDiffCm, Math.sin(Math.toRadians(p1AngleDeg))*p1p2distXcm),
                 new XYZCoord(p1p3distXcm, p1p3heightDiffCm, 0)};
+    }
+
+    /*
+    The wires hanging down below the x-axis from p1 and p3 form a triangle. This is where we start finding the coordinates
+    We denote the line between p1 and p3: a
+    We denote the line hanging down from  p1, b
+    We denote the line hanging down from p3, c
+    We denote the angle between x-axis at p1 and the line hanging down from p1, A
+    We denote the angle between x-axis at p3 and the line hanging down from p3, C
+    We denote the angle between the lines hanging down from p1 and p3, B
+
+    All lengths of the triangle are known
+     */
+    public void tachoesToCartesian(int[] t) {
+        int t1 = t[0];  // origo
+        int t2 = t[1];
+        int t3 = t[2];  // on x-axis
+
+        // Use cosine relation to find angles...
+        double A = -1;
+        double B = -1;
+        double C = -1;
+
+        // b=c*cos(A)
+        // First we find the X-coordinate
+
+
     }
 }

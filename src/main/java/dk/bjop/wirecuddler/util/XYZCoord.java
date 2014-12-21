@@ -15,4 +15,8 @@ public class XYZCoord {
         this.z = z;
     }
 
+    public String toString() {
+        return "(X, Y, Z) = ("+x+", "+y+", "+z+")";
+    }
+
 }
