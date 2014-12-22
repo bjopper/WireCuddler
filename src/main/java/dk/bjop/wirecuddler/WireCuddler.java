@@ -106,7 +106,7 @@ public class WireCuddler {
         double m3WireLength = Utils.tachoToCm(m3t);  // a
 
         // Cosine relation... (Ref: http://da.wikipedia.org/wiki/Cosinusrelation) + http://www.studieportalen.dk/kompendier/matematik/formelsamling/trigonometri/begreber/hoejde-grundlinje
-        double angleAtM1 = Math.toDegrees(Math.acos( (m1m3Dist*m1m3Dist + m1wireLength*m1wireLength - m3WireLength*m3WireLength) / (2*m1m3Dist*m1wireLength) ));  // A
+        double angleAtM1 = Math.toDegrees(Math.acos((m1m3Dist * m1m3Dist + m1wireLength * m1wireLength - m3WireLength * m3WireLength) / (2 * m1m3Dist * m1wireLength)));  // A
 
 
         Utils.println("X-infer: Angle is: " + angleAtM1);
@@ -143,10 +143,14 @@ public class WireCuddler {
         double triangleHeight2 = m2wireLength * Math.sin(Math.toRadians(angleAtM3)); // d or hb (height from b)
         double p2p3pos = m2wireLength * Math.sin(Math.toRadians(90 - angleAtM3));
 
+        Utils.println("p2p3pos: " + p2p3pos);
         // Coordinates of the point between p2 and p3
 
         // z-coord and x-coord
         double z = p2p3pos * Math.sin(Math.toRadians(p3AngleDeg));
+
+        Utils.println("z: " + z);
+
         double x = trianglePoints[2].x - ( p2p3pos * Math.sin(Math.toRadians(90-p3AngleDeg)));
 
         Utils.println("Plane coords of point on the line between p2 and p3: (x, z) = (" + x + ", " + z + ")");
@@ -156,7 +160,7 @@ public class WireCuddler {
 
         double xDiff = x - p1p3pos;
         Utils.println("xDiff: " + xDiff);
-        double finalZ = z - (xDiff * orthoSlope);
+        double finalZ = z + (xDiff * orthoSlope);   // TODO check this!!!!
         Utils.println("finalZ: " + finalZ);
 
         Utils.println("------------------------------ Height at intersecion point -----------------------------------------");
@@ -166,21 +170,29 @@ public class WireCuddler {
         Utils.println("Dist to intersect point: " +distToIntersectPoint);
 
 
-        double heightAtPoint = Math.sqrt ( Utils.tachoToCm(tachos[0])*Utils.tachoToCm(tachos[0]) - distToIntersectPoint*distToIntersectPoint );
+        double heightAtPoint = Math.sqrt(Utils.tachoToCm(tachos[0]) * Utils.tachoToCm(tachos[0]) - distToIntersectPoint * distToIntersectPoint);
 
         XYZCoord pos = new XYZCoord(p1p3pos, heightAtPoint, finalZ);
         Utils.println(pos.toString());
 
-        Utils.println("--------------------- DONE -----------------------------");
+        Utils.println("--------------------- DONE - reversing -----------------------------");
+
+        double[] rev = new double[3];
+
+        rev[0] = Math.sqrt( pos.x*pos.x + pos.y*pos.y + pos.z*pos.z );
+
+        double xd2 = pos.x - trianglePoints[1].x;
+        double zd2 = pos.z - trianglePoints[1].z;
+        rev[1] = Math.sqrt( xd2*xd2 + pos.y*pos.y + zd2*zd2 );
+
+        double xd3 = pos.x - trianglePoints[2].x;
+        rev[2] = Math.sqrt( xd3*xd3 + pos.y*pos.y + pos.z*pos.z );
 
 
-
-
-
-
-
-
-
+        Utils.println("Converting the pos found back to tacho-array...");
+        for (int i=0;i<rev.length;i++) {
+            Utils.println("p" + (i+1) + " wire tacho: " + Utils.cmToTacho(rev[i]) + " (" + rev[i] + " cm)");
+        }
 
 
 

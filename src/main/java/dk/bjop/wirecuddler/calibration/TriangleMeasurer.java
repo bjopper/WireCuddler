@@ -1,5 +1,7 @@
 package dk.bjop.wirecuddler.calibration;
 
+import dk.bjop.wirecuddler.motor.MotorGroup;
+import dk.bjop.wirecuddler.motor.NXTCuddleMotor;
 import dk.bjop.wirecuddler.sensors.SwitchListener;
 import dk.bjop.wirecuddler.util.Utils;
 import lejos.nxt.*;
@@ -9,17 +11,17 @@ import lejos.nxt.*;
  */
 public class TriangleMeasurer extends Thread implements SwitchListener{
 
-    NXTRegulatedMotor m1;
-    NXTRegulatedMotor m2;
-    NXTRegulatedMotor m3;
-    NXTRegulatedMotor[] motors;
+    NXTCuddleMotor m1;
+    NXTCuddleMotor m2;
+    NXTCuddleMotor m3;
+    //NXTCuddleMotor[] motors;
     int motorIndex = 0;
     int motorToTuneIndex = 0;
 
     static final int SWITCH_1 = 1;
     static final int SWITCH_2 = 2;
     TouchSensor ts1 = new TouchSensor(SensorPort.S1);
-    TouchSensor ts2 = new TouchSensor(SensorPort.S2);
+   // TouchSensor ts2 = new TouchSensor(SensorPort.S2);
 
     int acc = 50;
     float speed = 100;
@@ -28,19 +30,17 @@ public class TriangleMeasurer extends Thread implements SwitchListener{
 
     public TriangleMeasurer() {}
 
-    public void moveToRestPoint() {
+    public void moveToRestPoint(MotorGroup mgrp) {
 
-        m1 = new NXTRegulatedMotor(MotorPort.A);
-        m2 = new NXTRegulatedMotor(MotorPort.B);
-        m3 = new NXTRegulatedMotor(MotorPort.C);
-        motors = new NXTRegulatedMotor[]{m1, m2, m3};
 
-        m1.setSpeed(500);
-        m1.rotate(-10000);
-        m2.rotate(2000);
-        m3.rotate(2000);
 
-        initializeMotors();
+       /* m1.setSpeed(200);
+        m1.rotate(5000);
+        m2.rotate(-700);
+        m3.rotate(-700);*/
+
+        mgrp.setAccelerationForAll(acc);
+        mgrp.setSpeedForAll(speed);
 
 
 
@@ -53,47 +53,127 @@ public class TriangleMeasurer extends Thread implements SwitchListener{
 
         boolean targetReached = false;
         boolean wireToggler = true;
+        boolean sensorFirstActivation = true;
 
         while (!Button.ESCAPE.isDown() && !targetReached) {
 
             // Start roll-in on some motor
-            NXTRegulatedMotor tuneMotor = m1;//getMotorToTune();
-            tuneMotor.forward();
+            //NXTCuddleMotor tuneMotor = m1;//getMotorToTune();
+            m1.backward();
 
             // Wait for tension to become strong enough to trigger sensor
-            if (ts1.isPressed() || ts2.isPressed()) {
+            if (anyTouchSensorPressed()) {
                 Utils.println("SENSOR ACTIVATED!!!");
 
                 // Sensor triggered
-                tuneMotor.flt(); // Stop the motor immediately
+                m1.flt(); // Stop the motor immediately
+
+                // We do nor now anything about the state of the wires on startup. They may be relaxed which is why the first move of any actuator must always be a tighten. If we relax
+                // an already relaxed wire the wires get entangled in the machine and the system fucks up.
+                if (sensorFirstActivation) {
+                    Utils.println("First activation protocol...");
+                    loosenWire(m1, 480);
+
+                    tightenWireUntilSensorActivated(m2);
+                    loosenWireUntilSensorReleased(m2);
+
+                    tightenWireUntilSensorActivated(m3);
+                    loosenWireUntilSensorReleased(m3);
+                    sensorFirstActivation = false;
+                    continue;
+                }
 
                 // Try rollout of other engine (swith between them on each iteration)
 
-                if (!loosenWireWithRollback(wireToggler ? m2 : m3, 1080)) {
+                if (!loosenWireWithRollback(wireToggler ? m2 : m3, 720)) {
                     // It didnt. Try the other wire...
-                    if (!loosenWireWithRollback(wireToggler ? m3 : m2, 1080)) {
-                        // That didnt help either. From this we infer that the cuddle-object has reached the hookpoint of the motor were calibrating.
-                        tuneMotor.resetTachoCount();
-                        Utils.println("Sleep-point reached. Resetting tacho!");
-                        m1.rotate(-1440);
-                        targetReached = true;
-                        continue;
+                    if (!loosenWireWithRollback(wireToggler ? m3 : m2, 720)) {
+
+                        // Try loosen both wires
+                        Utils.println("Loosening both wires...");
+                        loosenWire(m2, 540);
+                        loosenWire(m3, 540);
+
+                        if (anyTouchSensorPressed()) {
+
+                            // That didnt help either. From this we infer that the cuddle-object has reached the hookpoint of the motor were calibrating.
+                            Utils.println("Sleep-point reached. Resetting tacho!");
+                            // Wire's too tight, so we losen it a bit
+
+                            Utils.println("Loosen wire until sensor released...");
+                            loosenWireUntilSensorReleased(m1);
+
+                            // The other wires may be loose so now we tighten these.
+                            /*Utils.println("Tightening m2...");
+                            tightenWireUntilSensorActivated(m2);
+                            // And loosen it a bit
+                            Utils.println("Loosening m2 again");
+                            loosenWireUntilSensorReleased(m2);
+
+                            // And we do the same for m3
+                            Utils.println("Tightening m3...");
+                            tightenWireUntilSensorActivated(m3);
+                            // And loosen it a bit
+                            Utils.println("Loosening m3 again");
+                            loosenWireUntilSensorReleased(m3);*/
+
+                            Utils.println("Loosen wire 360 degrees further");
+                            loosenWire(m1, 720);
+
+                            targetReached = true;
+                            m1.resetTachoCount();
+                            continue;
+                        }
                     }
                 }
                 wireToggler = !wireToggler;
             }
 
-            try {
-                Thread.sleep(25);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            xsleep(25);
+        }
+
+
+    }
+
+    private void xsleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
-    private boolean loosenWireWithRollback(NXTRegulatedMotor m, int degrees) {
-        // Relax a wire to see if this was what triggered the sensor
+    private void tightenWireUntilSensorActivated(NXTCuddleMotor m) {
+        if (anyTouchSensorPressed()) return;
+
+        m.backward();
+        while (!ts1.isPressed()) {
+            xsleep(25);
+        }
+        m.flt();
+    }
+
+    private void loosenWireUntilSensorReleased(NXTCuddleMotor m) {
+        if (!anyTouchSensorPressed()) return;
+
+        m.forward();
+        while (ts1.isPressed()) {
+            xsleep(25);
+        }
+        m.flt();
+    }
+
+    private void loosenWire(NXTCuddleMotor m, int degrees) {
+        m.rotate(degrees);
+    }
+
+    private void tightenWire(NXTCuddleMotor m, int degrees) {
         m.rotate(-degrees);
+    }
+
+    private boolean loosenWireWithRollback(NXTCuddleMotor m, int degrees) {
+        // Relax a wire to see if this was what triggered the sensor
+        m.rotate(degrees);
 
         // Did it help?
         if (!anyTouchSensorPressed()) {
@@ -102,26 +182,17 @@ public class TriangleMeasurer extends Thread implements SwitchListener{
         }
         else {
             // It didnt help. Roll back
-            m.rotate(degrees);
+            m.rotate(-degrees);
         }
         return false;
     }
 
-    private void initializeMotors() {
-        m1.setAcceleration(acc);
-        m2.setAcceleration(acc);
-        m3.setAcceleration(acc);
-
-        m1.setSpeed(speed);
-        m2.setSpeed(speed);
-        m3.setSpeed(speed);
-    }
 
     private boolean anyTouchSensorPressed() {
-        return ts1.isPressed() || ts2.isPressed();
+        return ts1.isPressed();
     }
 
-    private int getNextMotorIndex() {
+    /*private int getNextMotorIndex() {
         motorIndex++;
         if (motorIndex == motors.length) return 0;
         else return motorIndex;
@@ -131,27 +202,27 @@ public class TriangleMeasurer extends Thread implements SwitchListener{
         motorIndex--;
         if (motorIndex ==-1) return motors.length-1;
         else return motorIndex;
-    }
+    }*/
 
     private int getMotorToTuneIndex() {
         return motorToTuneIndex;
     }
 
-    private NXTRegulatedMotor getNextMotor() {
+    /*private NXTCuddleMotor getNextMotor() {
         return motors[getNextMotorIndex()];
     }
 
-    private NXTRegulatedMotor getPrevMotor() {
+    private NXTCuddleMotor getPrevMotor() {
         return motors[getPrevMotorIndex()];
     }
 
-    private NXTRegulatedMotor getCurrentMotor() {
+    private NXTCuddleMotor getCurrentMotor() {
         return motors[motorIndex];
     }
 
-    private NXTRegulatedMotor getMotorToTune() {
+    private NXTCuddleMotor getMotorToTune() {
         return motors[motorToTuneIndex];
-    }
+    }*/
 
 
     @Override
@@ -170,7 +241,7 @@ public class TriangleMeasurer extends Thread implements SwitchListener{
 
     @Override
     public synchronized void switchReleased(int switchID) {
-        this.notify();
+        /*this.notify();
         // reset tachocount on active motor
         if (switchID == SWITCH_2) {
             m1.stop();
@@ -185,6 +256,6 @@ public class TriangleMeasurer extends Thread implements SwitchListener{
             if (forward) motors[motorIndex].forward();
             else motors[motorIndex].backward();
 
-        }
+        }*/
     }
 }
