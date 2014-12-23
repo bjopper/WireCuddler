@@ -29,7 +29,7 @@ public class Constants {
     // p1 is at height zero. p2 and p3 are at heights relative to p1 with a positive value og p2 if it is located higher than p1 and negative value if located lower.
 
     // Project triangular area onto xz-plane
-    public static final double p1p2distXcm = Math.sqrt(Math.pow(Utils.tachoToCm(CalibValues.p1p2tachoDist), 2) - Math.pow(CalibValues.p1p2heightDiffCm,2));
+    /*public static final double p1p2distXcm = Math.sqrt(Math.pow(Utils.tachoToCm(CalibValues.p1p2tachoDist), 2) - Math.pow(CalibValues.p1p2heightDiffCm,2));
     public static final double p1p3distXcm = Math.sqrt(Math.pow(Utils.tachoToCm(CalibValues.p1p3tachoDist), 2) - Math.pow(CalibValues.p1p3heightDiffCm,2));
     public static final double p2p3distXcm = Math.sqrt(Math.pow(Utils.tachoToCm(CalibValues.p2p3tachoDist), 2) - Math.pow(Math.max(CalibValues.p1p2heightDiffCm, CalibValues.p1p3heightDiffCm)-Math.min(CalibValues.p1p2heightDiffCm, CalibValues.p1p3heightDiffCm),2));
 
@@ -41,5 +41,5 @@ public class Constants {
     // Build std cartesian coordinates of the points
     public static final XYZCoord[] trianglePoints =  new XYZCoord[] { new XYZCoord(0, 0, 0),
             new XYZCoord(Math.cos(Math.toRadians(p1AngleDeg))*p1p2distXcm, CalibValues.p1p2heightDiffCm, Math.sin(Math.toRadians(p1AngleDeg))*p1p2distXcm),
-            new XYZCoord(p1p3distXcm, CalibValues.p1p3heightDiffCm, 0)};
+            new XYZCoord(p1p3distXcm, CalibValues.p1p3heightDiffCm, 0)};*/
 }

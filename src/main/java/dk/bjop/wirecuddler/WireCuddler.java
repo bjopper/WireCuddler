@@ -1,7 +1,9 @@
 package dk.bjop.wirecuddler;
 
+import dk.bjop.wirecuddler.model.Triangle;
 import dk.bjop.wirecuddler.util.CalibValues;
 import dk.bjop.wirecuddler.util.Utils;
+import dk.bjop.wirecuddler.util.WiresTachoCoord;
 import dk.bjop.wirecuddler.util.XYZCoord;
 
 import java.io.IOException;
@@ -12,7 +14,7 @@ import java.io.IOException;
  */
 public class WireCuddler {
 
-
+    public static String default_calibFile = "calib.bin";
 
 
 
@@ -48,151 +50,48 @@ public class WireCuddler {
 
         //CalibValues.setTestdata();
         //CalibValues.saveCalib();
-        CalibValues.loadCalib();
 
 
-        Utils.println("-------------- Triangle setup calcs-----------------");
+
+        CalibValues test = CalibValues.cretaeTestdata();
+        test.saveCalib(WireCuddler.default_calibFile);
 
 
-        double p1p2distXcm = Math.sqrt(Math.pow(Utils.tachoToCm(CalibValues.p1p2tachoDist), 2) - Math.pow(CalibValues.p1p2heightDiffCm,2));
-        final double p1p3distXcm = Math.sqrt(Math.pow(Utils.tachoToCm(CalibValues.p1p3tachoDist), 2) - Math.pow(CalibValues.p1p3heightDiffCm,2));
-        final double p2p3distXcm = Math.sqrt(Math.pow(Utils.tachoToCm(CalibValues.p2p3tachoDist), 2) - Math.pow(Math.max(CalibValues.p1p2heightDiffCm, CalibValues.p1p3heightDiffCm)-Math.min(CalibValues.p1p2heightDiffCm, CalibValues.p1p3heightDiffCm),2));
+        // tests
 
-        Utils.println("Projected p1p2tachoDist CM: " + Utils.cmToTacho(p1p2distXcm) + " (cm: " + p1p2distXcm + ")");
-        Utils.println("Projected p1p3tachoDist CM: " + Utils.cmToTacho(p1p3distXcm) + " (cm: " + p1p3distXcm + ")");
-        Utils.println("Projected p2p3tachoDist CM: " + Utils.cmToTacho(p2p3distXcm) + " (cm: " + p2p3distXcm + ")");
-
-        // Find angles of the projected triangular area using the projected values. Cosine-relation...
-        final double p1AngleDeg = Math.toDegrees( Math.acos( (Math.pow(p1p3distXcm, 2) + Math.pow(p1p2distXcm, 2) - Math.pow(p2p3distXcm, 2)) / (2 * p1p3distXcm * p1p2distXcm)));
-        final double p2AngleDeg = Math.toDegrees( Math.acos( (Math.pow(p2p3distXcm, 2) + Math.pow(p1p2distXcm, 2) - Math.pow(p1p3distXcm, 2)) / (2 * p2p3distXcm * p1p2distXcm)));
-        final double p3AngleDeg = 180d - (p1AngleDeg + p2AngleDeg);
-
-        Utils.println("p1AngleDeg: " + p1AngleDeg);
-        Utils.println("p2AngleDeg: " + p2AngleDeg);
-        Utils.println("p3AngleDeg: " + p3AngleDeg);
-
-        // Build std cartesian coordinates of the points
-        XYZCoord[] trianglePoints =  new XYZCoord[] { new XYZCoord(0, 0, 0),
-                new XYZCoord(Math.cos(Math.toRadians(p1AngleDeg))*p1p2distXcm, CalibValues.p1p2heightDiffCm, Math.sin(Math.toRadians(p1AngleDeg))*p1p2distXcm),
-                new XYZCoord(p1p3distXcm, CalibValues.p1p3heightDiffCm, 0)};
+        CalibValues cv = Triangle.getInstance().getCalibValues();
 
 
-        Utils.println("-------------- Triangle points -----------------");
-        for (int i=0;i<trianglePoints.length;i++) {
-            Utils.println(trianglePoints[i].toString());
-        }
+        WiresTachoCoord wtc;
+        XYZCoord pos;
+        int smallDist = 1000;
 
-
-        Utils.println("-------------- Calib values and tests -----------------");
-
-
-        Utils.println("p1p2tachoDist: " + CalibValues.p1p2tachoDist + " (cm: " + Utils.tachoToCm(CalibValues.p1p2tachoDist) + ")");
-        Utils.println("p1p3tachoDist: " + CalibValues.p1p3tachoDist + " (cm: " + Utils.tachoToCm(CalibValues.p1p3tachoDist) + ")");
-        Utils.println("p2p3tachoDist: " + CalibValues.p2p3tachoDist + " (cm: " + Utils.tachoToCm(CalibValues.p2p3tachoDist) + ")");
-
-        Utils.println("Conversion test: 10,7cm is in tacho: " + Utils.cmToTacho(10.7f));
-        Utils.println("Conversion test: 10680 tachos is in CM: "+Utils.tachoToCm(10680));
-
-        Utils.println("------------ Location inference test X -------------------");
-
-        int[] tachos = new int[]{10000, 10000 , 10000};
-        for (int i=0;i<tachos.length;i++) Utils.println("#Tacho ["+(i+1)+"] = "+tachos[i] + " (cm: " + Utils.tachoToCm(tachos[i]) + ")");
-
-        int m1t = tachos[0];
-        int m3t = tachos[2];
-
-        double m1m3Dist = Utils.tachoToCm(CalibValues.p1p3tachoDist);  // b
-        double m1wireLength = Utils.tachoToCm(m1t);  // c
-        double m3WireLength = Utils.tachoToCm(m3t);  // a
-
-        // Cosine relation... (Ref: http://da.wikipedia.org/wiki/Cosinusrelation) + http://www.studieportalen.dk/kompendier/matematik/formelsamling/trigonometri/begreber/hoejde-grundlinje
-        double angleAtM1 = Math.toDegrees(Math.acos((m1m3Dist * m1m3Dist + m1wireLength * m1wireLength - m3WireLength * m3WireLength) / (2 * m1m3Dist * m1wireLength)));  // A
-
-
-        Utils.println("X-infer: Angle is: " + angleAtM1);
-
-        // We now consider the rightangled triangle... (sine-relation here)
-        double triangleHeight = m1wireLength * Math.sin(Math.toRadians(angleAtM1)); // d or hb (height from b)
-        double p1p3pos = m1wireLength * Math.sin(Math.toRadians(90 - angleAtM1));
-
-        Utils.println("2D: X-pos of point is: "+ p1p3pos + "cm");
-        Utils.println("2D: Height at X-pos: " + triangleHeight + "cm");
-
-
-        Utils.println("------------ p2p3 slope -------------------");
-
-
-       double p2p3Slope =  (trianglePoints[2].z - trianglePoints[1].z) / (trianglePoints[2].x - trianglePoints[1].x);
-        double orthoSlope = 1/p2p3Slope;
-       Utils.println("p2p3Slope: " + p2p3Slope);
-       Utils.println("p2p3 orthos-slope: " + orthoSlope);
-
-
-        Utils.println("------------ Location inference test of point on p2p3 -------------------");
-
-        int m2t = tachos[1];
-
-        double m2m3Dist = Utils.tachoToCm(CalibValues.p2p3tachoDist);  // b
-        double m2wireLength = Utils.tachoToCm(m2t);  // c
-
-// Cosine relation... (Ref: http://da.wikipedia.org/wiki/Cosinusrelation) + http://www.studieportalen.dk/kompendier/matematik/formelsamling/trigonometri/begreber/hoejde-grundlinje
-        double angleAtM3 = Math.toDegrees( Math.acos( (m2m3Dist*m2m3Dist + m2wireLength*m2wireLength - m3WireLength*m3WireLength) / (2*m2m3Dist*m2wireLength) ));  // A
-        Utils.println("Angle at M3: " + angleAtM3);
-
-// We now consider the rightangled triangle... (sine-relation here)
-        double triangleHeight2 = m2wireLength * Math.sin(Math.toRadians(angleAtM3)); // d or hb (height from b)
-        double p2p3pos = m2wireLength * Math.sin(Math.toRadians(90 - angleAtM3));
-
-        Utils.println("p2p3pos: " + p2p3pos);
-        // Coordinates of the point between p2 and p3
-
-        // z-coord and x-coord
-        double z = p2p3pos * Math.sin(Math.toRadians(p3AngleDeg));
-
-        Utils.println("z: " + z);
-
-        double x = trianglePoints[2].x - ( p2p3pos * Math.sin(Math.toRadians(90-p3AngleDeg)));
-
-        Utils.println("Plane coords of point on the line between p2 and p3: (x, z) = (" + x + ", " + z + ")");
-
-        Utils.println("------------------------------ Intersection of lines -----------------------------------------");
-
-
-        double xDiff = x - p1p3pos;
-        Utils.println("xDiff: " + xDiff);
-        double finalZ = z + (xDiff * orthoSlope);   // TODO check this!!!!
-        Utils.println("finalZ: " + finalZ);
-
-        Utils.println("------------------------------ Height at intersecion point -----------------------------------------");
-
-        //Distance from origo to intersection point (pythagoras)
-        double distToIntersectPoint = Math.sqrt( p1p3pos*p1p3pos + finalZ*finalZ );
-        Utils.println("Dist to intersect point: " +distToIntersectPoint);
-
-
-        double heightAtPoint = Math.sqrt(Utils.tachoToCm(tachos[0]) * Utils.tachoToCm(tachos[0]) - distToIntersectPoint * distToIntersectPoint);
-
-        XYZCoord pos = new XYZCoord(p1p3pos, heightAtPoint, finalZ);
+        Utils.println("-------------------------- Test: equal length wires");
+        wtc = new WiresTachoCoord(new int[]{10000, 10000 , 10000});
+        pos = wtc.toCartesian();
         Utils.println(pos.toString());
+        Utils.println(wtc.toString());
 
-        Utils.println("--------------------- DONE - reversing -----------------------------");
+        Utils.println("-------------------------- Test: Close to P2");
+        wtc = new WiresTachoCoord(new int[]{cv.getP1P2tachoDist(), smallDist , cv.getP2P3tachoDist()}); // Close to P2
+        pos = wtc.toCartesian();
+        Utils.println(pos.toString());
+        Utils.println(wtc.toString());
 
-        double[] rev = new double[3];
+        Utils.println("-------------------------- Test: Close to P1");
+        wtc = new WiresTachoCoord(new int[]{smallDist, cv.getP1P2tachoDist() , cv.getP1P3tachoDist()}); // Close to P1
+        pos = wtc.toCartesian();
+        Utils.println(pos.toString());
+        Utils.println(wtc.toString());
 
-        rev[0] = Math.sqrt( pos.x*pos.x + pos.y*pos.y + pos.z*pos.z );
-
-        double xd2 = pos.x - trianglePoints[1].x;
-        double zd2 = pos.z - trianglePoints[1].z;
-        rev[1] = Math.sqrt( xd2*xd2 + pos.y*pos.y + zd2*zd2 );
-
-        double xd3 = pos.x - trianglePoints[2].x;
-        rev[2] = Math.sqrt( xd3*xd3 + pos.y*pos.y + pos.z*pos.z );
+        Utils.println("-------------------------- Test: Close to P3");
+        wtc = new WiresTachoCoord(new int[]{cv.getP1P3tachoDist(), cv.getP2P3tachoDist() , smallDist}); // Close to P3
+        pos = wtc.toCartesian();
+        Utils.println(pos.toString());
+        Utils.println(wtc.toString());
 
 
-        Utils.println("Converting the pos found back to tacho-array...");
-        for (int i=0;i<rev.length;i++) {
-            Utils.println("p" + (i+1) + " wire tacho: " + Utils.cmToTacho(rev[i]) + " (" + rev[i] + " cm)");
-        }
+        Utils.println("--------------------- DONE -----------------------------");
 
 
 
@@ -220,5 +119,129 @@ public class WireCuddler {
 
 
     }
+
+    /*public static double[] cartesianToWirelengths(Triangle tri, XYZCoord pos) {
+        XYZCoord[] trianglePoints = tri.getTrianglePoints();
+
+
+        double[] rev = new double[3];
+
+        rev[0] = Math.sqrt( pos.x*pos.x + pos.y*pos.y + pos.z*pos.z );
+
+        double xd2 = pos.x - trianglePoints[1].x;
+        double zd2 = pos.z - trianglePoints[1].z;
+        rev[1] = Math.sqrt( xd2*xd2 + pos.y*pos.y + zd2*zd2 );
+
+        double xd3 = pos.x - trianglePoints[2].x;
+        rev[2] = Math.sqrt( xd3*xd3 + pos.y*pos.y + pos.z*pos.z );
+
+        return rev;
+    }*/
+
+
+    /*public static XYZCoord wirelengthsToCartesian(Triangle tri, int[] tachos) {
+
+        XYZCoord[] trianglePoints = tri.getTrianglePoints();
+        CalibValues cv = tri.getCalibValues();
+
+        Utils.println("-------------- Triangle points -----------------");
+        Utils.println(tri.getTrianglePointsString());
+
+
+
+        Utils.println("-------------- Calib values and tests -----------------");
+
+
+        Utils.println("p1p2tachoDist: " + cv.p1p2tachoDist + " (cm: " + Utils.tachoToCm(cv.p1p2tachoDist) + ")");
+        Utils.println("p1p3tachoDist: " + cv.p1p3tachoDist + " (cm: " + Utils.tachoToCm(cv.p1p3tachoDist) + ")");
+        Utils.println("p2p3tachoDist: " + cv.p2p3tachoDist + " (cm: " + Utils.tachoToCm(cv.p2p3tachoDist) + ")");
+
+        Utils.println("Conversion test: 10,7cm is in tacho: " + Utils.cmToTacho(10.7f));
+        Utils.println("Conversion test: 10680 tachos is in CM: "+Utils.tachoToCm(10680));
+
+        Utils.println("------------ Location inference test X -------------------");
+
+
+        for (int i=0;i<tachos.length;i++) Utils.println("#Tacho ["+(i+1)+"] = "+tachos[i] + " (cm: " + Utils.tachoToCm(tachos[i]) + ")");
+
+        int m1t = tachos[0];
+        int m3t = tachos[2];
+
+        double m1m3Dist = Utils.tachoToCm(cv.p1p3tachoDist);  // b
+        double m1wireLength = Utils.tachoToCm(m1t);  // c
+        double m3WireLength = Utils.tachoToCm(m3t);  // a
+
+        // Cosine relation... (Ref: http://da.wikipedia.org/wiki/Cosinusrelation) + http://www.studieportalen.dk/kompendier/matematik/formelsamling/trigonometri/begreber/hoejde-grundlinje
+        double angleAtM1 = Math.toDegrees(Math.acos((m1m3Dist * m1m3Dist + m1wireLength * m1wireLength - m3WireLength * m3WireLength) / (2 * m1m3Dist * m1wireLength)));  // A
+
+
+        Utils.println("X-infer: Angle is: " + angleAtM1);
+
+        // We now consider the rightangled triangle... (sine-relation here)
+        double triangleHeight = m1wireLength * Math.sin(Math.toRadians(angleAtM1)); // d or hb (height from b)
+        double p1p3pos = m1wireLength * Math.sin(Math.toRadians(90 - angleAtM1));
+
+        Utils.println("2D: X-pos of point is: "+ p1p3pos + "cm");
+        Utils.println("2D: Height at X-pos: " + triangleHeight + "cm");
+
+
+        Utils.println("------------ p2p3 slope -------------------");
+
+
+        double p2p3Slope =  (trianglePoints[2].z - trianglePoints[1].z) / (trianglePoints[2].x - trianglePoints[1].x);
+        double orthoSlope = 1/p2p3Slope;
+        Utils.println("p2p3Slope: " + p2p3Slope);
+        Utils.println("p2p3 orthos-slope: " + orthoSlope);
+
+
+        Utils.println("------------ Location inference test of point on p2p3 -------------------");
+
+        int m2t = tachos[1];
+
+        double m2m3Dist = Utils.tachoToCm(cv.p2p3tachoDist);  // b
+        double m2wireLength = Utils.tachoToCm(m2t);  // c
+
+// Cosine relation... (Ref: http://da.wikipedia.org/wiki/Cosinusrelation) + http://www.studieportalen.dk/kompendier/matematik/formelsamling/trigonometri/begreber/hoejde-grundlinje
+        double angleAtM3 = Math.toDegrees( Math.acos( (m2m3Dist*m2m3Dist + m2wireLength*m2wireLength - m3WireLength*m3WireLength) / (2*m2m3Dist*m2wireLength) ));  // A
+        Utils.println("Angle at M3: " + angleAtM3);
+
+// We now consider the rightangled triangle... (sine-relation here)
+        double triangleHeight2 = m2wireLength * Math.sin(Math.toRadians(angleAtM3)); // d or hb (height from b)
+        double p2p3pos = m2wireLength * Math.sin(Math.toRadians(90 - angleAtM3));
+
+        Utils.println("p2p3pos: " + p2p3pos);
+        // Coordinates of the point between p2 and p3
+
+        // z-coord and x-coord
+        double p3AngleDeg = tri.getAngleAtP3();
+        double z = p2p3pos * Math.sin(Math.toRadians(p3AngleDeg));
+
+        Utils.println("z: " + z);
+
+        double x = trianglePoints[2].x - ( p2p3pos * Math.sin(Math.toRadians(90-p3AngleDeg)));
+
+        Utils.println("Plane coords of point on the line between p2 and p3: (x, z) = (" + x + ", " + z + ")");
+
+        Utils.println("------------------------------ Intersection of lines -----------------------------------------");
+
+
+        double xDiff = x - p1p3pos;
+        Utils.println("xDiff: " + xDiff);
+        double finalZ = z + (xDiff * orthoSlope);   // TODO check this!!!!
+        Utils.println("finalZ: " + finalZ);
+
+        Utils.println("------------------------------ Height at intersecion point -----------------------------------------");
+
+        //Distance from origo to intersection point (pythagoras)
+        double distToIntersectPoint = Math.sqrt( p1p3pos*p1p3pos + finalZ*finalZ );
+        Utils.println("Dist to intersect point: " +distToIntersectPoint);
+
+
+        double heightAtPoint = Math.sqrt(Utils.tachoToCm(tachos[0]) * Utils.tachoToCm(tachos[0]) - distToIntersectPoint * distToIntersectPoint);
+
+        XYZCoord pos = new XYZCoord(p1p3pos, heightAtPoint, finalZ);
+        Utils.println(pos.toString());
+        return pos;
+    }*/
 
 }

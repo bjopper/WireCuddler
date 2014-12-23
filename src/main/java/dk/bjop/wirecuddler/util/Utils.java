@@ -49,7 +49,7 @@ public class Utils {
         return dist;
     }
 
-    public static WCCoord toWCCoord(XZCoord p) {
+   /* public static WiresTachoCoord toWCCoord(XZCoord p) {
         XZCoord p1 = truncate(Constants.trianglePoints[0]);
         XZCoord p2 = truncate(Constants.trianglePoints[1]);
         XZCoord p3 = truncate(Constants.trianglePoints[2]);
@@ -66,12 +66,12 @@ public class Utils {
         double l2 = Math.sqrt(h2*h2 + l2plane*l2plane);
         double l3 = Math.sqrt(h3*h3 + l3plane*l3plane);
 
-        return new WCCoord(l1, l2, l3);
-    }
+        return new WiresTachoCoord(l1, l2, l3);
+    }*/
 
-    public static XZCoord truncate(XYZCoord p) {
+    /*public static XZCoord truncate(XYZCoord p) {
         return new XZCoord(p.x, p.z);
-    }
+    }*/
 
     public static double getCuddleHeight() {
         // This is actually a y-value - a function of x and z (must likely a tilted plane will suffice)
