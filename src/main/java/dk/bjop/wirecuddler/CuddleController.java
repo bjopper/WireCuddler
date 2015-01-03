@@ -3,8 +3,9 @@ package dk.bjop.wirecuddler;
 import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.math.*;
 import dk.bjop.wirecuddler.motor.MotorGroup;
-import dk.bjop.wirecuddler.motor.RestPoint;
-import dk.bjop.wirecuddler.motor.StraightToPointMove;
+import dk.bjop.wirecuddler.calibration.RestPoint;
+import dk.bjop.wirecuddler.movement.moves.StraightToPointMove;
+import dk.bjop.wirecuddler.movement.CuddleMoveController;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
 

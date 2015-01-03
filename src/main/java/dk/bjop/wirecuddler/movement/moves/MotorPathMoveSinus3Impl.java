@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler.motor;
+package dk.bjop.wirecuddler.movement.moves;
 
 /**
  * Created by bpeterse on 10-09-2014.

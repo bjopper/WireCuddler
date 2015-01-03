@@ -1,7 +1,8 @@
 package dk.bjop.wirecuddler.motor;
 
-import dk.bjop.wirecuddler.CuddleMoveController;
+import dk.bjop.wirecuddler.movement.CuddleMoveController;
 import dk.bjop.wirecuddler.math.Utils;
+import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 import lejos.nxt.Button;
 
 /**

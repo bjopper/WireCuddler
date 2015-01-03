@@ -1,21 +1,20 @@
-package dk.bjop.wirecuddler.motor;
+package dk.bjop.wirecuddler.movement.moves;
 
 /**
  * Created by bpeterse on 10-09-2014.
+ * This sine-curve slowly increases the oscaillation speed as times go
  *
- * Std sine-curve
- * A speed of 12 is good.
  */
-public class MotorPathMoveSinusImpl  {
+public class MotorPathMoveSinus2Impl  {
 
     int speed = 12; //Degrees pr second
     double scale = 700;
     int initialRaiseTime = 5; // sec
     long moveTimeSec = 40;
 
-    public MotorPathMoveSinusImpl() {}
+    public MotorPathMoveSinus2Impl() {}
 
-    public MotorPathMoveSinusImpl(int speedDegSec) {
+    public MotorPathMoveSinus2Impl(int speedDegSec) {
         this.speed = speedDegSec;
     }
 
@@ -27,7 +26,8 @@ public class MotorPathMoveSinusImpl  {
         }
 
         long adjustedTime = elapsedTimeMillis - initialRaiseTime*1000;
-        return (int) (Math.sin(Math.toRadians((adjustedTime * speed)/1000f)) * scale) + (int)scale;
+        double newSpeed= Math.round((double)speed + (adjustedTime/4000f));
+        return (int) (Math.sin(Math.toRadians(Math.round((adjustedTime * newSpeed)/1000f))) * scale) + (int)scale;
     }
 
 

@@ -58,7 +58,8 @@ public class Triangle {
         // P1 height = P3 height
         // P2 height >= P1 height
        // if (cv.getP1P3heightDiffCm() != 0) throw new RuntimeException("Violation of (temporary) constraint: P1 and P3 are currently required to be at same height.");
-       // if (cv.getP1P2heightDiffCm() < 0) throw new RuntimeException("Violation of (temporary) constraint: P2 is currently required to have a height >= P1");
+        if (cv.getP1P2heightDiffCm() < 0) throw new RuntimeException("Violation of constraint: P2 is required to have a height >= P1");
+        if (cv.getP1P3heightDiffCm() < 0) throw new RuntimeException("Violation of constraint: P3 is required to have a height >= P1");
 // TODO implemnt constraints
 
 
@@ -153,6 +154,7 @@ public class Triangle {
         }
         return instance;
     }
+
 
     public XYZCoord[] getTrianglePoints() {
         return trianglePoints;

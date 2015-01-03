@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler.motor;
+package dk.bjop.wirecuddler.movement.moves;
 
 import dk.bjop.wirecuddler.math.SphericCoord;
 import dk.bjop.wirecuddler.math.WT3Coord;

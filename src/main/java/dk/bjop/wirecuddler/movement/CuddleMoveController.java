@@ -1,11 +1,11 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.movement;
 
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.math.XYZCoord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.motor.MotorPathController;
-import dk.bjop.wirecuddler.motor.MotorPathMove;
+import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 
 import java.util.ArrayList;
 
@@ -99,6 +99,8 @@ public class CuddleMoveController extends Thread{
     }
 
     public void queueMove(MotorPathMove move) {
+
+        // Either validate target pos here, or do it when the move is coinstructed.
         synchronized (listLock) {
             movesList.add(move);
             Utils.println("move added to movesList...");
