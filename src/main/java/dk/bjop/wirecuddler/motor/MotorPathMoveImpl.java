@@ -1,16 +1,16 @@
 package dk.bjop.wirecuddler.motor;
 
-import dk.bjop.wirecuddler.util.Utils;
+import dk.bjop.wirecuddler.math.Utils;
 
 /**
  * Created by bpeterse on 10-09-2014.
  */
-public class MotorPathImpl implements MotorPath {
+public class MotorPathMoveImpl  {
 
     long moveTimeSec = 20;
     float speedCmSec = 5;
 
-    @Override
+
     public int getExpectedTachoPosAtTimeT(long elapsedTimeMillis, int controllerID) {
         // a = vandret sidelængde top
         // b = lodret sidelængde nedad (konstant)
@@ -22,7 +22,7 @@ public class MotorPathImpl implements MotorPath {
         return Utils.cmToTacho(c - b); // we subtract b as we are only interested in the diff
     }
 
-    @Override
+
     public boolean isMovementFinished(long elapsedTimeMillis) {
         return elapsedTimeMillis >= moveTimeSec*1000;
     }

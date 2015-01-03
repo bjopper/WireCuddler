@@ -2,14 +2,14 @@ package dk.bjop.wirecuddler.calibration;
 
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.motor.NXTCuddleMotor;
-import dk.bjop.wirecuddler.sensors.SwitchListener;
-import dk.bjop.wirecuddler.util.Utils;
+import dk.bjop.wirecuddler.sensors.EmergencyBreakListener;
+import dk.bjop.wirecuddler.math.Utils;
 import lejos.nxt.*;
 
 /**
  * Created by bpeterse on 09-10-2014.
  */
-public class TriangleMeasurer extends Thread implements SwitchListener{
+public class TriangleMeasurer extends Thread implements EmergencyBreakListener {
 
     NXTCuddleMotor m1;
     NXTCuddleMotor m2;

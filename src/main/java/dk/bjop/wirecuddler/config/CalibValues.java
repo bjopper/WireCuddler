@@ -1,4 +1,6 @@
-package dk.bjop.wirecuddler.util;
+package dk.bjop.wirecuddler.config;
+
+import dk.bjop.wirecuddler.math.Utils;
 
 import java.io.*;
 
@@ -53,14 +55,14 @@ public class CalibValues {
             out.flush();
             out.close(); // flush the buffer and write the file
             this.fileOrigin = filename;
-            Utils.println("Calibration data saved!"+ toString());
+            Utils.println("Calibration data saved!" + toString());
         } catch (IOException e) {
             System.err.println("Failed to write to output stream");
         }
     }
 
-    public static CalibValues cretaeTestdata() {
-        return new CalibValues(0, 0, 13114, 13428, 10537, 0, null);
+    public static CalibValues cretaeTestdata(double p1p2heightDiffCm, double p1p3heightDiffCm, int p1p2tachoDist, int p1p3tachoDist, int p2p3tachoDist, int restpointIndex) {
+        return new CalibValues(p1p2heightDiffCm, p1p3heightDiffCm, p1p2tachoDist, p1p3tachoDist, p2p3tachoDist, restpointIndex, null);
     }
 
     public static CalibValues loadCalib(String filename) {

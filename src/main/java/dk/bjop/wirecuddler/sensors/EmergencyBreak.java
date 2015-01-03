@@ -1,5 +1,6 @@
 package dk.bjop.wirecuddler.sensors;
 
+import dk.bjop.wirecuddler.math.Utils;
 import lejos.nxt.Button;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
@@ -10,12 +11,12 @@ import java.util.Iterator;
 /**
  * Created by bpeterse on 09-10-2014.
  */
-public class Switch extends Thread {
+public class EmergencyBreak extends Thread {
     int switchId;
     TouchSensor ts;
     ArrayList<EmergencyBreakListener> listeners = new ArrayList<EmergencyBreakListener>();
 
-    public Switch(int swithId, SensorPort s) {
+    public EmergencyBreak(int swithId, SensorPort s) {
         this.switchId = swithId;
         this.ts = new TouchSensor(s);
     }
@@ -35,6 +36,8 @@ public class Switch extends Thread {
 
     public void run() {
         boolean pressed = false;
+
+        Utils.println("Emergency break activated and running...");
 
 
         while (!Button.ESCAPE.isDown()) {

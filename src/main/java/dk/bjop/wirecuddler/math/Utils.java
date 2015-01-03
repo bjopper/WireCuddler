@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler.util;
+package dk.bjop.wirecuddler.math;
 
 
 import lejos.nxt.comm.RConsole;
@@ -42,7 +42,7 @@ public class Utils {
         return dist;
     }
 
-    public static double distance(XZCoord p1, XZCoord p2) {
+    public static double distanceTo(XZCoord p1, XZCoord p2) {
         double dx   = p1.x - p2.x;         //horizontal difference
         double dy   = p1.z - p2.z;         //vertical difference
         double dist = Math.sqrt( dx*dx + dy*dy ); //distance using Pythagoras theorem

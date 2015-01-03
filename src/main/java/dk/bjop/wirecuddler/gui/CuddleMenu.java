@@ -1,8 +1,9 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.gui;
 
+import dk.bjop.wirecuddler.CuddleController;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.motor.NXTCuddleMotor;
-import dk.bjop.wirecuddler.util.Utils;
+import dk.bjop.wirecuddler.math.Utils;
 import lejos.nxt.*;
 
 /**
@@ -99,9 +100,14 @@ public class CuddleMenu {
         LCD.clear();
         LCD.drawString("THE END", 3, 3);*/
 
-        cc.doCuddle();
 
-       // System.exit(0);
+        try {
+            cc.doCuddle();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // System.exit(0);
     }
 
     private void selectMotorMenu() throws InterruptedException {
@@ -217,7 +223,7 @@ public class CuddleMenu {
         int decc = 400;
         int maxSpeed = 900;
 
-        TouchSensor ts1 = new TouchSensor(SensorPort.S1);
+        TouchSensor ts1 = cc.getTouchSensor();
 
         while (true) {
 

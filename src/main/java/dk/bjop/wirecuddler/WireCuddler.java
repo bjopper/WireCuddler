@@ -1,10 +1,8 @@
 package dk.bjop.wirecuddler;
 
-import dk.bjop.wirecuddler.model.Triangle;
-import dk.bjop.wirecuddler.util.CalibValues;
-import dk.bjop.wirecuddler.util.Utils;
-import dk.bjop.wirecuddler.util.WiresTachoCoord;
-import dk.bjop.wirecuddler.util.XYZCoord;
+import dk.bjop.wirecuddler.config.CalibValues;
+import dk.bjop.wirecuddler.gui.CuddleMenu;
+import dk.bjop.wirecuddler.math.Utils;
 
 import java.io.IOException;
 
@@ -52,58 +50,20 @@ public class WireCuddler {
         //CalibValues.saveCalib();
 
 
+        // cretaeTestdata(double p1p2heightDiffCm, double p1p3heightDiffCm, int p1p2tachoDist, int p1p3tachoDist, int p2p3tachoDist, int restpointIndex)
 
-        CalibValues test = CalibValues.cretaeTestdata();
+        //CalibValues test = CalibValues.cretaeTestdata(0, 0, 13114, 13428, 10537, 0); // Std triangle with all points at same height
+
+        // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
+        CalibValues test = CalibValues.cretaeTestdata(0, 0, Utils.cmToTacho(193), Utils.cmToTacho(195), Utils.cmToTacho(143), 0); //  P3 elevated
+
         test.saveCalib(WireCuddler.default_calibFile);
 
-
-        // tests
-
-        CalibValues cv = Triangle.getInstance().getCalibValues();
+        //System.exit(0);
 
 
-        WiresTachoCoord wtc;
-        XYZCoord pos;
-        int smallDist = 1000;
-
-        Utils.println("-------------------------- Test: equal length wires");
-        wtc = new WiresTachoCoord(new int[]{10000, 10000 , 10000});
-        pos = wtc.toCartesian();
-        Utils.println(pos.toString());
-        Utils.println(wtc.toString());
-
-        Utils.println("-------------------------- Test: Close to P2");
-        wtc = new WiresTachoCoord(new int[]{cv.getP1P2tachoDist(), smallDist , cv.getP2P3tachoDist()}); // Close to P2
-        pos = wtc.toCartesian();
-        Utils.println(pos.toString());
-        Utils.println(wtc.toString());
-
-        Utils.println("-------------------------- Test: Close to P1");
-        wtc = new WiresTachoCoord(new int[]{smallDist, cv.getP1P2tachoDist() , cv.getP1P3tachoDist()}); // Close to P1
-        pos = wtc.toCartesian();
-        Utils.println(pos.toString());
-        Utils.println(wtc.toString());
-
-        Utils.println("-------------------------- Test: Close to P3");
-        wtc = new WiresTachoCoord(new int[]{cv.getP1P3tachoDist(), cv.getP2P3tachoDist() , smallDist}); // Close to P3
-        pos = wtc.toCartesian();
-        Utils.println(pos.toString());
-        Utils.println(wtc.toString());
-
-
-        Utils.println("--------------------- DONE -----------------------------");
-
-
-
-
-        System.exit(0);
-
-        try {
             new CuddleMenu().mainMenu();
-        }
-        catch (Exception e) {
-            Utils.println("FUCKUP!!!!");
-        }
+
 
         //TODO Husk mail om ug6 via intra
 

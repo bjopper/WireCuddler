@@ -1,6 +1,7 @@
 package dk.bjop.wirecuddler.motor;
 
-import dk.bjop.wirecuddler.util.Utils;
+import dk.bjop.wirecuddler.math.Triangle;
+import dk.bjop.wirecuddler.math.Utils;
 import lejos.nxt.Button;
 import lejos.nxt.TouchSensor;
 
@@ -29,6 +30,8 @@ public class RestPoint {
         boolean targetReached = false;
         boolean wireToggler = true;
         boolean sensorFirstActivation = true;
+
+        mgp.setEmergencyBreakingEnabled(false);
 
         while (!Button.ESCAPE.isDown() && !targetReached) {
 
@@ -82,7 +85,12 @@ public class RestPoint {
                             loosenWire(mgp.getM1(), 720);
 
                             targetReached = true;
-                            mgp.getM1().resetTachoCount();
+
+                            Triangle tri = Triangle.getInstance();
+
+                            mgp.resetAllTachoCounters();
+                            mgp.setTachoCountOffsets(360, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist());
+
                             continue;
                         }
                     }
@@ -93,7 +101,7 @@ public class RestPoint {
             xsleep(25);
         }
 
-
+        mgp.setEmergencyBreakingEnabled(true);
     }
 
     private void xsleep(long millis) {

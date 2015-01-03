@@ -6,20 +6,20 @@ package dk.bjop.wirecuddler.motor;
  * Std sine-curve
  * A speed of 12 is good.
  */
-public class MotorPathSinusImpl implements MotorPath {
+public class MotorPathMoveSinusImpl  {
 
     int speed = 12; //Degrees pr second
     double scale = 700;
     int initialRaiseTime = 5; // sec
     long moveTimeSec = 40;
 
-    public MotorPathSinusImpl() {}
+    public MotorPathMoveSinusImpl() {}
 
-    public MotorPathSinusImpl(int speedDegSec) {
+    public MotorPathMoveSinusImpl(int speedDegSec) {
         this.speed = speedDegSec;
     }
 
-    @Override
+
     public int getExpectedTachoPosAtTimeT(long elapsedTimeMillis, int controllerID) {
         if (elapsedTimeMillis < initialRaiseTime*1000) {
             double increment = scale / (double)initialRaiseTime;
@@ -30,7 +30,7 @@ public class MotorPathSinusImpl implements MotorPath {
         return (int) (Math.sin(Math.toRadians((adjustedTime * speed)/1000f)) * scale) + (int)scale;
     }
 
-    @Override
+
     public boolean isMovementFinished(long elapsedTimeMillis) {
         return elapsedTimeMillis >= moveTimeSec*1000;
     }

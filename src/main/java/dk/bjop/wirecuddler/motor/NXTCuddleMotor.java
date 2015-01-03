@@ -10,6 +10,7 @@ public class NXTCuddleMotor extends NXTRegulatedMotor {
 
     boolean directionForward = true;
     int tachoOffset = 0;
+    boolean enabled = true;
 
     public NXTCuddleMotor(MotorPort port) {
         super(port);
@@ -67,4 +68,13 @@ public class NXTCuddleMotor extends NXTRegulatedMotor {
     public void setTachoOffset(int offset) {
         this.tachoOffset = offset;
     }
+
+    public void setEnabled(boolean flag) {
+        this.enabled = flag;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
 }

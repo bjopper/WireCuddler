@@ -1,6 +1,6 @@
 package dk.bjop.wirecuddler.motor;
 
-import dk.bjop.wirecuddler.util.Utils;
+import dk.bjop.wirecuddler.math.Utils;
 import lejos.nxt.LCD;
 import lejos.nxt.Sound;
 import lejos.nxt.comm.Bluetooth;

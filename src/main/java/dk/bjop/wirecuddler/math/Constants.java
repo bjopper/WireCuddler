@@ -1,11 +1,11 @@
-package dk.bjop.wirecuddler.util;
+package dk.bjop.wirecuddler.math;
 
 /**
  * Created by bpeterse on 10-09-2014.
  */
 public class Constants {
 
-    public static final double wireBarrelCircumference = 5.1d; // in CM
+    public static final double wireBarrelCircumference = 5.0571d; // in CM  Nyeste måling siger: 5,0571   Gamle måling: 5.1d
     public static final int gearing = 1 ;//3; // 1:3
 
     // Basic measurements and settings.

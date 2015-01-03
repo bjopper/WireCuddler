@@ -1,7 +1,6 @@
 package dk.bjop.wirecuddler;
 
-import dk.bjop.wirecuddler.util.Utils;
-import dk.bjop.wirecuddler.util.XYZCoord;
+import dk.bjop.wirecuddler.math.XYZCoord;
 
 /**
  * Created by bpeterse on 20-09-2014.

@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler.util;
+package dk.bjop.wirecuddler.math;
 
 /**
  * Created by bpeterse on 07-10-2014.
