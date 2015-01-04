@@ -1,13 +1,17 @@
 package dk.bjop.wirecuddler;
 
+import dk.bjop.wirecuddler.calibration.RestPoint;
 import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.math.*;
 import dk.bjop.wirecuddler.motor.MotorGroup;
-import dk.bjop.wirecuddler.calibration.RestPoint;
-import dk.bjop.wirecuddler.movement.moves.StraightToPointMove;
 import dk.bjop.wirecuddler.movement.CuddleMoveController;
+import dk.bjop.wirecuddler.movement.moves.StraightToPointMove;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
 
 /**
  * Created by bpeterse on 26-11-2014.
@@ -53,6 +57,8 @@ public class CuddleController {
         XYZCoord curPos = c.toCartesian();
         Utils.println(curPos.toString());
 
+        //doGenerateMovesTest();
+
         //System.exit(0);
 
         Utils.println("Current position:\n" + curPos.toString());
@@ -60,8 +66,12 @@ public class CuddleController {
 
         CuddleMoveController cmc = new CuddleMoveController(mg);
 
+        cmc.queueMoves(doGenerateMovesTest());
 
-        double height = 143;
+        cmc.start();
+
+
+        /*double height = 143;
         XYZCoord targetPos = new XYZCoord(120,height,70);
         XYZCoord tPos = new XYZCoord(160,height,70);
         XYZCoord tPos2 = new XYZCoord(150,height,50);
@@ -75,7 +85,73 @@ public class CuddleController {
         cmc.queueMove(new StraightToPointMove(tPos));
         cmc.queueMove(new StraightToPointMove(tPos2));
         cmc.queueMove(new StraightToPointMove(tPos3));
-        cmc.queueMove(new StraightToPointMove(currentPos));
+        cmc.queueMove(new StraightToPointMove(currentPos));*/
+    }
+
+    private Collection<StraightToPointMove> doGenerateMovesTest() {
+
+        Collection<StraightToPointMove> moves = new ArrayList<StraightToPointMove>();
+
+        double height = 100;
+
+
+        XYZCoord initPos = new XYZCoord(70,height,70);
+        moves.add(new StraightToPointMove(initPos));
+
+        int noOfMovesToGenerate = 25;
+
+        int maxX = 130;
+        int minX = 70;
+        int maxZ = 60;
+        int minZ = 10;
+
+
+        int x = 0 ;
+        int z = 0;
+        int c;
+        // rnd 1-4    random.nextInt(max - min + 1) + min
+        Random rnd = new Random(System.currentTimeMillis()+13);
+
+        int ones = 0;
+        int twos = 0;
+        int threes = 0;
+        int fours = 0;
+
+        for (int i = 0;i<noOfMovesToGenerate;i++) {
+
+            c = (rnd.nextInt(40)+10) / 10; // Weird...  rnd.nextInt(4)+1;  only output sequence 1 2 2 1 2 2 1 2 2 1 2 2 1 for ever???
+
+            if (c == 1) {
+                x = minX;
+                z = rnd.nextInt(maxZ - minZ + 1) + minZ;
+                ones++;
+            }
+            else if (c == 2) {
+                x = maxX;
+                z = rnd.nextInt(maxZ - minZ + 1) + minZ;
+                twos++;
+            }
+            else if (c == 3) {
+                z = minZ;
+                x = rnd.nextInt(maxX - minX + 1) + minX;
+                threes++;
+            }
+            else if (c == 4) {
+                z = maxZ;
+                x = rnd.nextInt(maxX - minX + 1) + minX;
+                fours++;
+            }
+
+            XYZCoord m = new XYZCoord(x, height, z);
+            moves.add(new StraightToPointMove(m));
+        }
+
+        Utils.println("1: "+ ones +"   2: "+twos + "    3: "+threes + "     4: "+fours + "   sum: "+ (ones+twos+threes+fours));
+
+        XYZCoord curPos = new WT3Coord(mg.getTachoCounts()).toCartesian();
+        moves.add(new StraightToPointMove(curPos));
+
+        return moves;
     }
 
     private void doMathtests() {

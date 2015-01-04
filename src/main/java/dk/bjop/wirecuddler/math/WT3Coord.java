@@ -9,7 +9,7 @@ package dk.bjop.wirecuddler.math;
  * Lengths are given in tacho-counts.
  */
 public class WT3Coord {
-    public static boolean debug = true;
+    public static boolean debug = false;
 
     private int[] tachos;
     private double[] wireLengths;

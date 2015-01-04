@@ -8,6 +8,7 @@ import dk.bjop.wirecuddler.motor.MotorPathController;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by bpeterse on 20-09-2014.
@@ -33,7 +34,7 @@ public class CuddleMoveController extends Thread{
         for (int i = 0; i<mpcs.length;i++) {
             mpcs[i].start();
         }
-       this.start();
+
     }
 
     public void run() {
@@ -104,6 +105,14 @@ public class CuddleMoveController extends Thread{
         synchronized (listLock) {
             movesList.add(move);
             Utils.println("move added to movesList...");
+        }
+    }
+
+    public void queueMoves(Collection<? extends MotorPathMove> moves) {
+
+        // Either validate target pos here, or do it when the move is constructed.
+        synchronized (listLock) {
+            movesList.addAll(moves);
         }
     }
 }
