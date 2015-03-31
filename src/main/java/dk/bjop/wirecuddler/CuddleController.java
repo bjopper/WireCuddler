@@ -4,14 +4,8 @@ import dk.bjop.wirecuddler.calibration.RestPoint;
 import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.math.*;
 import dk.bjop.wirecuddler.motor.MotorGroup;
-import dk.bjop.wirecuddler.movement.CuddleMoveController;
-import dk.bjop.wirecuddler.movement.moves.StraightToPointMove;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Random;
 
 /**
  * Created by bpeterse on 26-11-2014.
@@ -64,11 +58,7 @@ public class CuddleController {
         Utils.println("Current position:\n" + curPos.toString());
 
 
-        CuddleMoveController cmc = new CuddleMoveController(mg);
 
-        cmc.queueMoves(doGenerateMovesTest());
-
-        cmc.start();
 
 
         /*double height = 143;
@@ -88,7 +78,7 @@ public class CuddleController {
         cmc.queueMove(new StraightToPointMove(currentPos));*/
     }
 
-    private Collection<StraightToPointMove> doGenerateMovesTest() {
+/*    private Collection<StraightToPointMove> doGenerateMovesTest() {
 
         Collection<StraightToPointMove> moves = new ArrayList<StraightToPointMove>();
 
@@ -152,7 +142,7 @@ public class CuddleController {
         moves.add(new StraightToPointMove(curPos));
 
         return moves;
-    }
+    }*/
 
     private void doMathtests() {
         CalibValues cv = Triangle.getInstance().getCalibValues();

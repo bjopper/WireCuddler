@@ -27,12 +27,12 @@ public class MotorSyncController {
     static LogColumn[] columnDefs = new LogColumn[] { m1Tacho1, function1, error1, m1Tacho2, function2, error2 };
 
 
-    MotorPathController c1;
-    MotorPathController c2;
-    MotorPathController c3;
+    LookAheadCuddleMotorController c1;
+    LookAheadCuddleMotorController c2;
+    LookAheadCuddleMotorController c3;
 
 
-    public MotorSyncController(MotorPathController c1, MotorPathController c2) {
+    public MotorSyncController(LookAheadCuddleMotorController c1, LookAheadCuddleMotorController c2) {
         this.c1 = c1;
         this.c2 = c2;
     }

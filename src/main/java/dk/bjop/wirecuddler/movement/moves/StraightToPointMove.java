@@ -7,18 +7,28 @@ import dk.bjop.wirecuddler.math.XYZCoord;
 /**
  * Created by bpeterse on 10-09-2014.
  */
-public class StraightToPointMove extends StraightDirectionMove {
+public class StraightToPointMove implements MotorPathMove {
 
+    float speedCmSec = 2;
 
-    //XYZCoord targetPos = null;
+    XYZCoord startPos = null;
+    XYZCoord targetPos = null;
+    float startToTargetDistance;
+    long moveStartTime;
+    long moveEndTime;
+    long calculatedMoveTimeMillis;
 
-
-    public StraightToPointMove(XYZCoord targetPos){
-        super(targetPos);
+    public StraightToPointMove(XYZCoord startPos, XYZCoord target){
+        this.targetPos = target;
+        this.startPos = startPos;
+        startToTargetDistance = (float) startPos.distanceTo(targetPos);
+        calculatedMoveTimeMillis = (long) ((startToTargetDistance / speedCmSec) * 1000f);
     }
 
     @Override
-    public int[] getExpectedTachoPosAtTimeT(long elapsedTimeMillis) {
+    public int[] getExpectedTachoPosAtTimeT(long t) {
+        long elapsedTimeMillis = t - moveStartTime;
+
         if (startPos == null || targetPos == null) throw new RuntimeException("startPos or targetPos is NULL!");
 
         float distSinceStartAtTimeT = (elapsedTimeMillis / 1000f) * speedCmSec;
@@ -36,19 +46,33 @@ public class StraightToPointMove extends StraightDirectionMove {
     }
 
     @Override
-    public boolean isMovementFinished(long elapsedTimeMillis) {
-        float distSinceStartAtTimeT = (elapsedTimeMillis / 1000f) * speedCmSec;
-        return distSinceStartAtTimeT >= startToTargetDistance;
+    public boolean isAfterMove(long t) {
+        return t > moveEndTime;
     }
 
     @Override
-    public void setStartPos(XYZCoord startPos) {
-        this.startPos = startPos;
-        startToTargetDistance = (float) startPos.distanceTo(targetPos);
+    public boolean isBeforeMove(long t) {
+        return t < moveStartTime;
     }
 
     @Override
-    public XYZCoord getTargetPos() {
+    public long getMoveEndtime() {
+        return moveStartTime + getMoveExpectedDuration();
+    }
+
+    @Override
+    public void setMoveStarttime(long starttime) {moveStartTime = starttime;}
+
+    @Override
+    public long getMoveStartime() {return moveStartTime;}
+
+    @Override
+    public long getMoveExpectedDuration() {
+        return calculatedMoveTimeMillis;
+    }
+
+    @Override
+    public XYZCoord getMoveTargetPos() {
         return targetPos;
     }
 
