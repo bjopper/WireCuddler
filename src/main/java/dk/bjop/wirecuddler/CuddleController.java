@@ -11,7 +11,7 @@ import lejos.nxt.TouchSensor;
  * Created by bpeterse on 26-11-2014.
  */
 public class CuddleController {
-    private MotorGroup mg = new MotorGroup();
+    private MotorGroup mg = MotorGroup.getInstance();
     private TouchSensor ts1 = new TouchSensor(SensorPort.S1);
     private RestPoint rp = new RestPoint(ts1);
 
@@ -232,9 +232,9 @@ public class CuddleController {
     }
 
 
-    public MotorGroup getMotorgroup() {
+    /*public MotorGroup getMotorgroup() {
         return mg;
-    }
+    }*/
 
     public TouchSensor getTouchSensor() {
         return ts1;

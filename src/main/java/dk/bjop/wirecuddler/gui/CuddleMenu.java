@@ -215,7 +215,7 @@ public class CuddleMenu {
         LCD.drawString("-M"+(motor+1)+" CONTROL-", 2, 0, true);
         Thread.sleep(menuWaitAfterButtonPress);
 
-        MotorGroup mg = cc.getMotorgroup();
+        MotorGroup mg = MotorGroup.getInstance();
         boolean leftWasDownLastTime=false;
         boolean rightWasDownLastTime=false;
         NXTCuddleMotor m = mg.getMotorByIndex(motor);
@@ -287,7 +287,7 @@ public class CuddleMenu {
         LCD.drawString("-M"+(motor1)+"-M"+(motor2)+" CONTROL-", 2, 0, true);
         Thread.sleep(menuWaitAfterButtonPress);
 
-        MotorGroup mg = cc.getMotorgroup();
+        MotorGroup mg = MotorGroup.getInstance();
         boolean leftWasDownLastTime=false;
         boolean rightWasDownLastTime=false;
         NXTCuddleMotor m1 = mg.getMotorByIndex(motor1);
@@ -382,7 +382,7 @@ public class CuddleMenu {
     }
 
     private void setHomePos(int motor) {
-        MotorGroup mg = cc.getMotorgroup();
+        MotorGroup mg = MotorGroup.getInstance();
         Utils.println("Home tacho pos for M"+(motor+1)+": "+mg.getMotorByIndex(motor).getTachoCount()+" resetting now...");
 
         mg.getMotorByIndex(motor).resetTachoCount();

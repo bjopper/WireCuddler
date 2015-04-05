@@ -22,7 +22,14 @@ public class MotorGroup implements EmergencyBreakListener{
 
     boolean positionKnown = false;
 
-    public MotorGroup() {
+    private static MotorGroup instance;
+
+    public static MotorGroup getInstance() {
+        if (instance == null) instance = new MotorGroup();
+        return instance;
+    }
+
+    private MotorGroup() {
         motors = new NXTCuddleMotor[]{new NXTCuddleMotor(MotorPort.A), new NXTCuddleMotor(MotorPort.B), new NXTCuddleMotor(MotorPort.C)};
         eb = new EmergencyBreak(1, SensorPort.S1);
         eb.addListener(this);
