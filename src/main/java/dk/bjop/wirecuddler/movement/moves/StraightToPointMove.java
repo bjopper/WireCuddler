@@ -61,6 +61,11 @@ public class StraightToPointMove implements MotorPathMove {
     }
 
     @Override
+    public void setEndtime(long endtime) {
+        this.moveEndTime = endtime;
+    }
+
+    @Override
     public void setMoveStarttime(long starttime) {moveStartTime = starttime;}
 
     @Override

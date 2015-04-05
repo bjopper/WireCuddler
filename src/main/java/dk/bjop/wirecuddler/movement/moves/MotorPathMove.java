@@ -10,6 +10,7 @@ public interface MotorPathMove {
     public boolean isAfterMove(long t);
     public boolean isBeforeMove(long t);
     public long getMoveEndtime();
+    public void setEndtime(long endtime);
     public void setMoveStarttime(long starttime);
     public long getMoveStartime();
     public long getMoveExpectedDuration();

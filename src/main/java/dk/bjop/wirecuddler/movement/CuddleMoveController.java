@@ -119,23 +119,25 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
     @Override
     public int getTachoPositionAtTimeT(long t, LookAheadCuddleMotorController mpc) throws PosNotAvailableException {
 
-        MotorPathMove m = activeMovesList.get(0);
-        if (m.isAfterMove(t)) {
-            MotorPathMove newMove = cmp.getNewMove(m.getMoveTargetPos());
-            newMove.setMoveStarttime(m.getMoveEndtime());
-            activeMovesList.add(0,newMove);
+        MotorPathMove m = null;
+        synchronized (activeMovesList) {
             m = activeMovesList.get(0);
-            if (activeMovesList.size() > 2) {
-                activeMovesList.remove(activeMovesList.size()-1);
-            }
-        }
-        else if (m.isBeforeMove(t)) {
-            if (activeMovesList.size() > 1) {
-                m = activeMovesList.get(1);
-            }
-            else {
-                Utils.println("This should not happen!?");
-                throw new PosNotAvailableException("");
+            if (m.isAfterMove(t)) {
+                MotorPathMove newMove = cmp.getNewMove(m.getMoveTargetPos());
+                newMove.setMoveStarttime(t);
+                m.setEndtime(t);
+                activeMovesList.add(0, newMove);
+                m = activeMovesList.get(0);
+                if (activeMovesList.size() > 5 ) {
+                    activeMovesList.remove(activeMovesList.size() - 1);
+                }
+            } else if (m.isBeforeMove(t)) {
+                if (activeMovesList.size() > 1) {
+                    m = activeMovesList.get(1);
+                } else {
+                    Utils.println("This should not happen!?");
+                    throw new PosNotAvailableException("");
+                }
             }
         }
 
