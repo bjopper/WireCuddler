@@ -88,14 +88,10 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
 
                 MotorPathMove newMove = cmp.getNewMove();
 
-                if (m == null) {
-                    newMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), t);
-                    m.setEndtime(t);
-                }
-                else {
-                    newMove.initialize(m.getMoveTargetPos(), t);
-                    m.setEndtime(t);
-                }
+
+                newMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), t);
+                m.setEndtime(t);
+
 
 
                 activeMovesList.add(0, newMove);
