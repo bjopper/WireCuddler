@@ -79,7 +79,7 @@ public class LookAheadCuddleMotorController extends Thread {
             int perfectCurPos = 0;
             try {
                 nextPerfectPos = posCtrl.getTachoPositionAtTimeT(now + lookAheadMillis, this);
-                //perfectCurPos = posCtrl.getTachoPositionAtTimeT(now, this);
+                perfectCurPos = posCtrl.getTachoPositionAtTimeT(now, this);
             } catch (PosNotAvailableException e) {
                 Utils.println(e.getMessage());
                 break;

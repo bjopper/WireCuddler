@@ -1,5 +1,6 @@
 package dk.bjop.wirecuddler.motor;
 
+import dk.bjop.wirecuddler.math.Triangle;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.sensors.EmergencyBreak;
 import dk.bjop.wirecuddler.sensors.EmergencyBreakListener;
@@ -25,7 +26,13 @@ public class MotorGroup implements EmergencyBreakListener{
     private static MotorGroup instance;
 
     public static MotorGroup getInstance() {
-        if (instance == null) instance = new MotorGroup();
+        if (instance == null) {
+            instance = new MotorGroup();
+            Triangle tri = Triangle.getInstance();
+
+            // TODO fix these hardcoded settings
+            instance.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
+        }
         return instance;
     }
 
@@ -141,5 +148,15 @@ public class MotorGroup implements EmergencyBreakListener{
 
     public void setEmergencyBreakingEnabled(boolean enabled) {
         this.emergencyBreakEnabled = enabled;
+    }
+
+    public String tachosToString() {
+        int[] t = this.getTachoCounts();
+        String s = "(";
+        for (int i=0;i<motors.length;i++) {
+            s+=motors[i].getTachoCount()+", ";
+        }
+        s+=")";
+        return s;
     }
 }

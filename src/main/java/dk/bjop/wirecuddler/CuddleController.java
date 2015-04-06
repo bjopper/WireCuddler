@@ -37,9 +37,6 @@ public class CuddleController {
 
 
     public void doCuddle()throws InterruptedException {
-        Triangle tri = Triangle.getInstance();
-        //TODO fix these hardcoded settings...
-        mg.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
 
         int height = 70;
 

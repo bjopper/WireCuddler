@@ -1,10 +1,8 @@
 package dk.bjop.wirecuddler.movement.moves;
 
 import dk.bjop.wirecuddler.math.SphericCoord;
-import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.math.XYZCoord;
-import dk.bjop.wirecuddler.motor.MotorGroup;
 
 /**
  * Created by bpeterse on 10-09-2014.
@@ -18,7 +16,7 @@ public class StraightToPointMove implements MotorPathMove {
     float startToTargetDistance;
     long moveStartTime;
     long moveEndTime;
-    //long calculatedMoveTimeMillis;
+    long calculatedMoveTimeMillis;
 
     public StraightToPointMove(XYZCoord target){
         this.targetPos = target;
@@ -36,8 +34,10 @@ public class StraightToPointMove implements MotorPathMove {
     public void initialize(XYZCoord startPos, long starttime) {
         this.startPos = startPos;
         this.moveStartTime = starttime;
-
         startToTargetDistance = (float) startPos.distanceTo(targetPos);
+        calculatedMoveTimeMillis = (long) ((startToTargetDistance / speedCmSec) * 1000f);
+
+       // Utils.println("Start-target distance: "+startToTargetDistance);
     }
 
     @Override
@@ -67,19 +67,23 @@ public class StraightToPointMove implements MotorPathMove {
     public boolean isAfterMove(long t) {
         if (startPos == null) throw new RuntimeException("Move not initialized!");
 
+        return t > moveStartTime + calculatedMoveTimeMillis;
         /**
          * This is how we determine whether the move is done, by checking that the distance from startpos to currentpos is less/more than distance between startpos and targetpos.
          * This methos is general and works with other types of movement-patterns such as a sine-move. (a sine-move may not end up at a exact position)
          *
          *
          */
-        float currDist = (float) startPos.distanceTo(new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian());
+        /*XYZCoord currPos = new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian();
+        Utils.println("Currpos: " + currPos + "   Tachos:" + MotorGroup.getInstance().tachosToString());
+        Utils.println("Startpos: " + startPos);
+        float currDist = (float) startPos.distanceTo(currPos);
         if (x++ == 10) {
             Utils.println("DIST: "+currDist+ " START_END DIST: "+startToTargetDistance);
             x = 0;
         }
        if (currDist >= startToTargetDistance-1) return true;
-       else return false;
+       else return false;*/
     }
 
     @Override
