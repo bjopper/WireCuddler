@@ -41,7 +41,7 @@ public class CuddleController {
         //TODO fix these hardcoded settings...
         mg.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
 
-        int height = 100;
+        int height = 70;
 
         cmc = new CuddleMoveController(mg);
 
