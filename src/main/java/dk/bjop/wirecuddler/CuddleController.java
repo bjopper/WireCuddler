@@ -22,6 +22,11 @@ public class CuddleController {
     private TouchSensor ts1 = new TouchSensor(SensorPort.S1);
     private RestPoint rp = new RestPoint(ts1);
 
+
+    CuddleMoveController cmc;
+
+
+
     public CuddleController() {
         // verify calib-values validity
     }
@@ -36,9 +41,9 @@ public class CuddleController {
         //TODO fix these hardcoded settings...
         mg.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
 
-        int height = 143;
+        int height = 100;
 
-        CuddleMoveController cmc = new CuddleMoveController(mg);
+        cmc = new CuddleMoveController(mg);
 
         ArrayList<MotorPathMove> moves = new ArrayList<MotorPathMove>();
         moves.add(0, new StraightToPointMove(new XYZCoord(120,height,70)));
@@ -47,9 +52,11 @@ public class CuddleController {
         moves.add(3, new StraightToPointMove(new WT3Coord(mg.getTachoCounts()).toCartesian()));
 
         CuddleMoveProducer cmp = new CuddleMoveProducerByList(moves);
+        //CuddleMoveProducer cmp2 = new CuddleMoveProducerGenerateRandomInRectangle();
 
         cmc.setMoveProducer(cmp);
-        cmc.startMovement();
+
+        cmc.start();
 
         //doMathtests();
         //doMoveTest();

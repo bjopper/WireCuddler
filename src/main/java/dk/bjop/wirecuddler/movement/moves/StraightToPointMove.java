@@ -1,8 +1,10 @@
 package dk.bjop.wirecuddler.movement.moves;
 
 import dk.bjop.wirecuddler.math.SphericCoord;
+import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.math.XYZCoord;
+import dk.bjop.wirecuddler.motor.MotorGroup;
 
 /**
  * Created by bpeterse on 10-09-2014.
@@ -16,12 +18,12 @@ public class StraightToPointMove implements MotorPathMove {
     float startToTargetDistance;
     long moveStartTime;
     long moveEndTime;
-    long calculatedMoveTimeMillis;
+    //long calculatedMoveTimeMillis;
 
     public StraightToPointMove(XYZCoord target){
         this.targetPos = target;
-        startToTargetDistance = (float) startPos.distanceTo(targetPos);
-        calculatedMoveTimeMillis = (long) ((startToTargetDistance / speedCmSec) * 1000f);
+
+        //calculatedMoveTimeMillis = (long) ((startToTargetDistance / speedCmSec) * 1000f);
     }
 
     /**
@@ -34,6 +36,8 @@ public class StraightToPointMove implements MotorPathMove {
     public void initialize(XYZCoord startPos, long starttime) {
         this.startPos = startPos;
         this.moveStartTime = starttime;
+
+        startToTargetDistance = (float) startPos.distanceTo(targetPos);
     }
 
     @Override
@@ -58,10 +62,24 @@ public class StraightToPointMove implements MotorPathMove {
         return f2.getTachos();
     }
 
+    int x = 0;
     @Override
     public boolean isAfterMove(long t) {
         if (startPos == null) throw new RuntimeException("Move not initialized!");
-        return t > moveEndTime;
+
+        /**
+         * This is how we determine whether the move is done, by checking that the distance from startpos to currentpos is less/more than distance between startpos and targetpos.
+         * This methos is general and works with other types of movement-patterns such as a sine-move. (a sine-move may not end up at a exact position)
+         *
+         *
+         */
+        float currDist = (float) startPos.distanceTo(new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian());
+        if (x++ == 10) {
+            Utils.println("DIST: "+currDist+ " START_END DIST: "+startToTargetDistance);
+            x = 0;
+        }
+       if (currDist >= startToTargetDistance-1) return true;
+       else return false;
     }
 
     @Override
@@ -70,32 +88,10 @@ public class StraightToPointMove implements MotorPathMove {
         return t < moveStartTime;
     }
 
-   /* @Override
-    public long getMoveEndtime() {
-        return moveStartTime + getMoveExpectedDuration();
-    }*/
-
     @Override
     public void setEndtime(long endtime) {
         this.moveEndTime = endtime;
     }
-
-    /*@Override
-    public void setMoveStarttime(long starttime) {
-        if (startPos == null) throw new RuntimeException("Move not initialized!");
-        moveStartTime = starttime;
-    }
-
-    @Override
-    public long getMoveStartime() {
-        if (startPos == null) throw new RuntimeException("Move not initialized!");
-        return moveStartTime;
-    }
-
-    @Override
-    public long getMoveExpectedDuration() {
-        return calculatedMoveTimeMillis;
-    }*/
 
     @Override
     public XYZCoord getMoveTargetPos() {

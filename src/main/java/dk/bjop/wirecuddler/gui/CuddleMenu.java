@@ -40,7 +40,7 @@ public class CuddleMenu {
                 if (mainSelect == 1 ) calibMenu();
 
                 redraw = true;
-
+                Thread.sleep(menuWaitAfterButtonPress);
             }
             if (Button.LEFT.isDown()) {
                 mainSelect--;

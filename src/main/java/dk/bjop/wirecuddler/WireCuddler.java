@@ -73,7 +73,7 @@ public class WireCuddler {
 
         //test.saveCalib(WireCuddler.default_calibFile);
 
-        System.exit(0);
+        //System.exit(0);
 
         // TODO Create stop-system.
 

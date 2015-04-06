@@ -7,4 +7,6 @@ import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
  */
 public interface CuddleMoveProducer {
     MotorPathMove getNewMove();
+    boolean hasMoreMoves();
+    public void stopProduction();
 }

@@ -22,7 +22,6 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
 
     int threadsWaiting = 0;
     CuddleMoveProducer cmp;
-    boolean doMove = false;
     ArrayList<MotorPathMove> activeMovesList = new ArrayList<MotorPathMove>();
 
     public CuddleMoveController(MotorGroup mg) {
@@ -38,20 +37,19 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         this.cmp = cmp;
     }
 
-    public void startMovement() {
-        doMove = true;
-    }
 
     public void run() {
         Utils.println("Cuddle move controller running...");
 
         while (true) {
 
-            if (allThreadsWaiting() && doMove) {
+            if (allThreadsWaiting() && cmp.hasMoreMoves()) {
                 activeMovesList.add(0,cmp.getNewMove());
+                // TODO handle move-producer no more moves
                 activeMovesList.get(0).initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), System.currentTimeMillis());
                 notifyAllMoveControllers();
             }
+
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
@@ -84,9 +82,22 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         synchronized (activeMovesList) {
             m = activeMovesList.get(0);
             if (m.isAfterMove(t)) {
+
+
+                if (!cmp.hasMoreMoves()) throw new PosNotAvailableException("Producer fresh out of moves!");
+
                 MotorPathMove newMove = cmp.getNewMove();
-                newMove.initialize(m.getMoveTargetPos(), t);
-                m.setEndtime(t);
+
+                if (m == null) {
+                    newMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), t);
+                    m.setEndtime(t);
+                }
+                else {
+                    newMove.initialize(m.getMoveTargetPos(), t);
+                    m.setEndtime(t);
+                }
+
+
                 activeMovesList.add(0, newMove);
                 m = activeMovesList.get(0);
                 if (activeMovesList.size() > 5 ) {
@@ -102,7 +113,7 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
             }
         }
 
-        return m.getExpectedTachoPosAtTimeT(t)[mpc.getControllerID().getIDNumber()];
+        return m.getExpectedTachoPosAtTimeT(t)[mpc.getControllerID().getIDNumber()-1];
     }
 
     @Override
