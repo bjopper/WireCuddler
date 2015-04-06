@@ -17,20 +17,12 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
     MotorGroup mg;
     LookAheadCuddleMotorController[] mpcs;
 
-    //ArrayList<MotorPathMove> movesList = new ArrayList<MotorPathMove>();
     Object listLock = new Object();
-
     Object monitor = new Object();
 
     int threadsWaiting = 0;
-
-
-    //long currentMoveStarttime;
-
-
     CuddleMoveProducer cmp;
-
-
+    boolean doMove = false;
     ArrayList<MotorPathMove> activeMovesList = new ArrayList<MotorPathMove>();
 
     public CuddleMoveController(MotorGroup mg) {
@@ -40,8 +32,14 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         for (int i = 0; i<mpcs.length;i++) {
             mpcs[i].start();
         }
+    }
 
-        this.cmp = new CuddleMoveProducer();
+    public void setMoveProducer(CuddleMoveProducer cmp) {
+        this.cmp = cmp;
+    }
+
+    public void startMovement() {
+        doMove = true;
     }
 
     public void run() {
@@ -49,9 +47,9 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
 
         while (true) {
 
-            if (allThreadsReady()) {
-                activeMovesList.add(0,cmp.getNewMove(new WT3Coord(mg.getTachoCounts()).toCartesian()));
-                activeMovesList.get(0).setMoveStarttime(System.currentTimeMillis());
+            if (allThreadsWaiting() && doMove) {
+                activeMovesList.add(0,cmp.getNewMove());
+                activeMovesList.get(0).initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), System.currentTimeMillis());
                 notifyAllMoveControllers();
             }
             try {
@@ -62,29 +60,9 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         }
     }
 
-    private boolean allThreadsReady() {
+    private boolean allThreadsWaiting() {
         return threadsWaiting == 3;
     }
-
-  /*  private MotorPathMove getNextMove() {
-        MotorPathMove move = null;
-        synchronized (listLock) {
-            move = movesList.remove(0);
-        }
-        return move;
-    }*/
-
-    /* public void waitForMove(int mcid) {
-         synchronized (monitor) {
-             threadsWaiting++;
-             Utils.println("MotorPathController: '" + mcid + "' entering wait for move...");
-             try {
-                 monitor.wait();
-             } catch (InterruptedException e) {
-                 System.out.println("InterruptedException caught");
-             }
-         }
-     }*/
 
     private void notifyAllMoveControllers() {
         synchronized (monitor) {
@@ -93,23 +71,6 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
             threadsWaiting = 0;
         }
     }
-
-    /*public void queueMove(MotorPathMove move) {
-
-        // Either validate target pos here, or do it when the move is coinstructed.
-        synchronized (listLock) {
-            movesList.add(move);
-            Utils.println("move added to movesList...");
-        }
-    }*/
-
-    /*public void queueMoves(Collection<? extends MotorPathMove> moves) {
-
-        // Either validate target pos here, or do it when the move is constructed.
-        synchronized (listLock) {
-            movesList.addAll(moves);
-        }
-    }*/
 
     /**
      *
@@ -123,8 +84,8 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         synchronized (activeMovesList) {
             m = activeMovesList.get(0);
             if (m.isAfterMove(t)) {
-                MotorPathMove newMove = cmp.getNewMove(m.getMoveTargetPos());
-                newMove.setMoveStarttime(t);
+                MotorPathMove newMove = cmp.getNewMove();
+                newMove.initialize(m.getMoveTargetPos(), t);
                 m.setEndtime(t);
                 activeMovesList.add(0, newMove);
                 m = activeMovesList.get(0);
@@ -156,13 +117,5 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
             }
         }
     }
-
-    /*private void getMove() {
-        MotorPathMove move = null;
-
-        if (activeMovesList.isEmpty()) {
-            move = getNextMove();
-        }
-    }*/
 
 }

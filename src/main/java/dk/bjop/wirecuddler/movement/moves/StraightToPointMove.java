@@ -18,15 +18,28 @@ public class StraightToPointMove implements MotorPathMove {
     long moveEndTime;
     long calculatedMoveTimeMillis;
 
-    public StraightToPointMove(XYZCoord startPos, XYZCoord target){
+    public StraightToPointMove(XYZCoord target){
         this.targetPos = target;
-        this.startPos = startPos;
         startToTargetDistance = (float) startPos.distanceTo(targetPos);
         calculatedMoveTimeMillis = (long) ((startToTargetDistance / speedCmSec) * 1000f);
     }
 
+    /**
+     *
+     * Set the move as started/initiated. At
+     *
+     * @param startPos
+     */
+    @Override
+    public void initialize(XYZCoord startPos, long starttime) {
+        this.startPos = startPos;
+        this.moveStartTime = starttime;
+    }
+
     @Override
     public int[] getExpectedTachoPosAtTimeT(long t) {
+        if (startPos == null) throw new RuntimeException("Move not initialized!");
+
         long elapsedTimeMillis = t - moveStartTime;
 
         if (startPos == null || targetPos == null) throw new RuntimeException("startPos or targetPos is NULL!");
@@ -47,34 +60,42 @@ public class StraightToPointMove implements MotorPathMove {
 
     @Override
     public boolean isAfterMove(long t) {
+        if (startPos == null) throw new RuntimeException("Move not initialized!");
         return t > moveEndTime;
     }
 
     @Override
     public boolean isBeforeMove(long t) {
+        if (startPos == null) throw new RuntimeException("Move not initialized!");
         return t < moveStartTime;
     }
 
-    @Override
+   /* @Override
     public long getMoveEndtime() {
         return moveStartTime + getMoveExpectedDuration();
-    }
+    }*/
 
     @Override
     public void setEndtime(long endtime) {
         this.moveEndTime = endtime;
     }
 
-    @Override
-    public void setMoveStarttime(long starttime) {moveStartTime = starttime;}
+    /*@Override
+    public void setMoveStarttime(long starttime) {
+        if (startPos == null) throw new RuntimeException("Move not initialized!");
+        moveStartTime = starttime;
+    }
 
     @Override
-    public long getMoveStartime() {return moveStartTime;}
+    public long getMoveStartime() {
+        if (startPos == null) throw new RuntimeException("Move not initialized!");
+        return moveStartTime;
+    }
 
     @Override
     public long getMoveExpectedDuration() {
         return calculatedMoveTimeMillis;
-    }
+    }*/
 
     @Override
     public XYZCoord getMoveTargetPos() {
