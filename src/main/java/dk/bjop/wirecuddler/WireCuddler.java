@@ -60,6 +60,9 @@ public class WireCuddler {
         // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
         CalibValues test = CalibValues.cretaeTestdata(0, 200, Utils.cmToTacho(193), Utils.cmToTacho(195), Utils.cmToTacho(143), 0); //  P3 elevated
 
+        test.saveCalib(WireCuddler.default_calibFile);
+
+
         Triangle tri = Triangle.getInstance();
         double alpha = tri.getAngleAtP1();
         double beta = tri.getAngleAtP2();
