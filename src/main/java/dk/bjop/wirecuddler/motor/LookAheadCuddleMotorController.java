@@ -22,10 +22,16 @@ public class LookAheadCuddleMotorController extends Thread {
 
     private boolean stopRequested = false;
 
+    private boolean debugMode = false;
+
 
     public LookAheadCuddleMotorController(NXTCuddleMotor m, TachoPositionController posCtrl) {
         this.m=m;
         this.posCtrl = posCtrl;
+    }
+
+    public void setDebugMode(boolean debug) {
+        this.debugMode = debug;
     }
 
 
@@ -87,6 +93,14 @@ public class LookAheadCuddleMotorController extends Thread {
 
 
             int currPos = m.getTachoCount();
+
+
+            if (debugMode) {
+                // testing M3 only
+                Utils.println("["+getControllerID()+"] CurrPos: "+currPos + "   PerfectCurPos: "+perfectCurPos + "   nextPerfectpos: " + nextPerfectPos);
+            }
+
+
 
             int error = perfectCurPos - currPos;
 

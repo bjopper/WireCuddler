@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f5a0524e-d97b-40e5-96fe-d053bdb00362" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/config/CalibValues.java" afterPath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/config/CalibValues.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/CuddleController.java" afterPath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/CuddleController.java" />
+    <list default="true" id="f5a0524e-d97b-40e5-96fe-d053bdb00362" name="Default" comment="Now it works!?   Must be the previous commit that fixed it cause this one dosen't really change anything. nevermind - IT WORKS AGAIN!!!!!  :-)">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/CuddleMoveController.java" afterPath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/CuddleMoveController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/MotorGroup.java" afterPath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/MotorGroup.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/calibration/RestPoint.java" afterPath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/calibration/RestPoint.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/math/Triangle.java" afterPath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/math/Triangle.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/math/Utils.java" afterPath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/math/Utils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/WireCuddler.java" afterPath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/WireCuddler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/LookAheadCuddleMotorController.java" afterPath="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/LookAheadCuddleMotorController.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="WireCuddler.iws" />
@@ -51,12 +45,34 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="NXTCuddleMotor.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/NXTCuddleMotor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="100" max-vertical-offset="1768">
+              <caret line="21" column="19" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="Triangle.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/math/Triangle.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="2089" max-vertical-offset="3587">
               <caret line="149" column="27" selection-start-line="149" selection-start-column="27" selection-end-line="149" selection-end-column="27" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LookAheadCuddleMotorController.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/LookAheadCuddleMotorController.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="185" max-vertical-offset="3383">
+              <caret line="32" column="45" selection-start-line="32" selection-start-column="45" selection-end-line="32" selection-end-column="45" />
+              <folding>
+                <element signature="e#1086#1087#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -71,33 +87,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Utils.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/math/Utils.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="374" max-vertical-offset="2261">
-              <caret line="29" column="39" selection-start-line="29" selection-start-column="39" selection-end-line="29" selection-end-column="39" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CuddleMoveController.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="CuddleMoveController.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/CuddleMoveController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1475" max-vertical-offset="2091">
-              <caret line="112" column="5" selection-start-line="112" selection-start-column="5" selection-end-line="112" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="StraightToPointMove.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/moves/StraightToPointMove.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="621" max-vertical-offset="1785">
-              <caret line="57" column="37" selection-start-line="57" selection-start-column="37" selection-end-line="57" selection-end-column="37" />
+            <state vertical-scroll-proportion="0.8857143" vertical-offset="87" max-vertical-offset="2125">
+              <caret line="34" column="9" selection-start-line="34" selection-start-column="9" selection-end-line="34" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -117,17 +111,17 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/MotorGroup.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="170" max-vertical-offset="2584">
-              <caret line="31" column="24" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
+              <caret line="35" column="49" selection-start-line="35" selection-start-column="49" selection-end-line="35" selection-end-column="49" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RestPoint.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="RestPoint.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/calibration/RestPoint.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4364896" vertical-offset="100" max-vertical-offset="2703">
-              <caret line="24" column="16" selection-start-line="24" selection-start-column="16" selection-end-line="24" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="100" max-vertical-offset="2703">
+              <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -151,6 +145,11 @@
     </FindUsagesManager>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Now it works" />
+      </list>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
@@ -492,17 +491,17 @@
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/CuddleMoveProducerGenerateRandomInRectangle.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/gui/CuddleMenu.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/CuddleMoveProducerByList.java" />
-        <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/LookAheadCuddleMotorController.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/MotorSyncController.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/moves/StraightToPointMove.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/math/Utils.java" />
-        <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/CuddleMoveController.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/config/CalibValues.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/math/Triangle.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/WireCuddler.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/CuddleController.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/MotorGroup.java" />
         <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/calibration/RestPoint.java" />
+        <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/LookAheadCuddleMotorController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/CuddleMoveController.java" />
       </list>
     </option>
   </component>
@@ -1159,7 +1158,15 @@
       <created>1428519201908</created>
       <updated>1428519201908</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Introduced dev-mode. When this is on the system is initialized with dev parameters.&#10;Calib-object is now a singleton. It can be created in only two ways. by loadCalib or createCalib -methods.&#10;Motorgroup is now initialized with the default tacho-offsets corresponding to restpoint at M1.">
+      <created>1428521669155</created>
+      <updated>1428521669155</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Now it works!?   Must be the previous commit that fixed it cause this one dosen't really change anything. nevermind - IT WORKS AGAIN!!!!!  :-)">
+      <created>1428523795573</created>
+      <updated>1428523795573</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -1177,7 +1184,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3292683" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298122" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3292683" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24973261" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1212,7 +1219,9 @@
     <MESSAGE value="Fix a few bugs. System does not work yet. Many failures... :-(" />
     <MESSAGE value="Trying to fix this shit!" />
     <MESSAGE value="Fixed old calib that was used to test height-diff of P1 and P2. This is one of the things that fucked it all up." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed old calib that was used to test height-diff of P1 and P2. This is one of the things that fucked it all up." />
+    <MESSAGE value="Introduced dev-mode. When this is on the system is initialized with dev parameters.&#10;Calib-object is now a singleton. It can be created in only two ways. by loadCalib or createCalib -methods.&#10;Motorgroup is now initialized with the default tacho-offsets corresponding to restpoint at M1." />
+    <MESSAGE value="Now it works!?   Must be the previous commit that fixed it cause this one dosen't really change anything. nevermind - IT WORKS AGAIN!!!!!  :-)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Now it works!?   Must be the previous commit that fixed it cause this one dosen't really change anything. nevermind - IT WORKS AGAIN!!!!!  :-)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1494,14 +1503,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/NXTCuddleMotor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="159" max-vertical-offset="1768">
-          <caret line="21" column="19" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/moves/MotorPathMove.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="357">
@@ -1534,14 +1535,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/LookAheadCuddleMotorController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1069" max-vertical-offset="3145">
-          <caret line="53" column="17" selection-start-line="53" selection-start-column="17" selection-end-line="53" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="27574">
@@ -1565,14 +1558,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/CuddleMoveController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1475" max-vertical-offset="2091">
-          <caret line="112" column="5" selection-start-line="112" selection-start-column="5" selection-end-line="112" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1619,18 +1604,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/MotorGroup.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/calibration/RestPoint.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="170" max-vertical-offset="2584">
-          <caret line="31" column="24" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="100" max-vertical-offset="2703">
+          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/calibration/RestPoint.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/NXTCuddleMotor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4364896" vertical-offset="100" max-vertical-offset="2703">
-          <caret line="24" column="16" selection-start-line="24" selection-start-column="16" selection-end-line="24" selection-end-column="16" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="159" max-vertical-offset="1768">
+          <caret line="21" column="19" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/MotorGroup.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="170" max-vertical-offset="2584">
+          <caret line="35" column="49" selection-start-line="35" selection-start-column="49" selection-end-line="35" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/motor/LookAheadCuddleMotorController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="185" max-vertical-offset="3383">
+          <caret line="32" column="45" selection-start-line="32" selection-start-column="45" selection-end-line="32" selection-end-column="45" />
+          <folding>
+            <element signature="e#1086#1087#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/dk/bjop/wirecuddler/movement/CuddleMoveController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.8857143" vertical-offset="87" max-vertical-offset="2125">
+          <caret line="34" column="9" selection-start-line="34" selection-start-column="9" selection-end-line="34" selection-end-column="9" />
           <folding />
         </state>
       </provider>

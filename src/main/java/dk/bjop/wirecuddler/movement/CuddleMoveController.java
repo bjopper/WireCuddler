@@ -31,6 +31,8 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         for (int i = 0; i<mpcs.length;i++) {
             mpcs[i].start();
         }
+
+       // mpcs[2].setDebugMode(true);
     }
 
     public void setMoveProducer(CuddleMoveProducer cmp) {
