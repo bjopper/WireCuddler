@@ -1,6 +1,5 @@
 package dk.bjop.wirecuddler.math;
 
-import dk.bjop.wirecuddler.WireCuddler;
 import dk.bjop.wirecuddler.config.CalibValues;
 
 /**
@@ -150,7 +149,7 @@ public class Triangle {
 
     public static Triangle getInstance() {
         if (instance == null) {
-            instance = new Triangle(CalibValues.loadCalib(WireCuddler.default_calibFile));
+            instance = new Triangle(CalibValues.getInstance());
         }
         return instance;
     }

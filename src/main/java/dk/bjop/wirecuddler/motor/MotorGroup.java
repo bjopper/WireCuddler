@@ -27,17 +27,17 @@ public class MotorGroup implements EmergencyBreakListener{
 
     public static MotorGroup getInstance() {
         if (instance == null) {
-            instance = new MotorGroup();
-            Triangle tri = Triangle.getInstance();
-
-            // TODO fix these hardcoded settings
-            instance.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
+            instance = new MotorGroup(Triangle.getInstance());
         }
         return instance;
     }
 
-    private MotorGroup() {
+    private MotorGroup(Triangle tri) {
         motors = new NXTCuddleMotor[]{new NXTCuddleMotor(MotorPort.A), new NXTCuddleMotor(MotorPort.B), new NXTCuddleMotor(MotorPort.C)};
+
+        // TODO fix these hardcoded settings
+        this.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
+
         eb = new EmergencyBreak(1, SensorPort.S1);
         eb.addListener(this);
         eb.start();

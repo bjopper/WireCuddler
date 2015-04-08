@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * Created by bpeterse on 26-11-2014.
  */
 public class CuddleController {
-    private MotorGroup mg = MotorGroup.getInstance();
+    private MotorGroup mg = null;
     private TouchSensor ts1 = new TouchSensor(SensorPort.S1);
     private RestPoint rp = new RestPoint(ts1);
 
@@ -29,6 +29,7 @@ public class CuddleController {
 
     public CuddleController() {
         // verify calib-values validity
+        mg = MotorGroup.getInstance();
     }
 
     public void moveToRestpoint() {

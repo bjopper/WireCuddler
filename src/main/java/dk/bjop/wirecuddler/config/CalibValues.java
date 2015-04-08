@@ -8,6 +8,7 @@ import java.io.*;
  * Created by bpeterse on 05-11-2014.
  */
 public class CalibValues {
+    public static String default_calibFile = "calib.bin";
 
     public String fileOrigin = null;
 
@@ -21,6 +22,12 @@ public class CalibValues {
     public int restpoint = -1; // motor-index MOTORPORT.A = 0, B = 1, C = 2
 
     //public static int cuddlePlaneHeights[] = new int[3]; // Three point that define the plane...
+    private static CalibValues instance = null;
+
+    public static CalibValues getInstance() {
+        if (instance == null) throw new RuntimeException("Calib-object has not been initialized!");
+        return instance;
+    }
 
     private CalibValues(double p1p2heightDiffCm, double p1p3heightDiffCm, int p1p2tachoDist, int p1p3tachoDist, int p2p3tachoDist, int restpoint, String fileOrigin) {
         this.p1p2heightDiffCm = p1p2heightDiffCm;
@@ -32,10 +39,10 @@ public class CalibValues {
         this.fileOrigin = fileOrigin;
     }
 
-    public void saveCalib(String filename) {
+    public void saveCalib() {
 
         FileOutputStream out = null; // declare outside the try block
-        File data = new File(filename);
+        File data = new File(default_calibFile);
 
         try {
             out = new FileOutputStream(data);
@@ -54,21 +61,21 @@ public class CalibValues {
             dataOut.writeInt(restpoint);
             out.flush();
             out.close(); // flush the buffer and write the file
-            this.fileOrigin = filename;
+            this.fileOrigin = default_calibFile;
             Utils.println("Calibration data saved!" + toString());
         } catch (IOException e) {
             System.err.println("Failed to write to output stream");
         }
     }
 
-    public static CalibValues cretaeTestdata(double p1p2heightDiffCm, double p1p3heightDiffCm, int p1p2tachoDist, int p1p3tachoDist, int p2p3tachoDist, int restpointIndex) {
-        return new CalibValues(p1p2heightDiffCm, p1p3heightDiffCm, p1p2tachoDist, p1p3tachoDist, p2p3tachoDist, restpointIndex, null);
+    public static CalibValues createCalibInstance(double p1p2heightDiffCm, double p1p3heightDiffCm, int p1p2tachoDist, int p1p3tachoDist, int p2p3tachoDist, int restpointIndex) {
+        instance = new CalibValues(p1p2heightDiffCm, p1p3heightDiffCm, p1p2tachoDist, p1p3tachoDist, p2p3tachoDist, restpointIndex, null);
+        return getInstance();
     }
 
-    public static CalibValues loadCalib(String filename) {
-        File data = new File(filename);
+    public static CalibValues loadCalib() {
+        File data = new File(default_calibFile);
 
-        CalibValues cv = null;
         try {
             InputStream is = new FileInputStream(data);
             DataInputStream din = new DataInputStream(is);
@@ -80,14 +87,14 @@ public class CalibValues {
             int p2p3tachoDist = din.readInt();
             int restpoint = din.readInt();
 
-            cv = new CalibValues(p1p2heightDiffCm, p1p3heightDiffCm, p1p2tachoDist, p1p3tachoDist, p2p3tachoDist, restpoint, filename);
+            instance = new CalibValues(p1p2heightDiffCm, p1p3heightDiffCm, p1p2tachoDist, p1p3tachoDist, p2p3tachoDist, restpoint, default_calibFile);
 
             din.close();
-            Utils.println("Calibration data loaded!"+ cv.toString());
+            Utils.println("Calibration data loaded!"+ instance.toString());
         } catch (IOException ioe) {
-            System.err.println("Read Exception");
+            Utils.println("Read Exception");
         }
-        return cv;
+        return getInstance();
     }
 
     public String toString() {

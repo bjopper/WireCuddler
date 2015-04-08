@@ -1,6 +1,7 @@
 package dk.bjop.wirecuddler.math;
 
 
+import dk.bjop.wirecuddler.WireCuddler;
 import lejos.nxt.comm.RConsole;
 
 /**
@@ -26,7 +27,7 @@ public class Utils {
     }
 
     public static void println(String s) {
-        if (RConsole.isOpen()) {
+        if (WireCuddler.isDevMode() && RConsole.isOpen()) {
             RConsole.println(s);
         }
     }

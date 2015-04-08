@@ -120,7 +120,7 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
             try {
                 monitor.wait();
             } catch (InterruptedException e) {
-                System.out.println("InterruptedException caught");
+                Utils.println("InterruptedException caught");
             }
         }
     }

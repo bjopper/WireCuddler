@@ -13,6 +13,7 @@ import lejos.nxt.TouchSensor;
 public class RestPoint {
     TouchSensor ts1;
 
+    // TODO Check if it causes problems that both the EmergencyBrake object and this one uses the sensor. I'll bet i does...
     public RestPoint(TouchSensor ts1) {
         this.ts1 = ts1;
     }
