@@ -19,7 +19,7 @@ public class RestPoint {
     }
 
     public void getRestPointCoordinates() {
-
+        // TODO   do we need this method?
     }
 
     public void moveToRestPoint(MotorGroup mgp) {
