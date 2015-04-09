@@ -25,6 +25,8 @@ public class MotorGroup implements EmergencyBreakListener{
 
     private static MotorGroup instance;
 
+    private int[] initialPosition = null;
+
     public static MotorGroup getInstance() {
         if (instance == null) {
             instance = new MotorGroup(Triangle.getInstance());
@@ -37,10 +39,15 @@ public class MotorGroup implements EmergencyBreakListener{
 
         // TODO fix these hardcoded settings
         this.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
+        this.initialPosition = this.getTachoCounts();
 
         eb = new EmergencyBreak(1, SensorPort.S1);
         eb.addListener(this);
         eb.start();
+    }
+
+    public int[] getInitialPosition() {
+        return initialPosition;
     }
 
     public NXTCuddleMotor getM1() {

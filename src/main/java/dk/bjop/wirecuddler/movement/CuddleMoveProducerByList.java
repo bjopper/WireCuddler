@@ -12,8 +12,6 @@ public class CuddleMoveProducerByList implements CuddleMoveProducer {
 
     private ArrayList<MotorPathMove> movesList;
 
-    private boolean stopRequested = false;
-
     public CuddleMoveProducerByList(ArrayList<MotorPathMove> predefinedMoves) {
         this.movesList = predefinedMoves;
     }
@@ -33,11 +31,7 @@ public class CuddleMoveProducerByList implements CuddleMoveProducer {
     @Override
     public boolean hasMoreMoves() {
         Utils.println("Moves-list size: "+movesList.size());
-        return !stopRequested && movesList.size() > 0;
+        return movesList.size() > 0;
     }
 
-    @Override
-    public void stopProduction() {
-        stopRequested = true;
-    }
 }

@@ -36,6 +36,9 @@ public class CuddleController {
         rp.moveToRestPoint(mg);
     }
 
+    public void stopCuddle() {
+        cmc.skipCurrentMoveAndReturnToInitialPosition();
+    }
 
     public void doCuddle()throws InterruptedException {
 

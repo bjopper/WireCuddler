@@ -47,7 +47,8 @@ public class LookAheadCuddleMotorController extends Thread {
                 followTachoPath();
             } catch (InterruptedException e) {
                 // Stop motors
-                m.setAcceleration(1);
+                m.setAcceleration(1000);
+                m.setSpeed(1);
                 m.flt();
 
                Utils.println("MotorController '" + m.getID().getIDString() + "' interrupted. Cause: "+e.getMessage());

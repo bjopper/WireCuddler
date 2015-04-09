@@ -36,7 +36,7 @@ public class CuddleMenu {
             }
 
             if (Button.ENTER.isDown()) {
-                if (mainSelect == 0 ) cuddle();
+                if (mainSelect == 0 ) cuddleStartStopMenu();
                 if (mainSelect == 1 ) calibMenu();
 
                 redraw = true;
@@ -94,18 +94,36 @@ public class CuddleMenu {
         }
     }
 
-    private void cuddle() {
-
-        /*Utils.println("Cuddling not implemented! Exiting...");
-        LCD.clear();
-        LCD.drawString("THE END", 3, 3);*/
-
+    private void cuddleStartStopMenu() throws InterruptedException {
+        Thread.sleep(menuWaitAfterButtonPress);
+        boolean redraw = true;
 
         try {
             cc.doCuddle();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        while (true) {
+
+            if (redraw) {
+                LCD.clear();
+                LCD.drawString("  CUDDLING...", 0, 0);
+                LCD.drawString("Stop cuddling", 0, 1, true);
+
+                redraw = false;
+            }
+
+            if (Button.ENTER.isDown()) {
+                cc.stopCuddle();
+                Thread.sleep(menuWaitAfterButtonPress);
+                break;
+            }
+
+        }
+
+
+
 
         // System.exit(0);
     }

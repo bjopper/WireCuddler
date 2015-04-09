@@ -13,8 +13,6 @@ public class CuddleMoveProducerGenerateRandomInRectangle implements CuddleMovePr
 
     final double height = 100;
 
-    boolean stopRequested = false;
-
     public CuddleMoveProducerGenerateRandomInRectangle() {}
 
     public MotorPathMove getNewMove() {
@@ -23,12 +21,7 @@ public class CuddleMoveProducerGenerateRandomInRectangle implements CuddleMovePr
 
     @Override
     public boolean hasMoreMoves() {
-        return !stopRequested;
-    }
-
-    @Override
-    public void stopProduction() {
-        stopRequested = true;
+        return true;
     }
 
     private XYZCoord getMoveTargetPoint() {

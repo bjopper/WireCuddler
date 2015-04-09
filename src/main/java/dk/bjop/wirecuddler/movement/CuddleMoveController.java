@@ -6,6 +6,7 @@ import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.motor.LookAheadCuddleMotorController;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
+import dk.bjop.wirecuddler.movement.moves.StraightToPointMove;
 
 import java.util.ArrayList;
 
@@ -17,12 +18,14 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
     MotorGroup mg;
     LookAheadCuddleMotorController[] mpcs;
 
-    Object listLock = new Object();
+    Object moveProducerLock = new Object();
     Object monitor = new Object();
 
     int threadsWaiting = 0;
     CuddleMoveProducer cmp;
     ArrayList<MotorPathMove> activeMovesList = new ArrayList<MotorPathMove>();
+    private boolean skipCurrentMoveRequested =false;
+
 
     public CuddleMoveController(MotorGroup mg) {
         this.mg = mg;
@@ -36,7 +39,9 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
     }
 
     public void setMoveProducer(CuddleMoveProducer cmp) {
-        this.cmp = cmp;
+        synchronized (moveProducerLock) {
+            this.cmp = cmp;
+        }
     }
 
 
@@ -45,15 +50,18 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
 
         while (true) {
 
-            if (allThreadsWaiting() && cmp.hasMoreMoves()) {
-                activeMovesList.add(0,cmp.getNewMove());
-                // TODO handle move-producer no more moves
-                activeMovesList.get(0).initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), System.currentTimeMillis());
-                notifyAllMoveControllers();
+            if (allThreadsWaiting() && moveAvailable()) {
+                try {
+                    activeMovesList.add(0,getNextMove());
+                    activeMovesList.get(0).initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), System.currentTimeMillis());
+                    notifyAllMoveControllers();
+                } catch (PosNotAvailableException e) {
+                    Utils.println(e.getMessage());
+                }
             }
 
             try {
-                Thread.sleep(50);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -83,18 +91,12 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         MotorPathMove m = null;
         synchronized (activeMovesList) {
             m = activeMovesList.get(0);
-            if (m.isAfterMove(t)) {
+            if (m.isAfterMove(t) || skipCurrentMoveRequested) {
+                skipCurrentMoveRequested = false;
 
-
-                if (!cmp.hasMoreMoves()) throw new PosNotAvailableException("Producer fresh out of moves!");
-
-                MotorPathMove newMove = cmp.getNewMove();
-
-
+                MotorPathMove newMove = getNextMove();
                 newMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), t);
                 m.setEndtime(t);
-
-
 
                 activeMovesList.add(0, newMove);
                 m = activeMovesList.get(0);
@@ -112,6 +114,31 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         }
 
         return m.getExpectedTachoPosAtTimeT(t)[mpc.getControllerID().getIDNumber()-1];
+    }
+
+    public void skipCurrentMove() {
+        skipCurrentMoveRequested = true;
+    }
+
+    public void skipCurrentMoveAndReturnToInitialPosition() {
+        ArrayList<MotorPathMove> l = new ArrayList<MotorPathMove>();
+        l.add(new StraightToPointMove(new WT3Coord(mg.getInitialPosition()).toCartesian()));
+        setMoveProducer(new CuddleMoveProducerByList(l));
+
+        skipCurrentMove();
+    }
+
+    private MotorPathMove getNextMove() throws PosNotAvailableException {
+        synchronized (moveProducerLock) {
+            if (!moveAvailable()) throw new PosNotAvailableException("Producer fresh out of moves!");
+            return cmp.getNewMove();
+        }
+    }
+
+    private boolean moveAvailable() {
+        synchronized (moveProducerLock) {
+            return cmp.hasMoreMoves();
+        }
     }
 
     @Override
