@@ -166,8 +166,8 @@ public class LookAheadCuddleMotorController extends Thread {
 
         }
 
-        m.setAcceleration(100);
-        m.setSpeed(0);
+        m.setAcceleration(1000);
+        m.setSpeed(1);
         m.stop();
         m.flt();
         //m.resetTachoCount();

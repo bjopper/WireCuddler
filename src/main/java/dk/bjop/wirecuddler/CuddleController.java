@@ -39,7 +39,7 @@ public class CuddleController {
 
     public void doCuddle()throws InterruptedException {
 
-        int height = 70;
+        int height = 110;
 
         cmc = new CuddleMoveController(mg);
 

@@ -34,6 +34,9 @@ public class WT3Coord {
     }
 
     public XYZCoord toCartesian() {
+
+        long start=System.currentTimeMillis();
+
         Triangle tri = Triangle.getInstance();
 
         wireLengths = new double[]{Utils.tachoToCm(tachos[0]), Utils.tachoToCm(tachos[1]), Utils.tachoToCm(tachos[2])};
@@ -46,6 +49,9 @@ public class WT3Coord {
 
         XYZCoord pos = new XYZCoord(x, y, z);
         debugPrint(pos.toString());
+
+        Utils.println("toCartesian time: "+ (System.currentTimeMillis()-start));
+
         return pos;
     }
 
@@ -114,6 +120,7 @@ public class WT3Coord {
         // Coordinates of the point between p2 and p3
 
         // z-coord and x-coord
+        // TODO sine stuff can be precalculated
         double zd = p1p2pos * Math.sin(tri.getAngleAtP1());
         double xd = p1p2pos * Math.sin(piHalf-tri.getAngleAtP1());
 
