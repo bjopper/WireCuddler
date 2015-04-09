@@ -5,14 +5,9 @@ import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.math.*;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.CuddleMoveController;
-import dk.bjop.wirecuddler.movement.CuddleMoveProducer;
-import dk.bjop.wirecuddler.movement.CuddleMoveProducerByList;
-import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
-import dk.bjop.wirecuddler.movement.moves.StraightToPointMove;
+import dk.bjop.wirecuddler.movement.CuddleMoveProducerFactory;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
-
-import java.util.ArrayList;
 
 /**
  * Created by bpeterse on 26-11-2014.
@@ -41,29 +36,9 @@ public class CuddleController {
     }
 
     public void doCuddle()throws InterruptedException {
-
-        int height = 110;
-
         cmc = new CuddleMoveController(mg);
-
-        ArrayList<MotorPathMove> moves = new ArrayList<MotorPathMove>();
-        moves.add(0, new StraightToPointMove(new XYZCoord(120,height,70)));
-        moves.add(1, new StraightToPointMove(new XYZCoord(160,height,70)));
-        moves.add(2, new StraightToPointMove(new XYZCoord(40,height,30)));
-        moves.add(3, new StraightToPointMove(new WT3Coord(mg.getTachoCounts()).toCartesian()));
-
-        CuddleMoveProducer cmp = new CuddleMoveProducerByList(moves);
-        //CuddleMoveProducer cmp2 = new CuddleMoveProducerGenerateRandomInRectangle();
-
-        cmc.setMoveProducer(cmp);
-
+        cmc.setMoveProducer(CuddleMoveProducerFactory.getListBasedCMP(mg));
         cmc.start();
-
-        //doMathtests();
-        //doMoveTest();
-        // Uncomment these two lines to use automatic move to restpoint
-        //Triangle tri = Triangle.getInstance();
-        //mg.setTachoCountOffsets(720, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist());
     }
 
     private void doMoveTest() throws InterruptedException {

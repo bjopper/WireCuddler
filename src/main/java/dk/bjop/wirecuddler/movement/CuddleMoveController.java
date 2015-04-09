@@ -126,6 +126,8 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         setMoveProducer(new CuddleMoveProducerByList(l));
 
         skipCurrentMove();
+
+        // TODO after we have returned we need to adjust the position match the tachos of the initial position exactly!
     }
 
     private MotorPathMove getNextMove() throws PosNotAvailableException {
