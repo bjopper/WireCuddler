@@ -148,10 +148,12 @@ public class Triangle {
     }
 
     public static Triangle getInstance() {
-        if (instance == null) {
-            instance = new Triangle(CalibValues.getInstance());
-        }
+        if (instance == null) throw new RuntimeException("Triangle has not been initialized with calibration data!");
         return instance;
+    }
+
+    public static void createInstance(CalibValues cv) {
+        instance = new Triangle(cv);
     }
 
 

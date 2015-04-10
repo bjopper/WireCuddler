@@ -23,12 +23,12 @@ public class Constraints {
         return true;
     }
 
-    public static boolean isWithinXZBounds(XYZCoord p) {
+    /*public static boolean isWithinXZBounds(XYZCoord p) {
         // If distance from this point to any of P1, P2 or P3 is more than the distance between P1-P2, P1-P3 etc. we're out of bounds
         double distToP1 = p.distanceTo(Triangle.getInstance().getP1());
         double distToP2 = p.distanceTo(Triangle.getInstance().getP2());
         double distToP3 = p.distanceTo(Triangle.getInstance().getP3());
        return false;
-    }
+    }*/
 
 }

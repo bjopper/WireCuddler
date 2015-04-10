@@ -62,6 +62,10 @@ public class MotorGroup implements EmergencyBreakListener{
         return motors[M3];
     }
 
+    public NXTCuddleMotor[] getMotors() {
+        return motors;
+    }
+
     public NXTCuddleMotor getMotorByIndex(int indx) {
         if (indx >= 0 && indx < motors.length) return motors[indx];
         else return null;

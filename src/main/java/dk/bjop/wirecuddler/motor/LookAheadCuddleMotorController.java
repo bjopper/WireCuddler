@@ -3,7 +3,6 @@ package dk.bjop.wirecuddler.motor;
 import dk.bjop.wirecuddler.PosNotAvailableException;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.movement.TachoPositionController;
-import lejos.nxt.Button;
 
 /**
  * Created by bpeterse on 13-09-2014.
@@ -20,9 +19,9 @@ public class LookAheadCuddleMotorController extends Thread {
     int lookAheadMillis = 1000; // TODO Increase this to ~1100+ when we have to perform very quick accelerations/decellerations - we need an algorithm to do this automatically!
     float accMultiplier = 1.8f;
 
-    private boolean stopRequested = false;
-
     private boolean debugMode = false;
+
+    private boolean stopRequested = false;
 
 
     public LookAheadCuddleMotorController(NXTCuddleMotor m, TachoPositionController posCtrl) {
@@ -34,11 +33,19 @@ public class LookAheadCuddleMotorController extends Thread {
         this.debugMode = debug;
     }
 
+    public void setStopRequested() {
+        stopRequested = true;
+    }
 
     public void run() {
-        while (!Button.ESCAPE.isDown() /*&& !pathList.isEmpty()*/) {
-            stopRequested=false;
+
+        stopRequested = false;
+
+        while (true) {
+
             posCtrl.waitForMove(this); // blocks here
+
+            if (stopRequested) break;
 
             //cmc.waitForMove(m.getID().getIDNumber());
             long startTime = System.currentTimeMillis();
@@ -51,11 +58,11 @@ public class LookAheadCuddleMotorController extends Thread {
                 m.setSpeed(1);
                 m.flt();
 
-               Utils.println("MotorController '" + m.getID().getIDString() + "' interrupted. Cause: "+e.getMessage());
+                Utils.println("MotorController '" + m.getID().getIDString() + "' interrupted. Cause: "+e.getMessage());
+                break;
             }
         }
-
-        println("PathRunner ending...");
+        Utils.println("MotorController '" + m.getID().getIDString() + "' terminated.");
     }
 
     private void followTachoPath() throws InterruptedException {
@@ -71,7 +78,7 @@ public class LookAheadCuddleMotorController extends Thread {
 
         boolean targetPosAvailable = true;
 
-        while (!stopRequested) {
+        while (true) {
 
 
 
@@ -161,7 +168,7 @@ public class LookAheadCuddleMotorController extends Thread {
 //            MotorSyncController.log(getControllerID(), m.getTachoCount(), perfectCurPos, error);
 
             long loopTime = System.currentTimeMillis()-now;
-            if (loopTime > adjustIntervalMillis) println("LOOP FLAW! Looptime exceeded the interval");
+            if (loopTime > adjustIntervalMillis) Utils.println("LOOP FLAW! Looptime exceeded the interval");
             sleepx(adjustIntervalMillis - loopTime);
 
 
@@ -174,14 +181,11 @@ public class LookAheadCuddleMotorController extends Thread {
         //m.resetTachoCount();
 
 
-        println("Error of the " + obsCount + " observations: " + (errorSum/obsCount));
+        Utils.println("Error of the " + obsCount + " observations: " + (errorSum/obsCount));
 
 
     }
 
-    public void requestStop() {
-        stopRequested = true;
-    }
 
     public NXTCuddleMotor.MotorID getControllerID() {
         return m.getID();
@@ -194,10 +198,5 @@ public class LookAheadCuddleMotorController extends Thread {
             e.printStackTrace();
         }
     }
-    
-    public void println(String s) {
-        Utils.println("["+getControllerID()+"] "+s);
-    }
-
 
 }

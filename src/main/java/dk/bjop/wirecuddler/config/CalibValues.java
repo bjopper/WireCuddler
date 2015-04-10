@@ -8,7 +8,10 @@ import java.io.*;
  * Created by bpeterse on 05-11-2014.
  */
 public class CalibValues {
-    public static String default_calibFile = "calib.bin";
+    public static final String default_calibFile_dev = "dev_calib.bin";
+    public static final String default_calibFile_prod = "prod_calib.bin";
+
+    private static boolean isInDevMode = false;
 
     public String fileOrigin = null;
 
@@ -40,9 +43,9 @@ public class CalibValues {
     }
 
     public void saveCalib() {
-
+        String filename =getFilename();
         FileOutputStream out = null; // declare outside the try block
-        File data = new File(default_calibFile);
+        File data = new File(filename);
 
         try {
             out = new FileOutputStream(data);
@@ -61,7 +64,7 @@ public class CalibValues {
             dataOut.writeInt(restpoint);
             out.flush();
             out.close(); // flush the buffer and write the file
-            this.fileOrigin = default_calibFile;
+            this.fileOrigin = filename;
             Utils.println("Calibration data saved!" + toString());
         } catch (IOException e) {
             System.err.println("Failed to write to output stream");
@@ -73,8 +76,26 @@ public class CalibValues {
         return getInstance();
     }
 
+    public static boolean calibrationFileExist() {
+        return new File(getFilename()).exists();
+    }
+
+    public static void setDevMode(boolean devMode) {
+        isInDevMode = devMode;
+    }
+
+    public static boolean getDevMode() {
+        return isInDevMode;
+    }
+
+    private static String getFilename() {
+        return isInDevMode ? default_calibFile_dev : default_calibFile_prod;
+    }
+
     public static CalibValues loadCalib() {
-        File data = new File(default_calibFile);
+        String filename = getFilename();
+        File data = new File(filename);
+        Utils.println("Trying to load calib from file: '" + filename + "'");
 
         try {
             InputStream is = new FileInputStream(data);
@@ -87,10 +108,10 @@ public class CalibValues {
             int p2p3tachoDist = din.readInt();
             int restpoint = din.readInt();
 
-            instance = new CalibValues(p1p2heightDiffCm, p1p3heightDiffCm, p1p2tachoDist, p1p3tachoDist, p2p3tachoDist, restpoint, default_calibFile);
+            instance = new CalibValues(p1p2heightDiffCm, p1p3heightDiffCm, p1p2tachoDist, p1p3tachoDist, p2p3tachoDist, restpoint, filename);
 
             din.close();
-            Utils.println("Calibration data loaded!"+ instance.toString());
+            Utils.println("Calibration data loaded!" + instance.toString());
         } catch (IOException ioe) {
             Utils.println("Read Exception");
         }

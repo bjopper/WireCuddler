@@ -5,8 +5,6 @@ import dk.bjop.wirecuddler.gui.CuddleMenu;
 import dk.bjop.wirecuddler.math.Triangle;
 import dk.bjop.wirecuddler.math.Utils;
 
-import java.io.IOException;
-
 
 /**
  * Created by bpeterse on 21-06-2014.
@@ -29,19 +27,20 @@ public class WireCuddler {
     }
 
 
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException {
+
         if (WireCuddler.isDevMode()) {
             Utils.println("------------------    DEV MODE  --------------------");
 
+            CalibValues.setDevMode(true);
+
             // Set dev parameters
-            CalibValues inst = CalibValues.createCalibInstance(0, 0, Utils.cmToTacho(193), Utils.cmToTacho(195), Utils.cmToTacho(143), 0); // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
+            //CalibValues inst = CalibValues.createCalibInstance(0, 0, Utils.cmToTacho(193), Utils.cmToTacho(195), Utils.cmToTacho(143), 0); // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
             //inst.saveCalib();
         }
-        else {
 
-            // Load prod parameters
-            CalibValues.loadCalib();
-        }
+        if (CalibValues.calibrationFileExist()) CalibValues.loadCalib();
+
 
         // TODO Create stop-system.
         new CuddleMenu().mainMenu();
