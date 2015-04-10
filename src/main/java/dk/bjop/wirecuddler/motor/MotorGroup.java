@@ -36,6 +36,7 @@ public class MotorGroup implements EmergencyBreakListener{
 
     private MotorGroup(Triangle tri) {
         motors = new NXTCuddleMotor[]{new NXTCuddleMotor(MotorPort.A), new NXTCuddleMotor(MotorPort.B), new NXTCuddleMotor(MotorPort.C)};
+        this.resetAllTachoCounters();
 
         // TODO fix these hardcoded settings
         this.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
