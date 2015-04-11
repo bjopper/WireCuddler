@@ -7,7 +7,7 @@ import dk.bjop.wirecuddler.math.XYZCoord;
 /**
  * Created by bpeterse on 10-09-2014.
  */
-public class StraightToPointMove implements MotorPathMove {
+public class StraightLineMove implements MotorPathMove {
 
     // TODO high speeds (4+) causes the system to tighten the restpoint wire way too much when moving bcak to the restpoint. THis must be fixed
 
@@ -20,7 +20,7 @@ public class StraightToPointMove implements MotorPathMove {
     long moveEndTime;
     long calculatedMoveTimeMillis;
 
-    public StraightToPointMove(XYZCoord target){
+    public StraightLineMove(XYZCoord target){
         this.targetPos = target;
 
         //calculatedMoveTimeMillis = (long) ((startToTargetDistance / speedCmSec) * 1000f);

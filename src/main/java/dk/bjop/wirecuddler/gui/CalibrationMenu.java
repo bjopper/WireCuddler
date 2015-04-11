@@ -1,7 +1,6 @@
 package dk.bjop.wirecuddler.gui;
 
 import dk.bjop.wirecuddler.CuddleController;
-import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.motor.NXTCuddleMotor;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
@@ -100,15 +99,25 @@ public class CalibrationMenu {
         LCD.drawString("M3", 3, 3, motorSelect ==3);
     }
 
+    private NXTCuddleMotor getMotor(int index) {
+        switch (index) {
+            case 1: new NXTCuddleMotor(NXTCuddleMotor.MotorID.M1);
+            case 2: new NXTCuddleMotor(NXTCuddleMotor.MotorID.M2);
+            case 3: new NXTCuddleMotor(NXTCuddleMotor.MotorID.M3);
+        }
+        return null;
+    }
+
     private void motorMove(int motor) throws InterruptedException {
         LCD.clear();
         LCD.drawString("-M"+(motor+1)+" CONTROL-", 2, 0, true);
         Thread.sleep(menuWaitAfterButtonPress);
 
-        MotorGroup mg = MotorGroup.getInstance();
+        NXTCuddleMotor m = getMotor(motor);
+
+
         boolean leftWasDownLastTime=false;
         boolean rightWasDownLastTime=false;
-        NXTCuddleMotor m = mg.getMotorByIndex(motor);
         int acc = 100;
         int decc = 400;
         int maxSpeed = 900;

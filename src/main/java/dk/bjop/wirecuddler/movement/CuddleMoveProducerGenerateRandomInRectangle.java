@@ -2,7 +2,7 @@ package dk.bjop.wirecuddler.movement;
 
 import dk.bjop.wirecuddler.math.XYZCoord;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
-import dk.bjop.wirecuddler.movement.moves.StraightToPointMove;
+import dk.bjop.wirecuddler.movement.moves.StraightLineMove;
 
 import java.util.Random;
 
@@ -16,7 +16,7 @@ public class CuddleMoveProducerGenerateRandomInRectangle implements CuddleMovePr
     public CuddleMoveProducerGenerateRandomInRectangle() {}
 
     public MotorPathMove getNewMove() {
-        return new StraightToPointMove(getMoveTargetPoint());
+        return new StraightLineMove(getMoveTargetPoint());
     }
 
     @Override

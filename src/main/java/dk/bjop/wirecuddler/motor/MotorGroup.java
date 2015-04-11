@@ -4,7 +4,6 @@ import dk.bjop.wirecuddler.math.Triangle;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.sensors.EmergencyBreak;
 import dk.bjop.wirecuddler.sensors.EmergencyBreakListener;
-import lejos.nxt.MotorPort;
 import lejos.nxt.SensorPort;
 import lejos.nxt.Sound;
 
@@ -35,7 +34,7 @@ public class MotorGroup implements EmergencyBreakListener{
     }
 
     private MotorGroup(Triangle tri) {
-        motors = new NXTCuddleMotor[]{new NXTCuddleMotor(MotorPort.A), new NXTCuddleMotor(MotorPort.B), new NXTCuddleMotor(MotorPort.C)};
+        motors = new NXTCuddleMotor[]{new NXTCuddleMotor(NXTCuddleMotor.MotorID.M1), new NXTCuddleMotor(NXTCuddleMotor.MotorID.M2), new NXTCuddleMotor(NXTCuddleMotor.MotorID.M3)};
         this.resetAllTachoCounters();
 
         // TODO fix these hardcoded settings

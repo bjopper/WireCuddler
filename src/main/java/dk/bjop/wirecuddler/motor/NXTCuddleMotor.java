@@ -13,10 +13,12 @@ public class NXTCuddleMotor extends NXTRegulatedMotor {
 
         private String strID;
         private int motorIndex;
+        private MotorPort port;
 
         private MotorID(MotorPort port, int id) {
             this.motorIndex = id;
-            strID = "M"+motorIndex;
+            this.strID = "M"+motorIndex;
+            this.port = port;
         }
 
         public int getIDNumber() {
@@ -39,6 +41,10 @@ public class NXTCuddleMotor extends NXTRegulatedMotor {
             }
             return null;
         }
+
+        public MotorPort getPort() {
+            return port;
+        }
     }
 
 
@@ -50,9 +56,9 @@ public class NXTCuddleMotor extends NXTRegulatedMotor {
     boolean enabled = true;
 
 
-    public NXTCuddleMotor(MotorPort port) {
-        super(port);
-        this.id = MotorID.getMotorID(port);
+    public NXTCuddleMotor(MotorID mid) {
+        super(mid.getPort());
+        this.id = MotorID.getMotorID(mid.getPort());
     }
 
     public MotorID getID() {
