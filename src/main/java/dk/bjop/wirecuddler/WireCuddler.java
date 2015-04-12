@@ -42,7 +42,6 @@ public class WireCuddler {
         if (CalibValues.calibrationFileExist()) CalibValues.loadCalib();
 
 
-        // TODO Create stop-system.
         new CuddleMenu().mainMenu();
     }
 

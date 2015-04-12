@@ -47,7 +47,6 @@ public class LookAheadCuddleMotorController extends Thread {
 
             if (stopRequested) break;
 
-            //cmc.waitForMove(m.getID().getIDNumber());
             long startTime = System.currentTimeMillis();
             Utils.println("Controller: '" + m.getID().getIDString() + "' notified! Startime will be: " + startTime);
             try {
@@ -71,24 +70,9 @@ public class LookAheadCuddleMotorController extends Thread {
         long errorSum = 0;
         int obsCount = 0;
 
-       // long pathMoveStarttime = System.currentTimeMillis();
-
-        //m.setAcceleration(0);
-        //m.setSpeed(0);
-
-       // boolean targetPosAvailable = true;
-
         while (true) {
-
-
-
-            // Check for is finished
-
-
-
             long now = System.currentTimeMillis();
 
-            //int nextPerfectPos = path.getExpectedTachoPosAtTimeT((System.currentTimeMillis() - pathMoveStarttime) + lookAheadMillis)[id];
             int nextPerfectPos = 0;
             int perfectCurPos = 0;
             try {
@@ -99,16 +83,12 @@ public class LookAheadCuddleMotorController extends Thread {
                 break;
             }
 
-
             int currPos = m.getTachoCount();
-
 
             if (debugMode) {
                 // testing M3 only
                 Utils.println("["+getControllerID()+"] CurrPos: "+currPos + "   PerfectCurPos: "+perfectCurPos + "   nextPerfectpos: " + nextPerfectPos);
             }
-
-
 
             int error = perfectCurPos - currPos;
 
@@ -156,36 +136,19 @@ public class LookAheadCuddleMotorController extends Thread {
                 }
             }
 
-            //Utils.println("ACC: " +acc);
-
-            //println("DIFF: " + diff + "  ACC: " + acc + "  ERR: "+error+"  SPEED: " + m.getRotationSpeed());
-
             lookAheadMillis = 1000 + Math.abs(acc)/4;
-
-
-            /*logger.writeLog(m.getTachoCount());
-            logger.writeLog(perfectCurPos);
-            logger.writeLog(error);
-            logger.finishLine();*/
-//            MotorSyncController.log(getControllerID(), m.getTachoCount(), perfectCurPos, error);
 
             long loopTime = System.currentTimeMillis()-now;
             if (loopTime > adjustIntervalMillis) Utils.println("LOOP FLAW! Looptime exceeded the interval");
             sleepx(adjustIntervalMillis - loopTime);
-
-
         }
 
         m.setAcceleration(1000);
         m.setSpeed(1);
         m.stop();
         m.flt();
-        //m.resetTachoCount();
-
 
         Utils.println("Error of the " + obsCount + " observations: " + (errorSum/obsCount));
-
-
     }
 
 
