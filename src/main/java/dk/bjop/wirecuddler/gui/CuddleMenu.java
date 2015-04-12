@@ -66,12 +66,12 @@ public class CuddleMenu {
             if (Button.LEFT.isDown()) {
                 mainSelect--;
                 redraw = true;
-                Thread.sleep(150);
+                Thread.sleep(menuWaitAfterButtonPress);
             }
             if (Button.RIGHT.isDown()) {
                 mainSelect++;
                 redraw = true;
-                Thread.sleep(150);
+                Thread.sleep(menuWaitAfterButtonPress);
             }
 
             if (mainSelect < 0) mainSelect = 2;

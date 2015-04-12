@@ -1,17 +1,18 @@
 package dk.bjop.wirecuddler.movement.moves;
 
 import dk.bjop.wirecuddler.math.SphericCoord;
+import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.math.XYZCoord;
+import dk.bjop.wirecuddler.motor.MotorGroup;
 
 /**
  * Created by bpeterse on 10-09-2014.
  *
- * This move will advance towards the targetpoint, but will not settle on the point.
+ * This move will settle acuurately on the target point.
  */
-public class StraightLineMove implements MotorPathMove {
+public class PointMove implements MotorPathMove {
 
-    // TODO high speeds (4+) causes the system to tighten the restpoint wire way too much when moving bcak to the restpoint. THis must be fixed
 
     float speedCmSec = 4;
 
@@ -22,10 +23,13 @@ public class StraightLineMove implements MotorPathMove {
     long moveEndTime;
     long calculatedMoveTimeMillis;
 
-    public StraightLineMove(XYZCoord target){
+    int[] targetTachos;
+
+    public PointMove(XYZCoord target){
         this.targetPos = target;
 
         //calculatedMoveTimeMillis = (long) ((startToTargetDistance / speedCmSec) * 1000f);
+        targetTachos = target.toWiresTachoCoord().getTachos();
     }
 
     /**
@@ -48,6 +52,8 @@ public class StraightLineMove implements MotorPathMove {
     public int[] getExpectedTachoPosAtTimeT(long t) {
         if (startPos == null) throw new RuntimeException("Move not initialized!");
 
+        if (t >= moveStartTime + calculatedMoveTimeMillis) return targetTachos;
+
         long elapsedTimeMillis = t - moveStartTime;
 
         if (startPos == null || targetPos == null) throw new RuntimeException("startPos or targetPos is NULL!");
@@ -69,25 +75,21 @@ public class StraightLineMove implements MotorPathMove {
     int x = 0;
     @Override
     public boolean isAfterMove(long t) {
-        if (startPos == null) throw new RuntimeException("Move not initialized!");
+       if (startPos == null) throw new RuntimeException("Move not initialized!");
 
-        return t > moveStartTime + calculatedMoveTimeMillis;
-        /**
-         * This is how we determine whether the move is done, by checking that the distance from startpos to currentpos is less/more than distance between startpos and targetpos.
-         * This methos is general and works with other types of movement-patterns such as a sine-move. (a sine-move may not end up at a exact position)
-         *
-         *
-         */
-        /*XYZCoord currPos = new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian();
-        Utils.println("Currpos: " + currPos + "   Tachos:" + MotorGroup.getInstance().tachosToString());
-        Utils.println("Startpos: " + startPos);
-        float currDist = (float) startPos.distanceTo(currPos);
-        if (x++ == 10) {
-            Utils.println("DIST: "+currDist+ " START_END DIST: "+startToTargetDistance);
-            x = 0;
-        }
-       if (currDist >= startToTargetDistance-1) return true;
-       else return false;*/
+       if (t >= moveStartTime + calculatedMoveTimeMillis) {
+           int[] currTachos = MotorGroup.getInstance().getTachoCounts();
+           boolean terminate = true;
+           Utils.println("Diff: "+targetPos.toWiresTachoCoord().subtract(new WT3Coord(currTachos)).toString());
+           int span = 1; // TODO This might need some adjustment
+           for (int i=0;i<currTachos.length;i++) {
+               terminate = terminate && (targetTachos[i]+span > currTachos[i] && currTachos[i] > targetTachos[0]-span);
+           }
+           return terminate;
+       }
+        else {
+           return false;
+       }
     }
 
     @Override

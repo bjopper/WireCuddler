@@ -6,7 +6,7 @@ import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.motor.LookAheadCuddleMotorController;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
-import dk.bjop.wirecuddler.movement.moves.StraightLineMove;
+import dk.bjop.wirecuddler.movement.moves.PointMove;
 
 import java.util.ArrayList;
 
@@ -80,23 +80,7 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
             }
         }
 
-
-
-        WT3Coord initPos = new WT3Coord(mg.getInitialPosition());
-        WT3Coord currPos = new WT3Coord(mg.getTachoCounts());
-
-        Utils.println("Initial tachos were: "+initPos.toString());
-        Utils.println("Current tachos are: "+currPos.toString());
-
-        Utils.println("Adjusting pos to initial pos......");
-
-        int[] diff = initPos.subtract(currPos);
-
-        //NXTCuddleMotor[] motors = mg.getMotors();
-        for (int i=0;i<3;i++) {
-            // TODO adjust position using rotateTo-methods on the motors - or just make the a CMP that can move to an accurate position
-        }
-
+        Utils.println("Initial tachos were: "+new WT3Coord(mg.getInitialPosition()).toString());
         Utils.println("Current tachos are: "+new WT3Coord(mg.getTachoCounts()).toString());
 
         Utils.println("CuddleMoveController-thread terminating...");
@@ -156,7 +140,7 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
 
     public void skipCurrentMoveAndReturnToInitialPosition() {
         ArrayList<MotorPathMove> l = new ArrayList<MotorPathMove>();
-        l.add(new StraightLineMove(new WT3Coord(mg.getInitialPosition()).toCartesian()));
+        l.add(new PointMove(new WT3Coord(mg.getInitialPosition()).toCartesian()));
         setMoveProducer(new CuddleMoveProducerByList(l));
 
         skipCurrentMove();

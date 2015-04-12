@@ -67,7 +67,7 @@ public class CalibrationMenu {
                 switch (motorSelect) {
                     case 1:
                     case 2:
-                    case 3: motorMove(motorSelect-1);break;
+                    case 3: motorMove(motorSelect);break;
                 }
                 LCD.clear();
                 redrawSingleMotorMenu(motorSelect);
@@ -101,9 +101,9 @@ public class CalibrationMenu {
 
     private NXTCuddleMotor getMotor(int index) {
         switch (index) {
-            case 1: new NXTCuddleMotor(NXTCuddleMotor.MotorID.M1);
-            case 2: new NXTCuddleMotor(NXTCuddleMotor.MotorID.M2);
-            case 3: new NXTCuddleMotor(NXTCuddleMotor.MotorID.M3);
+            case 1: return new NXTCuddleMotor(NXTCuddleMotor.MotorID.M1);
+            case 2: return new NXTCuddleMotor(NXTCuddleMotor.MotorID.M2);
+            case 3: return new NXTCuddleMotor(NXTCuddleMotor.MotorID.M3);
         }
         return null;
     }

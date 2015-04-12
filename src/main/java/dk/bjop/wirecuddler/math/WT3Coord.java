@@ -55,9 +55,9 @@ public class WT3Coord {
         return pos;
     }
 
-    public int[] subtract(WT3Coord wtc) {
+    public WT3Coord subtract(WT3Coord wtc) {
         int[] c = wtc.getTachos();
-        return new int[]{tachos[0]-c[0], tachos[1]-c[1], tachos[2]-c[2]};
+        return new WT3Coord(new int[]{tachos[0]-c[0], tachos[1]-c[1], tachos[2]-c[2]});
     }
 
     public int[] getTachos() {
