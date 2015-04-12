@@ -1,7 +1,6 @@
 package dk.bjop.wirecuddler.movement.moves;
 
 import dk.bjop.wirecuddler.math.SphericCoord;
-import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.math.XYZCoord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
@@ -80,10 +79,9 @@ public class PointMove implements MotorPathMove {
        if (t >= moveStartTime + calculatedMoveTimeMillis) {
            int[] currTachos = MotorGroup.getInstance().getTachoCounts();
            boolean terminate = true;
-           Utils.println("Diff: "+targetPos.toWiresTachoCoord().subtract(new WT3Coord(currTachos)).toString());
            int span = 1; // TODO This might need some adjustment
            for (int i=0;i<currTachos.length;i++) {
-               terminate = terminate && (targetTachos[i]+span > currTachos[i] && currTachos[i] > targetTachos[0]-span);
+               terminate = terminate && (currTachos[i] <= targetTachos[i]+span && currTachos[i] >= targetTachos[i]-span);
            }
            return terminate;
        }

@@ -73,10 +73,10 @@ public class LookAheadCuddleMotorController extends Thread {
 
        // long pathMoveStarttime = System.currentTimeMillis();
 
-        m.setAcceleration(0);
-        m.setSpeed(0);
+        //m.setAcceleration(0);
+        //m.setSpeed(0);
 
-        boolean targetPosAvailable = true;
+       // boolean targetPosAvailable = true;
 
         while (true) {
 
@@ -121,7 +121,7 @@ public class LookAheadCuddleMotorController extends Thread {
 
             int diff = 0;
             int acc = 0;
-            if (nextPerfectPos < perfectCurPos) {
+            if (nextPerfectPos < currPos) {
                 m.backward();
 
                 diff = nextPerfectPos-currPos;
@@ -155,6 +155,8 @@ public class LookAheadCuddleMotorController extends Thread {
                     m.setSpeed(m.getMaxSpeed());
                 }
             }
+
+            //Utils.println("ACC: " +acc);
 
             //println("DIFF: " + diff + "  ACC: " + acc + "  ERR: "+error+"  SPEED: " + m.getRotationSpeed());
 

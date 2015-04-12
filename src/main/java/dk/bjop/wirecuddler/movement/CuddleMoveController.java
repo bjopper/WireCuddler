@@ -17,22 +17,25 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
 
     MotorGroup mg;
     LookAheadCuddleMotorController[] mpcs;
+    CuddleMoveProducer cmp;
 
     Object moveProducerLock = new Object();
     Object monitor = new Object();
 
     int threadsWaiting = 0;
-    CuddleMoveProducer cmp;
-    ArrayList<MotorPathMove> activeMovesList = new ArrayList<MotorPathMove>();
-    private boolean skipCurrentMoveRequested =false;
+    boolean skipCurrentMoveRequested =false;
 
-    private boolean stopRequested = false;
+    ArrayList<MotorPathMove> activeMovesList = new ArrayList<MotorPathMove>();
+
+
 
     public CuddleMoveController(MotorGroup mg) {
         this.mg = mg;
         this.mpcs = new LookAheadCuddleMotorController[] {new LookAheadCuddleMotorController(mg.getM1(), this), new LookAheadCuddleMotorController(mg.getM2(), this), new LookAheadCuddleMotorController(mg.getM3(), this)};
 
-       // mpcs[2].setDebugMode(true);
+        //mpcs[0].setDebugMode(true);
+        //mpcs[1].setDebugMode(true);
+        //mpcs[2].setDebugMode(true);
     }
 
     public void setMoveProducer(CuddleMoveProducer cmp) {
@@ -126,7 +129,7 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
                     m = activeMovesList.get(1);
                 } else {
                     Utils.println("This should not happen!?");
-                    throw new PosNotAvailableException("");
+                    throw new PosNotAvailableException("This should not happen!");
                 }
             }
         }
