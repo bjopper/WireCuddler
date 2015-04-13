@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler;
+package dk.bjop.wirecuddler.tests;
 
 /**
  * Created by bpeterse on 30-03-2015.
