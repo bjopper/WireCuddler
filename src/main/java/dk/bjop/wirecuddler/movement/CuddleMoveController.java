@@ -1,10 +1,11 @@
 package dk.bjop.wirecuddler.movement;
 
-import dk.bjop.wirecuddler.PosNotAvailableException;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.motor.LookAheadCuddleMotorController;
 import dk.bjop.wirecuddler.motor.MotorGroup;
+import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducer;
+import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducerByList;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 import dk.bjop.wirecuddler.movement.moves.PointMove;
 

@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler.movement;
+package dk.bjop.wirecuddler.movement.moveproducers;
 
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.math.XYZCoord;

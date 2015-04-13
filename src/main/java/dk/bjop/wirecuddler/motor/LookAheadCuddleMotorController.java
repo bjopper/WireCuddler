@@ -1,6 +1,6 @@
 package dk.bjop.wirecuddler.motor;
 
-import dk.bjop.wirecuddler.PosNotAvailableException;
+import dk.bjop.wirecuddler.movement.PosNotAvailableException;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.movement.TachoPositionController;
 
@@ -148,7 +148,7 @@ public class LookAheadCuddleMotorController extends Thread {
         m.stop();
         m.flt();
 
-        Utils.println("Error of the " + obsCount + " observations: " + (errorSum/obsCount));
+        Utils.println("Error of the " + obsCount + " observations: " + (errorSum / obsCount));
     }
 
 

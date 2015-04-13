@@ -2,7 +2,7 @@ package dk.bjop.wirecuddler.motor;
 
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.WT3Coord;
-import dk.bjop.wirecuddler.movement.CuddleMoveProducer;
+import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducer;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 
 import java.util.ArrayList;

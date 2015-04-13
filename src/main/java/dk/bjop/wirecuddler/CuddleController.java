@@ -5,7 +5,7 @@ import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.math.Triangle;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.CuddleMoveController;
-import dk.bjop.wirecuddler.movement.CuddleMoveProducerFactory;
+import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducerFactory;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
 

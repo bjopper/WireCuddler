@@ -1,6 +1,5 @@
 package dk.bjop.wirecuddler.movement;
 
-import dk.bjop.wirecuddler.PosNotAvailableException;
 import dk.bjop.wirecuddler.motor.LookAheadCuddleMotorController;
 
 /**
