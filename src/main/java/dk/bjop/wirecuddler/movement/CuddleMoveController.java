@@ -138,18 +138,22 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         return m.getExpectedTachoPosAtTimeT(t)[mpc.getControllerID().getIDNumber()-1];
     }
 
-    public void skipCurrentMove() {
-        skipCurrentMoveRequested = true;
+    public void setSkipCurrentMove() {
+        if (this.isAlive()) skipCurrentMoveRequested = true;
     }
 
-    public void skipCurrentMoveAndReturnToInitialPosition() {
+    private void setMoveToInitialPosition() {
         ArrayList<MotorPathMove> l = new ArrayList<MotorPathMove>();
         l.add(new PointMove(new WT3Coord(mg.getInitialPosition()).toCartesian()));
         setMoveProducer(new CuddleMoveProducerByList(l));
+    }
 
-        skipCurrentMove();
+    public void skipCurrentMoveAndReturnToInitialPosition() {
+        setSkipCurrentMove();
+        setMoveToInitialPosition();
+        if (!this.isAlive()) this.start();
 
-        // TODO after we have returned we need to adjust the position match the tachos of the initial position exactly!
+        // TODO after we have returned we need to adjust the position match the tachos of the initial position exactly!  Fixed by pointmove!?
     }
 
     private MotorPathMove getNextMove() throws PosNotAvailableException {

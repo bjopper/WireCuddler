@@ -54,6 +54,7 @@ public class CalibrationMenu {
             if (mainSelect < 0) mainSelect = 1;
             if (mainSelect > 1) mainSelect = 0;
         }
+
     }
 
     private void selectMotorMenu() throws InterruptedException {
@@ -110,7 +111,7 @@ public class CalibrationMenu {
 
     private void motorMove(int motor) throws InterruptedException {
         LCD.clear();
-        LCD.drawString("-M"+(motor+1)+" CONTROL-", 2, 0, true);
+        LCD.drawString("-M"+(motor)+" CONTROL-", 2, 0, true);
         Thread.sleep(menuWaitAfterButtonPress);
 
         NXTCuddleMotor m = getMotor(motor);

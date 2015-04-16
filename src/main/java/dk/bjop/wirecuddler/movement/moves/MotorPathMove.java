@@ -10,6 +10,5 @@ public interface MotorPathMove {
     public void initialize(XYZCoord startPos, long starttime);
     public boolean isAfterMove(long t);
     public boolean isBeforeMove(long t);
-    public void setEndtime(long endtime);
-    public XYZCoord getMoveTargetPos();
+    public void setEndtime(long endtime); // TODO remove this method and replace it with a terminateMove-method. That makes more sense.
 }

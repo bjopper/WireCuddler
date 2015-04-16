@@ -101,9 +101,4 @@ public class PointMove implements MotorPathMove {
         this.moveEndTime = endtime;
     }
 
-    @Override
-    public XYZCoord getMoveTargetPos() {
-        return targetPos;
-    }
-
 }

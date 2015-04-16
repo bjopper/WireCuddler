@@ -6,6 +6,7 @@ import dk.bjop.wirecuddler.math.Triangle;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.CuddleMoveController;
 import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducerFactory;
+import dk.bjop.wirecuddler.movement.moves.OperatedMove;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
 
@@ -22,31 +23,36 @@ public class CuddleController {
     public CuddleController() {}
 
     public void moveToRestpoint() {
-        rp.moveToRestPoint(MotorGroup.getInstance());
+        ensureInitialized();
+        cmc.skipCurrentMoveAndReturnToInitialPosition();
     }
 
     public void stopCuddle() {
         cmc.skipCurrentMoveAndReturnToInitialPosition();
     }
 
-    public void doCuddle()throws InterruptedException {
-
-        Triangle.createInstance(CalibValues.getInstance());
-        MotorGroup mg = MotorGroup.getInstance();
-
-        //TODO Fix lego brake - it has too much slack!
-
-
-        cmc = new CuddleMoveController(mg);
+    public void doCuddle() {
+        ensureInitialized();
         //cmc.setMoveProducer(CuddleMoveProducerFactory.getListBasedCMP(mg));
         cmc.setMoveProducer(CuddleMoveProducerFactory.getAutoRandomBasedCMP());
         cmc.start();
     }
 
-
-
-
-    public TouchSensor getTouchSensor() {
-        return ts1;
+    public void doOperatedMove(OperatedMove move) {
+        ensureInitialized();
+        cmc.setMoveProducer(CuddleMoveProducerFactory.getOperatedCMP(move));
+        cmc.start();
     }
+
+    private void ensureInitialized() {
+        if (cmc == null) {
+            Triangle.createInstance(CalibValues.getInstance());
+            MotorGroup mg = MotorGroup.getInstance();
+
+            //TODO Fix lego brake - it has too much slack!
+
+            cmc = new CuddleMoveController(mg);
+        }
+    }
+
 }

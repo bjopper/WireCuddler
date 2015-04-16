@@ -41,7 +41,6 @@ public class WireCuddler {
 
         if (CalibValues.calibrationFileExist()) CalibValues.loadCalib();
 
-
         new CuddleMenu().mainMenu();
     }
 

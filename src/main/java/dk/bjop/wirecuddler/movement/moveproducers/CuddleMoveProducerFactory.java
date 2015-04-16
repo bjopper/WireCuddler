@@ -28,4 +28,10 @@ public class CuddleMoveProducerFactory {
     public static CuddleMoveProducer getAutoRandomBasedCMP() {
         return new CuddleMoveProducerGenerateRandomInRectangle();
     }
+
+    public static CuddleMoveProducer getOperatedCMP(MotorPathMove om) {
+        ArrayList<MotorPathMove> move = new ArrayList<MotorPathMove>();
+        move.add(0, om);
+        return new CuddleMoveProducerByList(move);
+    }
 }

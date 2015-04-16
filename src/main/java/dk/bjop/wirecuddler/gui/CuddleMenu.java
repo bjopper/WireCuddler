@@ -14,6 +14,8 @@ public class CuddleMenu {
 
     CuddleController cc;
     CalibrationMenu cm;
+    CuddlePointMenu cpm;
+    SettingsMenu sm;
 
 
     public CuddleMenu() {
@@ -22,6 +24,8 @@ public class CuddleMenu {
         // M3-M2: 10537
         cc = new CuddleController();
         cm = new CalibrationMenu(cc);
+        cpm = new CuddlePointMenu(cc);
+        sm = new SettingsMenu(cc);
     }
 
     public void mainMenu() throws InterruptedException {
@@ -49,16 +53,17 @@ public class CuddleMenu {
             if (redraw) {
                 LCD.clear();
                 LCD.drawString("Cuddle", 0, 0, mainSelect==0);
-                LCD.drawString("Settings", 0, 1, false); // TODO implement
-                LCD.drawString("Calibration", 0, 2, mainSelect==1);
-                LCD.drawString("Exit", 0, 3, mainSelect==2);
+                LCD.drawString("Settings", 0, 1, mainSelect==1);
+                LCD.drawString("Calibration", 0, 2, mainSelect==2);
+                LCD.drawString("Exit", 0, 3, mainSelect==3);
                 redraw = false;
             }
 
             if (Button.ENTER.isDown()) {
                 if (mainSelect == 0 ) cuddleStartStopMenu();
-                if (mainSelect == 1 ) cm.calibMenu();
-                if (mainSelect == 2 ) throw new RuntimeException("Terminating system."); // This is the only known way to make sure the NXT shuts down the running program!? (and then lejos turns off by auto after a while)
+                if (mainSelect == 1 ) cpm.startMenu();
+                if (mainSelect == 2 ) cm.calibMenu();
+                if (mainSelect == 3 ) throw new RuntimeException("Terminating system."); // This is the only known way to make sure the NXT shuts down the running program!? (and then lejos turns off by auto after a while)
 
                 redraw = true;
                 Thread.sleep(menuWaitAfterButtonPress);
@@ -74,8 +79,8 @@ public class CuddleMenu {
                 Thread.sleep(menuWaitAfterButtonPress);
             }
 
-            if (mainSelect < 0) mainSelect = 2;
-            if (mainSelect > 2) mainSelect = 0;
+            if (mainSelect < 0) mainSelect = 3;
+            if (mainSelect > 3) mainSelect = 0;
         }
     }
 
@@ -83,11 +88,9 @@ public class CuddleMenu {
         Thread.sleep(menuWaitAfterButtonPress);
         boolean redraw = true;
 
-        try {
-            cc.doCuddle();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        cc.doCuddle();
+
 
         while (true) {
 

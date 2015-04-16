@@ -41,6 +41,7 @@ public class MotorGroup implements EmergencyBreakListener{
         this.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
         this.initialPosition = this.getTachoCounts();
 
+        // TODO What is this braking for?
         eb = new EmergencyBreak(1, SensorPort.S1);
         eb.addListener(this);
         eb.start();
@@ -130,10 +131,6 @@ public class MotorGroup implements EmergencyBreakListener{
         motors[M1].setEnabled(enabled);
         motors[M2].setEnabled(enabled);
         motors[M3].setEnabled(enabled);
-    }
-
-    public boolean positionKnown() {
-        return positionKnown;
     }
 
     public void setTachoMax(int m1Max, int m2Max, int m3Max) {
