@@ -1,6 +1,5 @@
 package dk.bjop.wirecuddler.movement.moveproducers;
 
-import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class CuddleMoveProducerByList implements CuddleMoveProducer {
 
     @Override
     public boolean hasMoreMoves() {
-        Utils.println("Moves-list size: "+movesList.size());
+        //Utils.println("Moves-list size: "+movesList.size());
         return movesList.size() > 0;
     }
 

@@ -90,9 +90,6 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
                         Utils.println(e.getMessage());
                     }
                 }
-                else {
-                    Utils.println("Awaiting CMP...");
-                }
             }
             else {
                 if (currentMove != null) {
