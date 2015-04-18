@@ -16,10 +16,12 @@ public class OperatedMove implements MotorPathMove {
         X, Y, Z, NONE;
     }
 
+    boolean forceMoveEnd = false;
+
     private MotorDirection mdir = MotorDirection.POSITIVE;
     private CoordDirection cd = CoordDirection.NONE;
 
-    private boolean terminateMove = false;
+    //private boolean terminateMove = false;
     private long movementStarttime;
     private XYZCoord pos;
     private XYZCoord newPos;
@@ -46,23 +48,18 @@ public class OperatedMove implements MotorPathMove {
         this.pos = newPos;
     }
 
-    public void terminateMove() {
-        stopMovement();
-        terminateMove = true;
-    }
-
     private float determineSpeed(long elapsedMillis) {
         // TODO Implement gradual acceleration
         return startSpeed;
     }
 
     public XYZCoord getCurrentPosition() {
-        return pos;
+        return newPos;
     }
 
     @Override
     public int[] getExpectedTachoPosAtTimeT(long t) {
-        if (terminateMove)  throw new RuntimeException("Move has been terminated.");
+        if (forceMoveEnd)  throw new RuntimeException("Move has been terminated.");
 
         if (cd != CoordDirection.NONE) {
 
@@ -88,18 +85,14 @@ public class OperatedMove implements MotorPathMove {
 
 
     @Override
-    public boolean isAfterMove(long t) {
-        return terminateMove;
+    public boolean isMoveDone(long t) {
+        return forceMoveEnd;
     }
 
     @Override
-    public boolean isBeforeMove(long t) {
-        return false;
-    }
-
-    @Override
-    public void setEndtime(long endtime) {
-
+    public void setMoveTerminate() {
+        stopMovement();
+        this.forceMoveEnd = true;
     }
 
 }

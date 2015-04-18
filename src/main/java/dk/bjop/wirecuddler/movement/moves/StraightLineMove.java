@@ -10,6 +10,7 @@ import dk.bjop.wirecuddler.math.XYZCoord;
  * This move will advance towards the targetpoint, but will not settle on the point.
  */
 public class StraightLineMove implements MotorPathMove {
+    boolean forceMoveEnd = false;
 
     // TODO high speeds (4+) causes the system to tighten the restpoint wire way too much when moving bcak to the restpoint. THis must be fixed
 
@@ -19,7 +20,6 @@ public class StraightLineMove implements MotorPathMove {
     XYZCoord targetPos = null;
     float startToTargetDistance;
     long moveStartTime;
-    long moveEndTime;
     long calculatedMoveTimeMillis;
 
     public StraightLineMove(XYZCoord target){
@@ -53,9 +53,9 @@ public class StraightLineMove implements MotorPathMove {
         if (startPos == null || targetPos == null) throw new RuntimeException("startPos or targetPos is NULL!");
 
         float distSinceStartAtTimeT = (elapsedTimeMillis / 1000f) * speedCmSec;
-        if (distSinceStartAtTimeT > startToTargetDistance) {
+        /*if (distSinceStartAtTimeT > startToTargetDistance) {
             distSinceStartAtTimeT = startToTargetDistance;
-        }
+        }*/
         //TODO optimize this for speed
         XYZCoord g1 = targetPos.subtract(startPos);
         SphericCoord sp = g1.toSpheric();
@@ -68,7 +68,7 @@ public class StraightLineMove implements MotorPathMove {
 
     int x = 0;
     @Override
-    public boolean isAfterMove(long t) {
+    public boolean isMoveDone(long t) {
         if (startPos == null) throw new RuntimeException("Move not initialized!");
 
         return t > moveStartTime + calculatedMoveTimeMillis;
@@ -91,14 +91,9 @@ public class StraightLineMove implements MotorPathMove {
     }
 
     @Override
-    public boolean isBeforeMove(long t) {
-        if (startPos == null) throw new RuntimeException("Move not initialized!");
-        return t < moveStartTime;
+    public void setMoveTerminate() {
+        this.forceMoveEnd = true;
     }
 
-    @Override
-    public void setEndtime(long endtime) {
-        this.moveEndTime = endtime;
-    }
 
 }

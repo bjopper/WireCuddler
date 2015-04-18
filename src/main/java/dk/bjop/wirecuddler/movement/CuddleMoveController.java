@@ -7,7 +7,6 @@ import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducer;
 import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducerByList;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
-import dk.bjop.wirecuddler.movement.moves.PointMove;
 
 import java.util.ArrayList;
 
@@ -20,14 +19,13 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
     LookAheadCuddleMotorController[] mpcs;
     CuddleMoveProducer cmp;
 
-    Object moveProducerLock = new Object();
+    Object cmpLock = new Object();
     Object monitor = new Object();
 
     int threadsWaiting = 0;
-    boolean skipCurrentMoveRequested =false;
-
-    ArrayList<MotorPathMove> activeMovesList = new ArrayList<MotorPathMove>();
-
+    MotorPathMove currentMove = null;
+    boolean skipCurrentMove = false;
+    boolean terminate = false;
 
 
     public CuddleMoveController(MotorGroup mg) {
@@ -39,67 +37,100 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         //mpcs[2].setDebugMode(true);
     }
 
-    public void setMoveProducer(CuddleMoveProducer cmp) {
-        synchronized (moveProducerLock) {
+
+    public void runMoves(CuddleMoveProducer cmp, boolean waitForCurrentMoveCompletion) {
+       if (!this.isAlive() || terminate) throw new RuntimeException("CuddleMoveController has not been started!");
+        if (!waitForCurrentMoveCompletion && currentMove != null) currentMove.setMoveTerminate();
+        synchronized (cmpLock) {
             this.cmp = cmp;
         }
     }
 
+    public void runMoves(ArrayList<MotorPathMove> moves, boolean waitForCurrentMoveCompletion) {
+        runMoves(new CuddleMoveProducerByList(moves), waitForCurrentMoveCompletion);
+    }
+
+    public void runMove(MotorPathMove m, boolean waitForCurrentMoveCompletion) {
+        ArrayList<MotorPathMove> moves = new ArrayList<MotorPathMove>();
+        moves.add(0,m);
+        runMoves(moves, waitForCurrentMoveCompletion);
+    }
+
+    public void terminateRunningMoves() {
+        if (!this.isAlive()) throw new RuntimeException("CuddleMoveController has not been started!");
+        synchronized (cmpLock) {
+            this.cmp = null;
+        }
+    }
+
+    public void stopController() {
+        this.terminate=true;
+    }
+
 
     public void run() {
+        terminate = false;
 
         Utils.println("Starting LookAheadCuddleMotorControllers...");
         for (int i = 0; i<mpcs.length;i++) {
             mpcs[i].start();
         }
-
         Utils.println("Cuddle move controller running...");
 
-        while (true) {
+
+        while (!terminate) {
 
             if (allThreadsWaiting()) {
                 if (moveAvailable()){
                     try {
-                        activeMovesList.add(0, getNextMove());
-                        activeMovesList.get(0).initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), System.currentTimeMillis());
+                        currentMove = getNextMove();
+                        currentMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), System.currentTimeMillis());
                         notifyAllMoveControllers();
                     } catch (PosNotAvailableException e) {
                         Utils.println(e.getMessage());
                     }
                 }
                 else {
-                    Utils.println("Stopping LookAheadCuddleMotorControllers...");
-                    for (int i = 0; i < mpcs.length; i++) {
-                        mpcs[i].setStopRequested();
-                        mpcs[i].interrupt();
+                    Utils.println("Awaiting CMP...");
+                }
+            }
+            else {
+                if (currentMove != null) {
+                    long t = System.currentTimeMillis() + 100;
+                    if (currentMove.isMoveDone(t)) {
+                        skipCurrentMove = false;
+                        if (moveAvailable()) {
+                            MotorPathMove newMove = null;
+                            try {
+                                newMove = getNextMove();
+                                newMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), t);
+                                currentMove = newMove;
+                            } catch (PosNotAvailableException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            currentMove = null;
+                        }
                     }
-                    break;
                 }
             }
 
             try {
-                Thread.sleep(200);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
+        Utils.println("Stopping LookaheadCuddleMotorController threads...");
+        for (int i = 0; i < mpcs.length; i++) {
+            mpcs[i].setStopRequested();
+            mpcs[i].interrupt();
+        }
         Utils.println("Initial tachos were: "+new WT3Coord(mg.getInitialPosition()).toString());
         Utils.println("Current tachos are: "+new WT3Coord(mg.getTachoCounts()).toString());
-
         Utils.println("CuddleMoveController-thread terminating...");
-    }
-
-    private boolean allThreadsWaiting() {
-        return threadsWaiting == 3;
-    }
-
-    private void notifyAllMoveControllers() {
-        synchronized (monitor) {
-            Utils.println("Notifying all threads of start!");
-            monitor.notifyAll();
-            threadsWaiting = 0;
-        }
+        terminate=false;
     }
 
     /**
@@ -109,64 +140,8 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
      */
     @Override
     public int getTachoPositionAtTimeT(long t, LookAheadCuddleMotorController mpc) throws PosNotAvailableException {
-
-        MotorPathMove m = null;
-        synchronized (activeMovesList) {
-            m = activeMovesList.get(0);
-            if (m.isAfterMove(t) || skipCurrentMoveRequested) {
-                skipCurrentMoveRequested = false;
-
-                MotorPathMove newMove = getNextMove();
-                newMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), t);
-                m.setEndtime(t);
-
-                activeMovesList.add(0, newMove);
-                m = activeMovesList.get(0);
-                if (activeMovesList.size() > 5 ) {
-                    activeMovesList.remove(activeMovesList.size() - 1);
-                }
-            } else if (m.isBeforeMove(t)) {
-                if (activeMovesList.size() > 1) {
-                    m = activeMovesList.get(1);
-                } else {
-                    Utils.println("This should not happen!?");
-                    throw new PosNotAvailableException("This should not happen!");
-                }
-            }
-        }
-
-        return m.getExpectedTachoPosAtTimeT(t)[mpc.getControllerID().getIDNumber()-1];
-    }
-
-    public void setSkipCurrentMove() {
-        if (this.isAlive()) skipCurrentMoveRequested = true;
-    }
-
-    private void setMoveToInitialPosition() {
-        ArrayList<MotorPathMove> l = new ArrayList<MotorPathMove>();
-        l.add(new PointMove(new WT3Coord(mg.getInitialPosition()).toCartesian()));
-        setMoveProducer(new CuddleMoveProducerByList(l));
-    }
-
-    public void skipCurrentMoveAndReturnToInitialPosition() {
-        setSkipCurrentMove();
-        setMoveToInitialPosition();
-        if (!this.isAlive()) this.start();
-
-        // TODO after we have returned we need to adjust the position match the tachos of the initial position exactly!  Fixed by pointmove!?
-    }
-
-    private MotorPathMove getNextMove() throws PosNotAvailableException {
-        synchronized (moveProducerLock) {
-            if (!moveAvailable()) throw new PosNotAvailableException("Producer fresh out of moves!");
-            else return cmp.getNewMove();
-        }
-    }
-
-    private boolean moveAvailable() {
-        synchronized (moveProducerLock) {
-            return cmp != null && cmp.hasMoreMoves();
-        }
+        if (currentMove != null) return currentMove.getExpectedTachoPosAtTimeT(t)[mpc.getControllerID().getIDNumber()-1]; // TODO make threadsafe
+        else throw new PosNotAvailableException("Current move is null!");
     }
 
     @Override
@@ -179,6 +154,31 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
             } catch (InterruptedException e) {
                 Utils.println("InterruptedException caught");
             }
+        }
+    }
+
+    private MotorPathMove getNextMove() throws PosNotAvailableException {
+        synchronized (cmpLock) {
+            if (!moveAvailable()) throw new PosNotAvailableException("Producer fresh out of moves!");
+            else return cmp.getNewMove();
+        }
+    }
+
+    private boolean moveAvailable() {
+        synchronized (cmpLock) {
+            return cmp != null && cmp.hasMoreMoves();
+        }
+    }
+
+    private boolean allThreadsWaiting() {
+        return threadsWaiting == 3;
+    }
+
+    private void notifyAllMoveControllers() {
+        synchronized (monitor) {
+            Utils.println("Notifying all threads of start!");
+            monitor.notifyAll();
+            threadsWaiting = 0;
         }
     }
 

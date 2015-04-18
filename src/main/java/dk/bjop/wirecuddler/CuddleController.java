@@ -1,22 +1,20 @@
 package dk.bjop.wirecuddler;
 
-import dk.bjop.wirecuddler.calibration.RestPoint;
 import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.math.Triangle;
+import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.CuddleMoveController;
 import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducerFactory;
+import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 import dk.bjop.wirecuddler.movement.moves.OperatedMove;
-import lejos.nxt.SensorPort;
-import lejos.nxt.TouchSensor;
+import dk.bjop.wirecuddler.movement.moves.PointMove;
 
 /**
  * Created by bpeterse on 26-11-2014.
  */
 public class CuddleController {
 
-    private TouchSensor ts1 = new TouchSensor(SensorPort.S1);
-    private RestPoint rp = new RestPoint(ts1);
     private CuddleMoveController cmc;
 
 
@@ -24,24 +22,24 @@ public class CuddleController {
 
     public void moveToRestpoint() {
         ensureInitialized();
-        cmc.skipCurrentMoveAndReturnToInitialPosition();
+        MotorPathMove m = new PointMove(new WT3Coord(MotorGroup.getInstance().getInitialPosition()).toCartesian());
+        m.initialize(new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian(), System.currentTimeMillis());
+        cmc.runMove(m, false);
     }
 
     public void stopCuddle() {
-        cmc.skipCurrentMoveAndReturnToInitialPosition();
+        cmc.stopController();
     }
 
     public void doCuddle() {
         ensureInitialized();
-        //cmc.setMoveProducer(CuddleMoveProducerFactory.getListBasedCMP(mg));
-        cmc.setMoveProducer(CuddleMoveProducerFactory.getAutoRandomBasedCMP());
-        cmc.start();
+        //cmc.attachMoveProducer(CuddleMoveProducerFactory.getListBasedCMP(mg));
+        cmc.runMoves(CuddleMoveProducerFactory.getAutoRandomBasedCMP(), false);
     }
 
     public void doOperatedMove(OperatedMove move) {
         ensureInitialized();
-        cmc.setMoveProducer(CuddleMoveProducerFactory.getOperatedCMP(move));
-        cmc.start();
+        cmc.runMoves(CuddleMoveProducerFactory.getOperatedCMP(move), false);
     }
 
     private void ensureInitialized() {
@@ -52,6 +50,7 @@ public class CuddleController {
             //TODO Fix lego brake - it has too much slack!
 
             cmc = new CuddleMoveController(mg);
+            cmc.start();
         }
     }
 

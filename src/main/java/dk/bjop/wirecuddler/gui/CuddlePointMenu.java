@@ -108,7 +108,7 @@ public class CuddlePointMenu {
         }
 
 
-        oMove.terminateMove();
+        oMove.setMoveTerminate();
     }
 
 

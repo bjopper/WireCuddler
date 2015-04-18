@@ -11,7 +11,7 @@ import dk.bjop.wirecuddler.motor.MotorGroup;
  * This move will settle acuurately on the target point.
  */
 public class PointMove implements MotorPathMove {
-
+    boolean forceMoveEnd = false;
 
     float speedCmSec = 4;
 
@@ -19,7 +19,6 @@ public class PointMove implements MotorPathMove {
     XYZCoord targetPos = null;
     float startToTargetDistance;
     long moveStartTime;
-    long moveEndTime;
     long calculatedMoveTimeMillis;
 
     int[] targetTachos;
@@ -58,9 +57,9 @@ public class PointMove implements MotorPathMove {
         if (startPos == null || targetPos == null) throw new RuntimeException("startPos or targetPos is NULL!");
 
         float distSinceStartAtTimeT = (elapsedTimeMillis / 1000f) * speedCmSec;
-        if (distSinceStartAtTimeT > startToTargetDistance) {
+        /*if (distSinceStartAtTimeT > startToTargetDistance) {
             distSinceStartAtTimeT = startToTargetDistance;
-        }
+        }*/
         //TODO optimize this for speed
         XYZCoord g1 = targetPos.subtract(startPos);
         SphericCoord sp = g1.toSpheric();
@@ -73,7 +72,7 @@ public class PointMove implements MotorPathMove {
 
     int x = 0;
     @Override
-    public boolean isAfterMove(long t) {
+    public boolean isMoveDone(long t) {
        if (startPos == null) throw new RuntimeException("Move not initialized!");
 
        if (t >= moveStartTime + calculatedMoveTimeMillis) {
@@ -91,14 +90,8 @@ public class PointMove implements MotorPathMove {
     }
 
     @Override
-    public boolean isBeforeMove(long t) {
-        if (startPos == null) throw new RuntimeException("Move not initialized!");
-        return t < moveStartTime;
-    }
-
-    @Override
-    public void setEndtime(long endtime) {
-        this.moveEndTime = endtime;
+    public void setMoveTerminate() {
+        this.forceMoveEnd = true;
     }
 
 }
