@@ -7,6 +7,7 @@ import dk.bjop.wirecuddler.math.XYZCoord;
  */
 public class OperatedMove implements MotorPathMove {
     private final float startSpeed = 2; // cm/sec
+    private final float maxSpeed = 8;
 
     public enum MotorDirection {
         POSITIVE, NEGATIVE
@@ -49,8 +50,8 @@ public class OperatedMove implements MotorPathMove {
     }
 
     private float determineSpeed(long elapsedMillis) {
-        // TODO Implement gradual acceleration
-        return startSpeed;
+        float speed = startSpeed + ((float)elapsedMillis/1000f);
+        return speed > maxSpeed ? maxSpeed : speed;
     }
 
     public XYZCoord getCurrentPosition() {
