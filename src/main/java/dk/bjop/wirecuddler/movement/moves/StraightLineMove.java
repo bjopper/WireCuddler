@@ -71,6 +71,8 @@ public class StraightLineMove implements MotorPathMove {
     public boolean isMoveDone(long t) {
         if (startPos == null) throw new RuntimeException("Move not initialized!");
 
+        if (forceMoveEnd) return true;
+
         return t > moveStartTime + calculatedMoveTimeMillis;
         /**
          * This is how we determine whether the move is done, by checking that the distance from startpos to currentpos is less/more than distance between startpos and targetpos.

@@ -75,6 +75,8 @@ public class PointMove implements MotorPathMove {
     public boolean isMoveDone(long t) {
        if (startPos == null) throw new RuntimeException("Move not initialized!");
 
+       if (forceMoveEnd) return true;
+
        if (t >= moveStartTime + calculatedMoveTimeMillis) {
            int[] currTachos = MotorGroup.getInstance().getTachoCounts();
            boolean terminate = true;
