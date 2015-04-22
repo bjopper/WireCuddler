@@ -96,4 +96,9 @@ public class PointMove implements MotorPathMove {
         this.forceMoveEnd = true;
     }
 
+    @Override
+    public void setSpeed(float speed) {
+        this.speedCmSec = speed;
+    }
+
 }

@@ -8,6 +8,7 @@ import dk.bjop.wirecuddler.math.XYZCoord;
 public interface MotorPathMove {
     public int[] getExpectedTachoPosAtTimeT(long t);
     public void initialize(XYZCoord startPos, long starttime);
+    public void setSpeed(float speed);
     public boolean isMoveDone(long t);
     public void setMoveTerminate();
 }

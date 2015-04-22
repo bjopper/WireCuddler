@@ -148,7 +148,7 @@ public class LookAheadCuddleMotorController extends Thread {
         m.stop();
         m.flt();
 
-        Utils.println("Error of the " + obsCount + " observations: " + (errorSum / obsCount));
+        if (obsCount > 0) Utils.println("Error of the " + obsCount + " observations: " + (errorSum / obsCount));
     }
 
 

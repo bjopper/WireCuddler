@@ -7,7 +7,6 @@ import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.CuddleMoveController;
 import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducerFactory;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
-import dk.bjop.wirecuddler.movement.moves.OperatedMove;
 import dk.bjop.wirecuddler.movement.moves.PointMove;
 
 /**
@@ -19,6 +18,10 @@ public class CuddleController {
 
 
     public CuddleController() {}
+
+    public void initialize() {
+        ensureInitialized();
+    }
 
     public void moveToRestpoint() {
         ensureInitialized();
@@ -37,9 +40,9 @@ public class CuddleController {
         cmc.runMoves(CuddleMoveProducerFactory.getAutoRandomBasedCMP(), false);
     }
 
-    public void doOperatedMove(OperatedMove move) {
+    public void manualMove(MotorPathMove move) {
         ensureInitialized();
-        cmc.runMoves(CuddleMoveProducerFactory.getOperatedCMP(move), false);
+        cmc.runMove(move, false);
     }
 
     private void ensureInitialized() {

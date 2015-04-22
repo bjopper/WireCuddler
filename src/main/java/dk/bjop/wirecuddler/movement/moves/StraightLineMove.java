@@ -45,6 +45,11 @@ public class StraightLineMove implements MotorPathMove {
     }
 
     @Override
+    public void setSpeed(float speed) {
+        this.speedCmSec = speed;
+    }
+
+    @Override
     public int[] getExpectedTachoPosAtTimeT(long t) {
         if (startPos == null) throw new RuntimeException("Move not initialized!");
 

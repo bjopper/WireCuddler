@@ -4,7 +4,8 @@ import dk.bjop.wirecuddler.CuddleController;
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.math.XYZCoord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
-import dk.bjop.wirecuddler.movement.moves.OperatedMove;
+import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
+import dk.bjop.wirecuddler.movement.moves.StraightLineMove;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
 
@@ -68,9 +69,9 @@ public class CuddlePointMenu {
 
     private void selectDirectionMenu() throws InterruptedException {
 
-        OperatedMove oMove = new OperatedMove();
-        cc.doOperatedMove(oMove);
-        oMove.initialize(new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian(), System.currentTimeMillis());
+        //OperatedMove oMove = new OperatedMove();
+        //cc.doOperatedMove(oMove);
+        //oMove.initialize(new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian(), System.currentTimeMillis());
 
 
         LCD.clear();
@@ -80,11 +81,7 @@ public class CuddlePointMenu {
         while (true) {
 
             if (Button.ENTER.isDown()) {
-                switch (motorSelect) {
-                    case 1:
-                    case 2:
-                    case 3: directionMove(getDirection(motorSelect), oMove);break;
-                }
+                directionMove(motorSelect);
                 LCD.clear();
                 redrawSelectDirectionMenu(motorSelect);
                 Thread.sleep(menuWaitAfterButtonPress);
@@ -107,38 +104,19 @@ public class CuddlePointMenu {
             if (motorSelect < 1) motorSelect = 3;
         }
 
-
-        oMove.setMoveTerminate();
     }
 
-
-    private void redrawSelectDirectionMenu(int motorSelect) {
-        LCD.drawString("SELECT DIRECTION", 0, 0);
-        LCD.drawString("Left / Right", 3, 1, motorSelect ==1);
-        LCD.drawString("Fwd / backwd", 3, 2, motorSelect ==2);
-        LCD.drawString("Up / Down", 3, 3, motorSelect ==3);
-    }
-
-    private OperatedMove.CoordDirection getDirection(int motorIndex) {
-        switch (motorIndex) {
-            case 1: return OperatedMove.CoordDirection.X;
-            case 2: return OperatedMove.CoordDirection.Z;
-            case 3: return OperatedMove.CoordDirection.Y;
-        }
-        return OperatedMove.CoordDirection.NONE;
-    }
-
-
-    private void directionMove(OperatedMove.CoordDirection cod, OperatedMove oMove) throws InterruptedException {
+    private void directionMove(int cartesianDirection) throws InterruptedException {
+        cc.initialize();
         LCD.clear();
-        redrawDirectionMove(cod, oMove.getCurrentPosition());
+        redrawDirectionMove(cartesianDirection, getCurrentPosition());
         boolean redraw = true;
 
         Thread.sleep(menuWaitAfterButtonPress);
         while (true) {
 
             if (redraw) {
-                redrawDirectionMove(cod, oMove.getCurrentPosition());
+                redrawDirectionMove(cartesianDirection, getCurrentPosition());
                 redraw = false;
             }
 
@@ -146,35 +124,38 @@ public class CuddlePointMenu {
                 break;
             }
             if (Button.LEFT.isDown()) {
-                oMove.setMoveOn(OperatedMove.MotorDirection.NEGATIVE, cod);
+
+                MotorPathMove m = getMove(getCurrentPosition(), cartesianDirection, true);
+                cc.manualMove(m);
+
                 while (Button.LEFT.isDown()) {
-                    redrawDirectionMove(cod, oMove.getCurrentPosition());
-                    Thread.sleep(50);
+                    redrawDirectionMove(cartesianDirection, getCurrentPosition());
+                    Thread.sleep(25);
                 }
-                oMove.stopMovement();
+                m.setMoveTerminate();
                 redraw = true;
             }
             if (Button.RIGHT.isDown()) {
-                oMove.setMoveOn(OperatedMove.MotorDirection.POSITIVE, cod);
+
+                MotorPathMove m = getMove(getCurrentPosition(), cartesianDirection, false);
+                cc.manualMove(m);
+
                 while (Button.RIGHT.isDown()) {
-                    redrawDirectionMove(cod, oMove.getCurrentPosition());
-                    Thread.sleep(50);
+                    redrawDirectionMove(cartesianDirection, getCurrentPosition());
+                    Thread.sleep(25);
                 }
-                oMove.stopMovement();
+                m.setMoveTerminate();
                 redraw = true;
             }
 
         }
-
-        oMove.stopMovement();
     }
 
-    private void redrawDirectionMove(OperatedMove.CoordDirection dir, XYZCoord pos) {
-
-        switch (dir) {
-            case X: LCD.drawString("LEFT / RIGHT", 0, 0, true);
-            case Z: LCD.drawString("FWD / BACKWD", 0, 0, true);
-            case Y: LCD.drawString("UP / DOWN", 0, 0, true);
+    private void redrawDirectionMove(int cartesianDirection, XYZCoord pos) {
+        switch (cartesianDirection) {
+            case 1: LCD.drawString(LFT_RGHT, 0, 0, true);break;
+            case 2: LCD.drawString(FWD_BCKWD, 0, 0, true);break;
+            case 3: LCD.drawString(UP_DWN, 0, 0, true);break;
         }
 
         if (pos != null) {
@@ -182,6 +163,36 @@ public class CuddlePointMenu {
             LCD.drawString("Y: " + formatNumber(pos.y), 3, 3);
             LCD.drawString("Z: " + formatNumber(pos.z), 3, 4);
         }
+    }
+
+    private final String LFT_RGHT="Left / Right";
+    private final String FWD_BCKWD="Fwd / backwd";
+    private final String UP_DWN="Up / Down";
+
+
+    private void redrawSelectDirectionMenu(int motorSelect) {
+        LCD.drawString("SELECT DIRECTION", 0, 0);
+        LCD.drawString(LFT_RGHT, 3, 1, motorSelect ==1);
+        LCD.drawString(FWD_BCKWD, 3, 2, motorSelect ==2);
+        LCD.drawString(UP_DWN, 3, 3, motorSelect ==3);
+    }
+
+    private MotorPathMove getMove(XYZCoord curPos, int cartesianDirection, boolean fwd) {
+        int adder = 10;
+        adder = fwd ? adder : -adder;
+        MotorPathMove t = null;
+        switch  (cartesianDirection) {
+            case 1: t = new StraightLineMove(curPos.add(new XYZCoord(adder, 0, 0)));break;
+            case 2: t = new StraightLineMove(curPos.add(new XYZCoord(0, 0, adder)));break;
+            case 3: t = new StraightLineMove(curPos.add(new XYZCoord(0, adder, 0)));break;
+        }
+        t.initialize(curPos, System.currentTimeMillis());
+        t.setSpeed(2);
+        return t;
+    }
+
+    private XYZCoord getCurrentPosition() {
+        return new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian();
     }
 
     private double formatNumber(double n) {
