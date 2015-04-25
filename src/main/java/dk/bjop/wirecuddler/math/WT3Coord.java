@@ -47,10 +47,31 @@ public class WT3Coord {
         //z = tri.getProjectedZ(z);
         double y = getYCoordinate(x, z);
 
+        boolean isValid = true;
+        String errStr = "";
+        if (Double.isNaN(x)) {
+            errStr+="x is NAN\n";
+            isValid=false;
+        }
+        if (Double.isNaN(y)) {
+            errStr+="y is NAN\n";
+            isValid=false;
+        }
+        if (Double.isNaN(z)) {
+            errStr+="z is NAN\n";
+            isValid=false;
+        }
+
         XYZCoord pos = new XYZCoord(x, y, z);
+
+        if (!isValid) {
+            throw new RuntimeException("Invalid XYZ result: "+pos.toString() + " from WT3: "+this.toString());
+        }
+
+
         debugPrint(pos.toString());
 
-        Utils.println("toCartesian time: "+ (System.currentTimeMillis()-start));
+        //Utils.println("toCartesian time: "+ (System.currentTimeMillis()-start));
 
         return pos;
     }

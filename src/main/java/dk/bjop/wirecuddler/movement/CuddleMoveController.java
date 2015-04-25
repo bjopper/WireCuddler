@@ -20,11 +20,13 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
     CuddleMoveProducer cmp;
 
     Object cmpLock = new Object();
-    Object monitor = new Object();
+    Object controllersLock = new Object();
+    Object moveCompleteLock = new Object();
+
+    boolean objectsAwaitingMovesCompleted = false;
 
     int threadsWaiting = 0;
     MotorPathMove currentMove = null;
-    boolean skipCurrentMove = false;
     boolean terminate = false;
 
 
@@ -90,12 +92,14 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
                         Utils.println(e.getMessage());
                     }
                 }
+                else {
+                    if (objectsAwaitingMovesCompleted) notifyAllMovesCompleted();
+                }
             }
             else {
                 if (currentMove != null) {
-                    long t = System.currentTimeMillis() + 100;
+                    long t = System.currentTimeMillis();
                     if (currentMove.isMoveDone(t)) {
-                        skipCurrentMove = false;
                         if (moveAvailable()) {
                             MotorPathMove newMove = null;
                             try {
@@ -130,6 +134,25 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         terminate=false;
     }
 
+    public void waitForAllMovesCompleted() {
+
+        synchronized (moveCompleteLock) {
+            objectsAwaitingMovesCompleted = true;
+            try {
+                moveCompleteLock.wait();
+            } catch (InterruptedException e) {
+                Utils.println("InterruptedException caught");
+            }
+        }
+    }
+
+    private void notifyAllMovesCompleted() {
+        synchronized (moveCompleteLock) {
+            moveCompleteLock.notifyAll();
+            objectsAwaitingMovesCompleted=false;
+        }
+    }
+
     /**
      *
      * @param t the time at which we want to know the tacho-position. If no position can be obtained for the given time -1 is returned.
@@ -143,11 +166,11 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
 
     @Override
     public void waitForMove(LookAheadCuddleMotorController m) {
-        synchronized (monitor) {
+        synchronized (controllersLock) {
             threadsWaiting++;
             Utils.println("MotorPathController: '" + m.getControllerID().getIDNumber() + "' entering wait for move...");
             try {
-                monitor.wait();
+                controllersLock.wait();
             } catch (InterruptedException e) {
                 Utils.println("InterruptedException caught");
             }
@@ -172,9 +195,9 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
     }
 
     private void notifyAllMoveControllers() {
-        synchronized (monitor) {
+        synchronized (controllersLock) {
             Utils.println("Notifying all threads of start!");
-            monitor.notifyAll();
+            controllersLock.notifyAll();
             threadsWaiting = 0;
         }
     }

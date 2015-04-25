@@ -9,53 +9,42 @@ import dk.bjop.wirecuddler.math.XYZCoord;
  *
  * This move will advance towards the targetpoint, but will not settle on the point.
  */
-public class StraightLineMove implements MotorPathMove {
+public class StraightAcceleratingMove implements MotorPathMove {
     boolean forceMoveEnd = false;
 
-    // TODO high speeds (4+) causes the system to tighten the restpoint wire way too much when moving bcak to the restpoint. THis must be fixed
-
-    float speedCmSec = 4;
+    private final float startSpeed = 2; // cm/sec
+    private final float maxSpeed = 8;
 
     XYZCoord startPos = null;
     XYZCoord targetPos = null;
-    float startToTargetDistance;
     long moveStartTime;
-    long calculatedMoveTimeMillis;
 
-    public StraightLineMove(XYZCoord target){
+
+    public StraightAcceleratingMove(XYZCoord target){
         this.targetPos = target;
     }
 
-    /**
-     *
-     * Set the move as started/initiated. At
-     *
-     * @param startPos
-     */
     @Override
     public void initialize(XYZCoord startPos, long starttime) {
         this.startPos = startPos;
         this.moveStartTime = starttime;
-        startToTargetDistance = (float) startPos.distanceTo(targetPos);
-        calculatedMoveTimeMillis = (long) ((startToTargetDistance / speedCmSec) * 1000f);
         forceMoveEnd = false;
     }
 
     @Override
     public void setSpeed(float speed) {
-        this.speedCmSec = speed;
+        throw new RuntimeException("Not implemented!");
     }
 
     @Override
     public int[] getExpectedTachoPosAtTimeT(long t) {
         if (startPos == null) throw new RuntimeException("Move not initialized!");
         if (startPos == null || targetPos == null) throw new RuntimeException("startPos or targetPos is NULL!");
+
         long elapsedTimeMillis = t - moveStartTime;
 
-        float distSinceStartAtTimeT = (elapsedTimeMillis / 1000f) * speedCmSec;
-        /*if (distSinceStartAtTimeT > startToTargetDistance) {
-            distSinceStartAtTimeT = startToTargetDistance;
-        }*/
+        float distSinceStartAtTimeT = (elapsedTimeMillis / 1000f) * determineSpeed(elapsedTimeMillis);
+
         //TODO optimize this for speed
         XYZCoord g1 = targetPos.subtract(startPos);
         SphericCoord sp = g1.toSpheric();
@@ -66,13 +55,18 @@ public class StraightLineMove implements MotorPathMove {
         return f2.getTachos();
     }
 
+
+    private float determineSpeed(long elapsedMillis) {
+        float speed = startSpeed + ((float)elapsedMillis/1000f);
+        return speed > maxSpeed ? maxSpeed : speed;
+    }
+
     @Override
     public boolean isMoveDone(long t) {
         if (startPos == null) throw new RuntimeException("Move not initialized!");
 
         if (forceMoveEnd) return true;
-
-        return t > moveStartTime + calculatedMoveTimeMillis;
+        else return false;
         /**
          * This is how we determine whether the move is done, by checking that the distance from startpos to currentpos is less/more than distance between startpos and targetpos.
          * This methos is general and works with other types of movement-patterns such as a sine-move. (a sine-move may not end up at a exact position)

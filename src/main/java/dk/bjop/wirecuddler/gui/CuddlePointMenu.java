@@ -1,11 +1,13 @@
 package dk.bjop.wirecuddler.gui;
 
 import dk.bjop.wirecuddler.CuddleController;
+import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.math.XYZCoord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
-import dk.bjop.wirecuddler.movement.moves.StraightLineMove;
+import dk.bjop.wirecuddler.movement.moves.PointMove;
+import dk.bjop.wirecuddler.movement.moves.StraightAcceleratingMove;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
 
@@ -18,13 +20,15 @@ public class CuddlePointMenu {
 
     CuddleController cc;
 
-
+    boolean positionChanged = false;
 
     public CuddlePointMenu(CuddleController cc) {
         this.cc = cc;
     }
 
     public void startMenu() throws InterruptedException{
+        Thread.sleep(menuWaitAfterButtonPress);
+        positionChanged = false;
         boolean redraw = true;
         int mainSelect = 0;
 
@@ -64,15 +68,10 @@ public class CuddlePointMenu {
         }
 
         // TODO check we are at restpoint or move us there before exiting this menu
-        cc.moveToRestpoint();
+        if (positionChanged) cc.moveToRestpoint();
     }
 
     private void selectDirectionMenu() throws InterruptedException {
-
-        //OperatedMove oMove = new OperatedMove();
-        //cc.doOperatedMove(oMove);
-        //oMove.initialize(new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian(), System.currentTimeMillis());
-
 
         LCD.clear();
         int motorSelect = 1;
@@ -108,6 +107,13 @@ public class CuddlePointMenu {
 
     private void directionMove(int cartesianDirection) throws InterruptedException {
         cc.initialize();
+        Utils.println("Moving, and waiting...");
+        if (!positionChanged) {
+            cc.manualMove(new PointMove(new XYZCoord(10, 10, 10)),true);
+            positionChanged = true;
+        }
+        Utils.println("Done!");
+
         LCD.clear();
         redrawDirectionMove(cartesianDirection, getCurrentPosition());
         boolean redraw = true;
@@ -126,7 +132,7 @@ public class CuddlePointMenu {
             if (Button.LEFT.isDown()) {
 
                 MotorPathMove m = getMove(getCurrentPosition(), cartesianDirection, true);
-                cc.manualMove(m);
+                cc.manualMove(m, false);
 
                 while (Button.LEFT.isDown()) {
                     redrawDirectionMove(cartesianDirection, getCurrentPosition());
@@ -138,7 +144,7 @@ public class CuddlePointMenu {
             if (Button.RIGHT.isDown()) {
 
                 MotorPathMove m = getMove(getCurrentPosition(), cartesianDirection, false);
-                cc.manualMove(m);
+                cc.manualMove(m, false);
 
                 while (Button.RIGHT.isDown()) {
                     redrawDirectionMove(cartesianDirection, getCurrentPosition());
@@ -178,17 +184,19 @@ public class CuddlePointMenu {
     }
 
     private MotorPathMove getMove(XYZCoord curPos, int cartesianDirection, boolean fwd) {
-        int adder = 10;
-        adder = fwd ? adder : -adder;
-        MotorPathMove t = null;
+        int adder = 1;
+        adder = fwd ? -adder : adder;
+
+        XYZCoord target = null;
         switch  (cartesianDirection) {
-            case 1: t = new StraightLineMove(curPos.add(new XYZCoord(adder, 0, 0)));break;
-            case 2: t = new StraightLineMove(curPos.add(new XYZCoord(0, 0, adder)));break;
-            case 3: t = new StraightLineMove(curPos.add(new XYZCoord(0, adder, 0)));break;
+            case 1: target = curPos.add(new XYZCoord(adder, 0, 0));break;
+            case 2: target = curPos.add(new XYZCoord(0, 0, adder));break;
+            case 3: target = curPos.add(new XYZCoord(0, adder, 0));break;
         }
-        t.initialize(curPos, System.currentTimeMillis());
-        t.setSpeed(2);
-        return t;
+
+        Utils.println("New target:" + target.toString());
+
+        return new StraightAcceleratingMove(target);
     }
 
     private XYZCoord getCurrentPosition() {

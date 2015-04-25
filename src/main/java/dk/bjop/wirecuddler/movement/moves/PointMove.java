@@ -49,12 +49,11 @@ public class PointMove implements MotorPathMove {
     @Override
     public int[] getExpectedTachoPosAtTimeT(long t) {
         if (startPos == null) throw new RuntimeException("Move not initialized!");
+        if (startPos == null || targetPos == null) throw new RuntimeException("startPos or targetPos is NULL!");
 
         if (t >= moveStartTime + calculatedMoveTimeMillis) return targetTachos;
 
         long elapsedTimeMillis = t - moveStartTime;
-
-        if (startPos == null || targetPos == null) throw new RuntimeException("startPos or targetPos is NULL!");
 
         float distSinceStartAtTimeT = (elapsedTimeMillis / 1000f) * speedCmSec;
         /*if (distSinceStartAtTimeT > startToTargetDistance) {

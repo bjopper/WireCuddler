@@ -40,9 +40,10 @@ public class CuddleController {
         cmc.runMoves(CuddleMoveProducerFactory.getAutoRandomBasedCMP(), false);
     }
 
-    public void manualMove(MotorPathMove move) {
+    public void manualMove(MotorPathMove move, boolean awaitMoveCompletion) {
         ensureInitialized();
         cmc.runMove(move, false);
+        if (awaitMoveCompletion) cmc.waitForAllMovesCompleted();
     }
 
     private void ensureInitialized() {

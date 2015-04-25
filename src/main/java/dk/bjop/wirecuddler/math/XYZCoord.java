@@ -64,4 +64,7 @@ public class XYZCoord {
         return new XYZCoord(x+p.x, y+p.y, z+p.z);
     }
 
+    public boolean isValid() {
+        return !Double.isNaN(x) && !Double.isNaN(y) && !Double.isNaN(z);
+    }
 }
