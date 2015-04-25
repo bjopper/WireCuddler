@@ -106,6 +106,8 @@ public class CuddlePointMenu {
     }
 
     private void directionMove(int cartesianDirection) throws InterruptedException {
+
+        // TODO ennforce boundaries!
         cc.initialize();
         Utils.println("Moving, and waiting...");
         if (!positionChanged) {
