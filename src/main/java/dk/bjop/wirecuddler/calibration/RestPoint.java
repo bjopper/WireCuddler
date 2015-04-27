@@ -1,6 +1,6 @@
 package dk.bjop.wirecuddler.calibration;
 
-import dk.bjop.wirecuddler.math.Triangle;
+import dk.bjop.wirecuddler.math.BaseGeometry;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.motor.NXTCuddleMotor;
@@ -89,7 +89,7 @@ public class RestPoint {
 
                             targetReached = true;
 
-                            Triangle tri = Triangle.getInstance();
+                            BaseGeometry tri = BaseGeometry.getInstance();
 
                             mgp.resetAllTachoCounters();
                             mgp.setTachoCountOffsets(360, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist());

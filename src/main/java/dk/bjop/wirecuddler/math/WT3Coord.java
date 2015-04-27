@@ -37,7 +37,7 @@ public class WT3Coord {
 
         long start=System.currentTimeMillis();
 
-        Triangle tri = Triangle.getInstance();
+        BaseGeometry tri = BaseGeometry.getInstance();
 
         wireLengths = new double[]{Utils.tachoToCm(tachos[0]), Utils.tachoToCm(tachos[1]), Utils.tachoToCm(tachos[2])};
 
@@ -128,7 +128,7 @@ public class WT3Coord {
         return z;
     }*/
 
-    private double getZCoordinate(Triangle tri, double x) {
+    private double getZCoordinate(BaseGeometry tri, double x) {
         XYZCoord[] trianglePoints = tri.getTrianglePoints();
 
         debugPrint("------------ Location inference test of point on p1p2 -------------------");
@@ -162,7 +162,7 @@ public class WT3Coord {
         return z;
     }
 
-    private double getXCoordinate(Triangle tri) {
+    private double getXCoordinate(BaseGeometry tri) {
         debugPrint("------------ Location inference test X -------------------");
         for (int i=0;i<tachos.length;i++) debugPrint("#Tacho ["+(i+1)+"] = "+tachos[i] + " (cm: " + Utils.tachoToCm(tachos[i]) + ")");
 

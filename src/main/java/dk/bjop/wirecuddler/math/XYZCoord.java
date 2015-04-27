@@ -21,7 +21,7 @@ public class XYZCoord {
 
     public double[] toWirelengths() {
 
-        XYZCoord[] trianglePoints = Triangle.getInstance().getTrianglePoints();
+        XYZCoord[] trianglePoints = BaseGeometry.getInstance().getTrianglePoints();
 
         double[] rev = new double[3];
 

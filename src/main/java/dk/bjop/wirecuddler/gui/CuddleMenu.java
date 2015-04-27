@@ -14,7 +14,8 @@ public class CuddleMenu {
 
     CuddleController cc;
     CalibrationMenu cm;
-    CuddlePointMenu cpm;
+    //CuddlePointMenu cpm;
+    ProfileMenu pm;
     SettingsMenu sm;
 
 
@@ -24,7 +25,8 @@ public class CuddleMenu {
         // M3-M2: 10537
         cc = new CuddleController();
         cm = new CalibrationMenu(cc);
-        cpm = new CuddlePointMenu(cc);
+        //cpm = new CuddlePointMenu(cc);
+        pm = new ProfileMenu(cc);
         sm = new SettingsMenu(cc);
     }
 
@@ -35,7 +37,7 @@ public class CuddleMenu {
                     CalibValues.loadCalib();
                     startupMenu();
                 } else {
-                    cm.calibMenu();
+                    cm.startMenu();
                 }
             }
             else {
@@ -44,67 +46,72 @@ public class CuddleMenu {
         }
     }
 
+    public int getNextIndex(int min, int max, int cur) {
+        if (cur == max-1) return min;
+        else return ++cur;
+    }
+
+    public int getPrevIndex(int min, int max, int cur) {
+        if (cur == min) return max-1;
+        else return --cur;
+    }
+
+    private void redraw(int select) {
+        LCD.clear();
+        LCD.drawString("    MAIN MENU", 0, 0, false);
+        LCD.drawString(" - Cuddle", 0, 2, select==0);
+        LCD.drawString(" - Settings", 0, 3, select==1);
+        LCD.drawString(" - Calibration", 0, 4, select==2);
+        LCD.drawString(" - Exit", 0, 5, select==3);
+    }
+
     private void startupMenu() throws InterruptedException{
         boolean redraw = true;
         int mainSelect = 0;
+        redraw(mainSelect);
 
         while (true) {
 
-            if (redraw) {
-                LCD.clear();
-                LCD.drawString("Cuddle", 0, 0, mainSelect==0);
-                LCD.drawString("Settings", 0, 1, mainSelect==1);
-                LCD.drawString("Calibration", 0, 2, mainSelect==2);
-                LCD.drawString("Exit", 0, 3, mainSelect==3);
-                redraw = false;
-            }
-
             if (Button.ENTER.isDown()) {
+                while (Button.ENTER.isDown()) Thread.sleep(10);
                 if (mainSelect == 0 ) cuddleStartStopMenu();
-                if (mainSelect == 1 ) cpm.startMenu();
-                if (mainSelect == 2 ) cm.calibMenu();
+                if (mainSelect == 1 ) pm.startMenu();
+                if (mainSelect == 2 ) cm.startMenu();
                 if (mainSelect == 3 ) throw new RuntimeException("Terminating system."); // This is the only known way to make sure the NXT shuts down the running program!? (and then lejos turns off by auto after a while)
 
-                redraw = true;
-                Thread.sleep(menuWaitAfterButtonPress);
+                redraw(mainSelect);
             }
             if (Button.LEFT.isDown()) {
-                mainSelect--;
-                redraw = true;
-                Thread.sleep(menuWaitAfterButtonPress);
+                mainSelect = getPrevIndex(0, 4, mainSelect);
+                redraw(mainSelect);
+                while (Button.LEFT.isDown()) Thread.sleep(10);
             }
             if (Button.RIGHT.isDown()) {
-                mainSelect++;
-                redraw = true;
-                Thread.sleep(menuWaitAfterButtonPress);
+                mainSelect = getNextIndex(0, 4, mainSelect);
+                redraw(mainSelect);
+                while (Button.RIGHT.isDown()) Thread.sleep(10);
             }
-
-            if (mainSelect < 0) mainSelect = 3;
-            if (mainSelect > 3) mainSelect = 0;
         }
     }
 
     private void cuddleStartStopMenu() throws InterruptedException {
-        Thread.sleep(menuWaitAfterButtonPress);
         boolean redraw = true;
 
-
         cc.doCuddle();
-
 
         while (true) {
 
             if (redraw) {
                 LCD.clear();
                 LCD.drawString("  CUDDLING...", 0, 0);
-                LCD.drawString("Stop cuddling", 0, 1, true);
+                LCD.drawString("Stop cuddling", 0, 4, true);
 
                 redraw = false;
             }
 
             if (Button.ENTER.isDown()) {
                 cc.stopCuddle();
-                Thread.sleep(menuWaitAfterButtonPress);
+                while (Button.ENTER.isDown()) Thread.sleep(10);
                 break;
             }
 

@@ -1,7 +1,7 @@
 package dk.bjop.wirecuddler;
 
 import dk.bjop.wirecuddler.config.CalibValues;
-import dk.bjop.wirecuddler.math.Triangle;
+import dk.bjop.wirecuddler.math.BaseGeometry;
 import dk.bjop.wirecuddler.math.WT3Coord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.CuddleMoveController;
@@ -48,7 +48,7 @@ public class CuddleController {
 
     private void ensureInitialized() {
         if (cmc == null) {
-            Triangle.createInstance(CalibValues.getInstance());
+            BaseGeometry.createInstance(CalibValues.getInstance());
             MotorGroup mg = MotorGroup.getInstance();
 
             //TODO Fix lego brake - it has too much slack!

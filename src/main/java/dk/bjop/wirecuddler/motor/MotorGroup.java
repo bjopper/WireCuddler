@@ -1,6 +1,6 @@
 package dk.bjop.wirecuddler.motor;
 
-import dk.bjop.wirecuddler.math.Triangle;
+import dk.bjop.wirecuddler.math.BaseGeometry;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.sensors.EmergencyBreak;
 import dk.bjop.wirecuddler.sensors.EmergencyBreakListener;
@@ -28,12 +28,12 @@ public class MotorGroup implements EmergencyBreakListener{
 
     public static MotorGroup getInstance() {
         if (instance == null) {
-            instance = new MotorGroup(Triangle.getInstance());
+            instance = new MotorGroup(BaseGeometry.getInstance());
         }
         return instance;
     }
 
-    private MotorGroup(Triangle tri) {
+    private MotorGroup(BaseGeometry tri) {
         motors = new NXTCuddleMotor[]{new NXTCuddleMotor(NXTCuddleMotor.MotorID.M1), new NXTCuddleMotor(NXTCuddleMotor.MotorID.M2), new NXTCuddleMotor(NXTCuddleMotor.MotorID.M3)};
         this.resetAllTachoCounters();
 

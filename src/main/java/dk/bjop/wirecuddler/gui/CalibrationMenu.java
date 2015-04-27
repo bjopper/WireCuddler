@@ -17,44 +17,51 @@ public class CalibrationMenu {
         this.cc = cc;
     }
 
+    public int getNextIndex(int min, int max, int cur) {
+        if (cur == max-1) return min;
+        else return ++cur;
+    }
 
-    public void calibMenu() throws InterruptedException {
+    public int getPrevIndex(int min, int max, int cur) {
+        if (cur == min) return max-1;
+        else return --cur;
+    }
+
+    public void startMenu() throws InterruptedException {
         Thread.sleep(menuWaitAfterButtonPress);
         boolean redraw = true;
         int mainSelect = 0;
+        redrawStartMenu(mainSelect);
         while (true) {
-
-            if (redraw) {
-                LCD.clear();
-                LCD.drawString("  CALIBRATION", 0, 0);
-                LCD.drawString("Manual", 0, 1, mainSelect==0);
-                LCD.drawString("Automatic", 0, 2, mainSelect==1);
-                redraw = false;
-            }
-
             if (Button.ENTER.isDown()) {
                 if (mainSelect == 0 ) selectMotorMenu();
                 if (mainSelect == 1 ) autoCalibrate();
-
-                redraw = true;
-                Thread.sleep(menuWaitAfterButtonPress);
+                redrawStartMenu(mainSelect);
             }
             if (Button.ESCAPE.isDown()) {
+                while (Button.ESCAPE.isDown()) Thread.sleep(10);
                 break;
             }
             if (Button.LEFT.isDown()) {
-                mainSelect--;
+                mainSelect = getPrevIndex(0, 2, mainSelect);
+                redrawStartMenu(mainSelect);
+                while (Button.LEFT.isDown()) Thread.sleep(10);
                 redraw = true;
             }
             if (Button.RIGHT.isDown()) {
-                mainSelect++;
+                mainSelect = getNextIndex(0, 2, mainSelect);
+                redrawStartMenu(mainSelect);
+                while (Button.RIGHT.isDown()) Thread.sleep(10);
                 redraw = true;
             }
-
-            if (mainSelect < 0) mainSelect = 1;
-            if (mainSelect > 1) mainSelect = 0;
         }
+    }
 
+    private void redrawStartMenu(int select) {
+        LCD.clear();
+        LCD.drawString("   CALIBRATION", 0, 0);
+        LCD.drawString(" - Manual", 0, 3, select==0);
+        LCD.drawString(" - Automatic", 0, 4, select==1);
     }
 
     private void selectMotorMenu() throws InterruptedException {
@@ -72,32 +79,29 @@ public class CalibrationMenu {
                 }
                 LCD.clear();
                 redrawSingleMotorMenu(motorSelect);
-                Thread.sleep(menuWaitAfterButtonPress);
             }
             if (Button.ESCAPE.isDown()) {
+                while (Button.ESCAPE.isDown()) Thread.sleep(10);
                 break;
             }
             if (Button.LEFT.isDown()) {
-                motorSelect--;
+                motorSelect = getPrevIndex(1, 4, motorSelect);
                 redrawSingleMotorMenu(motorSelect);
-                Thread.sleep(menuWaitAfterButtonPress);
+                while (Button.LEFT.isDown()) Thread.sleep(10);
             }
             if (Button.RIGHT.isDown()) {
-                motorSelect++;
+                motorSelect = getNextIndex(1, 4, motorSelect);
                 redrawSingleMotorMenu(motorSelect);
-                Thread.sleep(menuWaitAfterButtonPress);
+                while (Button.RIGHT.isDown()) Thread.sleep(10);
             }
-
-            if (motorSelect > 3) motorSelect = 1;
-            if (motorSelect < 1) motorSelect = 3;
         }
     }
 
     private void redrawSingleMotorMenu(int motorSelect) {
-        LCD.drawString("SELECT MOTOR", 0, 0);
-        LCD.drawString("M1", 3, 1, motorSelect ==1);
-        LCD.drawString("M2", 3, 2, motorSelect ==2);
-        LCD.drawString("M3", 3, 3, motorSelect ==3);
+        LCD.drawString("   SELECT MOTOR", 0, 0);
+        LCD.drawString("M1", 6, 2, motorSelect ==1);
+        LCD.drawString("M2", 6, 3, motorSelect ==2);
+        LCD.drawString("M3", 6, 4, motorSelect ==3);
     }
 
     private NXTCuddleMotor getMotor(int index) {
@@ -124,7 +128,7 @@ public class CalibrationMenu {
         int maxSpeed = 900;
 
         while (true) {
-            LCD.drawString("Tacho: "+m.getTachoCount(),2,3);
+            LCD.drawString("Tacho: "+m.getTachoCount(),3,4);
 
             if (Button.ESCAPE.isDown()) {
                 m.setSpeed(1);

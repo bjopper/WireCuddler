@@ -2,7 +2,7 @@ package dk.bjop.wirecuddler;
 
 import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.gui.CuddleMenu;
-import dk.bjop.wirecuddler.math.Triangle;
+import dk.bjop.wirecuddler.math.BaseGeometry;
 import dk.bjop.wirecuddler.math.Utils;
 
 
@@ -46,7 +46,7 @@ public class WireCuddler {
 
 
     private static double getOrigoToPointAngle(float x, float y) {
-        CalibValues cv = Triangle.getInstance().getCalibValues();
+        CalibValues cv = BaseGeometry.getInstance().getCalibValues();
         cv.getP1P3heightDiffCm();
         return Math.tan(y/x);
     }

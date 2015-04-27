@@ -16,10 +16,10 @@ import dk.bjop.wirecuddler.config.CalibValues;
  * - Motor M1 drives the wire at P1 and so forth.
  *
  */
-public class Triangle {
+public class BaseGeometry {
     public static boolean debug = true;
 
-    private static Triangle instance = null;
+    private static BaseGeometry instance = null;
 
     private final double piHalf = Math.PI / 2d;
 
@@ -50,7 +50,7 @@ public class Triangle {
     // Slope of line orthogonal to the line spanned by P2-P3 in the plane spanned by P1, P2 and P3
     double p1p2OrthoSlope;
 
-    private Triangle(CalibValues cv) {
+    private BaseGeometry(CalibValues cv) {
         this.cv = cv;
 
         // Temporarily constrain triangle. Require:
@@ -147,13 +147,13 @@ public class Triangle {
         p1p2OrthoSlope = 1/p1p2Slope;
     }
 
-    public static Triangle getInstance() {
+    public static BaseGeometry getInstance() {
         if (instance == null) throw new RuntimeException("Triangle has not been initialized with calibration data!");
         return instance;
     }
 
     public static void createInstance(CalibValues cv) {
-        instance = new Triangle(cv);
+        instance = new BaseGeometry(cv);
     }
 
 
