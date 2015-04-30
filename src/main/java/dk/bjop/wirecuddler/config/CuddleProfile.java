@@ -76,6 +76,8 @@ public class CuddleProfile {
         if (tPoints == null) return false;
         if (tPoints.length != 4) return false;
 
+        //TODO verify that no lines intersect i.e. that we have a valid rectangle
+
         for (int i = 0; i < tPoints.length; i++) {
             if (tPoints[i] == null) return false;
         }
@@ -251,7 +253,7 @@ public class CuddleProfile {
     }
 
 
-    private static String[] listExistingProfiles() {
+    public static String[] listExistingProfiles() {
         ArrayList<String> names = new ArrayList<String>();
         int count = 0;
         for (int i=0;i<allowedProfileFilenames.length;i++) {
@@ -262,6 +264,13 @@ public class CuddleProfile {
             }
         }
         return names.toArray(new String[count]);
+    }
+
+    public static void deleteAllProfiles() {
+        String[] profiles = listExistingProfiles();
+        for (int i=0;i<profiles.length;i++) {
+            deleteProfile(profiles[i]);
+        }
     }
 
     public static boolean canCreateNewProfiles() {

@@ -1,11 +1,9 @@
 package dk.bjop.wirecuddler;
 
 import dk.bjop.wirecuddler.config.CalibValues;
-import dk.bjop.wirecuddler.config.CuddleProfile;
 import dk.bjop.wirecuddler.gui.CuddleMenu;
 import dk.bjop.wirecuddler.math.BaseGeometry;
 import dk.bjop.wirecuddler.math.Utils;
-import dk.bjop.wirecuddler.math.XYZCoord;
 
 
 /**
@@ -45,7 +43,7 @@ public class WireCuddler {
 
 
         // Profile testing...
-        CuddleProfile.deleteProfile("WCProfile1.cfg");
+        /*CuddleProfile.deleteProfile("WCProfile1.cfg");
         CuddleProfile.deleteProfile("WCProfile2.cfg");
         CuddleProfile.deleteProfile("WCProfile3.cfg");
 
@@ -82,7 +80,7 @@ public class WireCuddler {
 
 
 
-        terminateProgram(null);
+        terminateProgram(null);*/
 
         new CuddleMenu().mainMenu();
     }

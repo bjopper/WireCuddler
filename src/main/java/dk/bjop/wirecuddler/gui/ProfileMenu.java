@@ -47,9 +47,9 @@ public class ProfileMenu {
 
         int mainSelect = 0;
 
-        String heading="   PROFILE MENU   ";
+        String heading="  PROFILE MENU   ";
         int offset = 2;
-        String[] options = new String[]{"- Switch profile", "- Create profile", "- Edit profile", "- Delete profile"};
+        String[] options = new String[]{"Switch profile", "Create profile", "Edit profile", "Delete profile"};
 
         redraw(heading, offset, options, mainSelect);
         while (true) {
@@ -86,19 +86,22 @@ public class ProfileMenu {
         LCD.clear();
         LCD.drawString(heading, 0, 0, false);
         for (int i = 0; i < options.length; i++) {
-            LCD.drawString(options[i], 0, lineOffset + i, select == i);
+            LCD.drawString("- " + options[i], 0, lineOffset + i, select == i);
         }
     }
 
-    private void profileDeleteMenu() {
+    private void profileDeleteMenu() throws InterruptedException {
+        profileSelectMenu();
         throw new RuntimeException("Not implemented!");
     }
 
-    private void profileEditMenu() {
+    private void profileEditMenu() throws InterruptedException {
+        profileSelectMenu();
         throw new RuntimeException("Not implemented!");
     }
 
-    private void profileSwitchMenu() {
+    private void profileSwitchMenu() throws InterruptedException {
+        profileSelectMenu();
         throw new RuntimeException("Not implemented!");
     }
 
@@ -113,15 +116,24 @@ public class ProfileMenu {
             return;
         }
 
+        String profileName = null;
+        try {
+            profileName = CuddleProfile.getFirstAvailableFilename();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        showOkCancelMessage("NEW PROFILE", new String[]{"Name of new profile:",profileName}, false);
+
         XYZCoord[] torsoPoints = null;
         XYZCoord[] legPoints = null;
         XYZCoord[] armPoints = null;
 
 
         int mainSelect = 0;
-        String heading = "     SET AREAS    ";
+        String heading = "    SET AREAS";
         int offset = 2;
-        String[] options = new String[]{"- Torso", "- Legs", "- Arms"};
+        String[] options = new String[]{"Torso", "Legs", "Arms"};
 
         redraw(heading, offset, options, mainSelect);
         while (true) {
@@ -132,6 +144,7 @@ public class ProfileMenu {
                 else if (mainSelect == 1) legPoints = profileSetLegPoints();
                 else if (mainSelect == 2) armPoints = profileSetArmPoints();
                 else throw new RuntimeException("Invalid choice! [" + mainSelect + "]");
+                redraw(heading, offset, options, mainSelect);
             }
             if (Button.LEFT.isDown()) {
                 mainSelect = getPrevIndex(0, options.length, mainSelect);
@@ -145,23 +158,16 @@ public class ProfileMenu {
             }
             if (Button.ESCAPE.isDown()) {
                 while (Button.ESCAPE.isDown()) Thread.sleep(10);
+
+                if (CuddleProfile.validateTorsoPoints(torsoPoints)) {
+                    if (showOkCancelMessage("Save all points?", null, false)) {
+                        new CuddleProfile(torsoPoints, legPoints, armPoints).saveProfile(profileName, false);
+                        showTimedMessage("Profile saved!", null, false, 1000);
+                    }
+                }
                 break;
             }
         }
-
-        if (CuddleProfile.validateTorsoPoints(torsoPoints)) {
-            CuddleProfile cp = CuddleProfile.createInstance(torsoPoints, legPoints, armPoints);
-
-            Utils.println("Saving new profile...");
-            try {
-                cp.saveProfile(CuddleProfile.getFirstAvailableFilename(), false);
-                Utils.println("New profile saved!");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-
     }
 
     private XYZCoord[] profileSetTorsoPoints() throws InterruptedException {
@@ -171,7 +177,7 @@ public class ProfileMenu {
         int mainSelect = 0;
         String heading = "Set torso points";
         int offset = 2;
-        String[] options = new String[]{"- Top-left", "- Top-right", "- Bottom-right", "- Bottom-left"};
+        String[] options = new String[]{"Top-left", "Top-right", "Bottom-right", "Bottom-left"};
 
         redraw(heading, offset, options, mainSelect);
         while (true) {
@@ -180,13 +186,15 @@ public class ProfileMenu {
                 while (Button.ENTER.isDown()) Thread.sleep(10);
                 selectXYZDirectionMenu();
 
-                if (showOkCancelMessage("Store current point?", new String[]{" - ENTER = yes", " - ESCAPE = no"}, false)) {
+                if (showOkCancelMessage("Store as '" + options[mainSelect] + "' point?", new String[]{" - ENTER = yes", " - ESCAPE = no"}, false)) {
+
+                    //TODO verify that the point is within bounds
+
                     torsoPoints[mainSelect] = getCurrentPosition();
-                    showOkCancelMessage("Point stored!", null, false);
-                    break;
+                    showTimedMessage("Point '" + options[mainSelect] + "' stored!", null, false, 1000);
                 }
                 else {
-                    showOkCancelMessage("Point NOT stored!", null, false);
+                    showTimedMessage("Point '" + options[mainSelect] + "' NOT stored!", null, false, 1000);
                 }
                 redraw(heading, offset, options, mainSelect);
             }
@@ -202,40 +210,50 @@ public class ProfileMenu {
             }
             if (Button.ESCAPE.isDown()) {
                 while (Button.ESCAPE.isDown()) Thread.sleep(10);
-                boolean anyNulls = false;
-                for (int i=0;i<torsoPoints.length;i++) {
-                    if (torsoPoints[i] == null) anyNulls = true;
-                }
-                if (anyNulls) {
+
+                if (!CuddleProfile.validateTorsoPoints(torsoPoints)) {
 
                     // TODO allow exit on escape
 
-                    showOkCancelMessage("ERROR", new String[]{"Not all torso-points", "have been set.!"}, true);
+                    if (!showOkCancelMessage("     Exit?", new String[]{"Not all torso-points", "have been set. ","Press Escape to exit", "point-setup or Enter", "to continue to set points."}, true)) {
+                        return null;
+                    }
                 }
                 else {
 
                     // TODO save abort and show profile filename
-
+                    showOkCancelMessage("Torso-points are now set!",null, false);
                     return torsoPoints;
                 }
             }
         }
-        return torsoPoints;
     }
 
     private boolean showOkCancelMessage(String heading, String[] msg, boolean dobeep) {
+        showMessage(heading, msg, dobeep);
+        Button.waitForAnyPress();
+        if (Button.readButtons() == Button.ID_ENTER) return true;
+        else return false;
+    }
+
+    private void showTimedMessage(String heading, String[] msg, boolean dobeep, long millis) {
+        showMessage(heading, msg, dobeep);
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showMessage(String heading, String[] msg, boolean dobeep) {
         LCD.clear();
         LCD.drawString(heading, 0, 0, true);
         if (msg != null) {
             for (int i = 0; i < msg.length; i++) {
-                if (msg[i] == null) LCD.drawString(msg[i], 0, 2 + i, true);
+                if (msg[i] != null) LCD.drawString(" -" + msg[i], 0, 2 + i, false);
             }
         }
         if (dobeep) Sound.beep();
-
-        Button.waitForAnyPress();
-        if (Button.readButtons() == Button.ID_ENTER) return true;
-        else return false;
     }
 
     private void selectXYZDirectionMenu() throws InterruptedException {
@@ -256,12 +274,12 @@ public class ProfileMenu {
                 break;
             }
             if (Button.LEFT.isDown()) {
-                motorSelect = getPrevIndex(1, 3, motorSelect);
+                motorSelect = getPrevIndex(1, 4, motorSelect);
                 redrawSelectDirectionMenu(motorSelect);
                 while (Button.LEFT.isDown()) Thread.sleep(10);
             }
             if (Button.RIGHT.isDown()) {
-                motorSelect = getNextIndex(1, 3, motorSelect);
+                motorSelect = getNextIndex(1, 4, motorSelect);
                 redrawSelectDirectionMenu(motorSelect);
                 while (Button.RIGHT.isDown()) Thread.sleep(10);
             }
@@ -383,6 +401,45 @@ public class ProfileMenu {
 
     private XYZCoord[] profileSetArmPoints() {
         throw new RuntimeException("Not implemented!");
+    }
+
+    private String profileSelectMenu() throws InterruptedException {
+        String[] profileNames = CuddleProfile.listExistingProfiles();
+        if (profileNames.length == 0) {
+            showOkCancelMessage("No profiles found!", null, true);
+            return null;
+        }
+        int selection = 0;
+        drawProfileSelectMenu(selection, profileNames);
+        while (true) {
+            if (Button.ENTER.isDown()) {
+                while (Button.ENTER.isDown()) Thread.sleep(10);
+                return profileNames[selection];
+            }
+            if (Button.LEFT.isDown()) {
+                selection = getPrevIndex(0, profileNames.length, selection);
+                drawProfileSelectMenu(selection, profileNames);
+                while (Button.LEFT.isDown()) Thread.sleep(10);
+            }
+            if (Button.RIGHT.isDown()) {
+                selection = getNextIndex(0, profileNames.length, selection);
+                drawProfileSelectMenu(selection, profileNames);
+                while (Button.RIGHT.isDown()) Thread.sleep(10);
+            }
+            if (Button.ESCAPE.isDown()) {
+                while (Button.ESCAPE.isDown()) Thread.sleep(10);
+                return null;
+            }
+        }
+    }
+
+    private void drawProfileSelectMenu(int selectedIndex, String[] profileNames) {
+        LCD.clear();
+        if (profileNames != null) {
+            for (int i = 0; i < profileNames.length; i++) {
+                if (profileNames[i] != null) LCD.drawString("-" + profileNames[i], 0, 2 + i, i==selectedIndex);
+            }
+        }
     }
 
 }
