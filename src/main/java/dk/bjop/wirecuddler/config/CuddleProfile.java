@@ -62,17 +62,13 @@ public class CuddleProfile {
         this.torsoPoints = torsoPoints;
     }
 
-    private void setLegPoints(XYZCoord[] legPoints) {
-        if (legPoints != null) {
-            if (legPoints[0] == null || legPoints[1] == null) throw new RuntimeException("If leg-points array i defined none of its entries may be null");
-        }
+    public void setLegPoints(XYZCoord[] legPoints) {
+        if (!validateLegPoints(legPoints)) throw new RuntimeException("If leg-points array is defined none of its entries may be null");
         this.legPoints = legPoints;
     }
 
-    private void setArmPoints(XYZCoord[] armPoints) {
-        if (armPoints != null) {
-            if (armPoints[0] == null || armPoints[1] == null) throw new RuntimeException("If arm-points array i defined none of its entries may be null");
-        }
+    public void setArmPoints(XYZCoord[] armPoints) {
+        if (!validateArmPoints(armPoints)) throw new RuntimeException("If arm-points array is defined none of its entries may be null");
         this.armPoints = armPoints;
     }
 
@@ -171,7 +167,7 @@ public class CuddleProfile {
         if (p.getProperty(ARMS_LEFT) != null && p.getProperty(ARMS_RIGHT) != null) {
             aPoints = new XYZCoord[2];
             aPoints[0] = deserializeCoordPoint(p.getProperty(ARMS_LEFT));
-            aPoints[0] = deserializeCoordPoint(p.getProperty(ARMS_RIGHT));
+            aPoints[1] = deserializeCoordPoint(p.getProperty(ARMS_RIGHT));
         }
 
 

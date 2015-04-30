@@ -1,9 +1,11 @@
 package dk.bjop.wirecuddler;
 
 import dk.bjop.wirecuddler.config.CalibValues;
+import dk.bjop.wirecuddler.config.CuddleProfile;
 import dk.bjop.wirecuddler.gui.CuddleMenu;
 import dk.bjop.wirecuddler.math.BaseGeometry;
 import dk.bjop.wirecuddler.math.Utils;
+import dk.bjop.wirecuddler.math.XYZCoord;
 
 
 /**
@@ -43,7 +45,7 @@ public class WireCuddler {
 
 
         // Profile testing...
-        /*CuddleProfile.deleteProfile("WCProfile1.cfg");
+        CuddleProfile.deleteProfile("WCProfile1.cfg");
         CuddleProfile.deleteProfile("WCProfile2.cfg");
         CuddleProfile.deleteProfile("WCProfile3.cfg");
 
@@ -62,14 +64,21 @@ public class WireCuddler {
         }
 
         cp.saveProfile(pName, false);
+
+        XYZCoord[] lp = new XYZCoord[]{new XYZCoord(13,14,15), new XYZCoord(16,17,18)};
+        cp.setLegPoints(lp);
+        cp.saveProfile(pName, true);
+
+        XYZCoord[] ap = new XYZCoord[]{new XYZCoord(19,20,21), new XYZCoord(22,23,24)};
+        cp.setArmPoints(ap);
         cp.saveProfile(pName, true);
 
         CuddleProfile.dumpProfileFilenames();
 
         CuddleProfile cpl = CuddleProfile.loadProfile("WCProfile1.cfg");
-        Utils.println(cpl.toString());*/
+        Utils.println(cpl.toString());
 
-
+        CuddleProfile.dumpProfileFilenames();
 
 
 
