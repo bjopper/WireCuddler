@@ -1,6 +1,7 @@
 package dk.bjop.wirecuddler.gui;
 
 import dk.bjop.wirecuddler.CuddleController;
+import dk.bjop.wirecuddler.WireCuddler;
 import dk.bjop.wirecuddler.config.CalibValues;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
@@ -77,7 +78,7 @@ public class CuddleMenu {
                 if (mainSelect == 0 ) cuddleStartStopMenu();
                 if (mainSelect == 1 ) pm.startMenu();
                 if (mainSelect == 2 ) cm.startMenu();
-                if (mainSelect == 3 ) throw new RuntimeException("Terminating system."); // This is the only known way to make sure the NXT shuts down the running program!? (and then lejos turns off by auto after a while)
+                if (mainSelect == 3 ) WireCuddler.terminateProgram("Termination requested by user!");
 
                 redraw(mainSelect);
             }

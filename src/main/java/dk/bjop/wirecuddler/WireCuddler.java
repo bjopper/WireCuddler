@@ -41,6 +41,40 @@ public class WireCuddler {
 
         if (CalibValues.calibrationFileExist()) CalibValues.loadCalib();
 
+
+        // Profile testing...
+        /*CuddleProfile.deleteProfile("WCProfile1.cfg");
+        CuddleProfile.deleteProfile("WCProfile2.cfg");
+        CuddleProfile.deleteProfile("WCProfile3.cfg");
+
+        CuddleProfile.dumpProfileFilenames();
+
+
+        XYZCoord[] tp = new XYZCoord[]{new XYZCoord(1,2,3), new XYZCoord(4,5,6), new XYZCoord(7,8,9), new XYZCoord(10,11,12)};
+
+        CuddleProfile cp = new CuddleProfile(tp, null, null);
+
+        String pName = null;
+        try {
+            pName = CuddleProfile.getFirstAvailableFilename();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        cp.saveProfile(pName, false);
+        cp.saveProfile(pName, true);
+
+        CuddleProfile.dumpProfileFilenames();
+
+        CuddleProfile cpl = CuddleProfile.loadProfile("WCProfile1.cfg");
+        Utils.println(cpl.toString());*/
+
+
+
+
+
+        terminateProgram(null);
+
         new CuddleMenu().mainMenu();
     }
 
@@ -49,6 +83,11 @@ public class WireCuddler {
         CalibValues cv = BaseGeometry.getInstance().getCalibValues();
         cv.getP1P3heightDiffCm();
         return Math.tan(y/x);
+    }
+
+    // This is the only known way to make sure the NXT shuts down the running program!? (and then lejos turns off by auto after a while)
+    public static void terminateProgram(String msg) {
+        throw new RuntimeException(msg == null ? "Terminating system." : msg);
     }
 
 }

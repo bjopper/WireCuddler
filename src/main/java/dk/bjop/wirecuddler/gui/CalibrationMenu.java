@@ -135,6 +135,7 @@ public class CalibrationMenu {
                 m.setAcceleration(decc);
                 m.stop();
                 m.flt();
+                while (Button.ESCAPE.isDown()) Thread.sleep(10);
                 break;
             }
             if (Button.LEFT.isDown()) {

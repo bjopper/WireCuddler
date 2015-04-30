@@ -154,7 +154,7 @@ public class ProfileMenu {
 
             Utils.println("Saving new profile...");
             try {
-                cp.saveProfile(CuddleProfile.getNewProfileFilename());
+                cp.saveProfile(CuddleProfile.getFirstAvailableFilename(), false);
                 Utils.println("New profile saved!");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -207,13 +207,20 @@ public class ProfileMenu {
                     if (torsoPoints[i] == null) anyNulls = true;
                 }
                 if (anyNulls) {
-                    showOkCancelMessage("ERROR", new String[]{"All torso-points must", "be set. Keep trucking!"}, true);
+
+                    // TODO allow exit on escape
+
+                    showOkCancelMessage("ERROR", new String[]{"Not all torso-points", "have been set.!"}, true);
                 }
                 else {
+
+                    // TODO save abort and show profile filename
+
                     return torsoPoints;
                 }
             }
         }
+        return torsoPoints;
     }
 
     private boolean showOkCancelMessage(String heading, String[] msg, boolean dobeep) {

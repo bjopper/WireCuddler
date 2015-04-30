@@ -3,7 +3,10 @@ package dk.bjop.wirecuddler.config;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.XYZCoord;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -12,7 +15,7 @@ import java.util.StringTokenizer;
  * Created by bpeterse on 24-12-2014.
  */
 public class CuddleProfile {
-    public static String[] allowedProfileFilenames = new String[]{"CProfile1.wcfg", "CProfile2.wcfg", "CProfile3.wcfg", "CProfile4.wcfg","CProfile5.wcfg"};
+    public static String[] allowedProfileFilenames = new String[]{"WCProfile1.cfg", "WCProfile2.cfg", "WCProfile3.cfg", "WCProfile4.cfg","WCProfile5.cfg"};
 
     private static final String TORSO_TOPLEFT = "torso:top-left";
     private static final String TORSO_TOPRIGHT = "torso:top-right";
@@ -25,6 +28,7 @@ public class CuddleProfile {
     private static final String ARMS_LEFT = "arms:left";
     private static final String ARMS_RIGHT = "arms:right";
 
+    private String fileOrigin = null;
 
 
     private XYZCoord[] torsoPoints = null;
@@ -36,7 +40,7 @@ public class CuddleProfile {
 
     private static CuddleProfile instance = null;
 
-    private CuddleProfile(XYZCoord[] torsoPoints, XYZCoord[] legPoints, XYZCoord[] armPoints) {
+    public CuddleProfile(XYZCoord[] torsoPoints, XYZCoord[] legPoints, XYZCoord[] armPoints) {
         setTorsoPoints(torsoPoints);
         setLegPoints(legPoints);
         setArmPoints(armPoints);
@@ -116,19 +120,32 @@ public class CuddleProfile {
         return armPoints != null;
     }
 
+    private void setFileOrigin(String filename) {
+        this.fileOrigin = filename;
+    }
+
+    public String getFileOrigin() {
+        return this.fileOrigin;
+    }
+
     public static CuddleProfile getInstance() {
         if (instance == null) throw new RuntimeException("Profile-object has not been initialized!");
         return instance;
     }
 
     public static CuddleProfile loadProfile(String filename) {
+        if (!isValidFilename(filename)) {
+            throw new RuntimeException("Invalid filename: '" + filename + "'");
+        }
+
         File data = new File(filename);
         if (!data.exists()) throw new RuntimeException("File: '" + filename + "' could not be found!");
+
         Utils.println("Trying to load profile data from file: '" + filename + "'");
 
-        Properties p = null;
+        Properties p = new Properties();
         try {
-            InputStream is = new FileInputStream(data);
+            FileInputStream is = new FileInputStream(data);
             p.load(is);
             is.close();
             Utils.println("Profile data loaded!");
@@ -159,10 +176,32 @@ public class CuddleProfile {
 
 
         instance = new CuddleProfile(tPoints, lPoints, aPoints);
+        instance.setFileOrigin(filename);
         return getInstance();
     }
 
-    public void saveProfile(String filename) {
+    public static void deleteProfile(String filename) {
+        File f = new File(filename);
+        if (f.exists()) {
+            Utils.println("Deleting file: '" + filename + "'");
+            f.delete();
+            Utils.println("Deleted!");
+        }
+        else {
+            Utils.println("Cannot delete '" + filename + "' - file does not exist!");
+        }
+    }
+
+
+    public void saveProfile(String filename, boolean overrideExistingFile) {
+
+        if (!isValidFilename(filename)) {
+            throw new RuntimeException("Invalid filename: '" + filename + "'");
+        }
+
+        if (!overrideExistingFile && !isFilenameAvailable(filename)) {
+            throw new RuntimeException("Filename valid, but file already exists! ('" + filename + "')!");
+        }
 
         Properties p = new Properties();
         p.setProperty(TORSO_TOPLEFT,serializeCoordPoint(torsoPoints[0]));
@@ -187,7 +226,8 @@ public class CuddleProfile {
             out = new FileOutputStream(data);
             p.store(out, "CuddleProfile");
             out.close(); // flush the buffer and write the file
-            Utils.println("Cuddle profile data saved!" + toString());
+            this.setFileOrigin(filename);
+            Utils.println("Cuddle profile data saved to file: '" + filename + "'\n" + toString());
         } catch (IOException e) {
             Utils.println(e.getMessage());
         }
@@ -206,24 +246,31 @@ public class CuddleProfile {
     private static String[] splitString(String s, String delim) {
         StringTokenizer strTkn = new StringTokenizer(s, delim);
         ArrayList<String> arrLis = new ArrayList<String>(s.length());
-        while (strTkn.hasMoreTokens())
+        int count = 0;
+        while (strTkn.hasMoreTokens()) {
             arrLis.add(strTkn.nextToken());
-        return arrLis.toArray(new String[0]);
+            count++;
+        }
+        return arrLis.toArray(new String[count]);
     }
 
 
     private static String[] listExistingProfiles() {
         ArrayList<String> names = new ArrayList<String>();
+        int count = 0;
         for (int i=0;i<allowedProfileFilenames.length;i++) {
             File f = new File(allowedProfileFilenames[i]);
-            if (f.exists()) names.add(allowedProfileFilenames[i]);
+            if (f.exists()) {
+                names.add(allowedProfileFilenames[i]);
+                count++;
+            }
         }
-        return (String[]) names.toArray();
+        return names.toArray(new String[count]);
     }
 
     public static boolean canCreateNewProfiles() {
         try {
-            getNewProfileFilename();
+            getFirstAvailableFilename();
             return true;
         }
         catch (Exception e) {
@@ -231,18 +278,63 @@ public class CuddleProfile {
         }
     }
 
-    public void dumpProfileFilenames() {
+    public static void dumpProfileFilenames() {
+        Utils.println("Profiles on brick:\n");
         String[] filenames = listExistingProfiles();
         for (int i=0;i<filenames.length;i++) {
-            Utils.println(filenames[i]);
+            Utils.println(" - "+filenames[i]);
         }
     }
 
-    public static String getNewProfileFilename() throws Exception {
+    public static String getFirstAvailableFilename() throws Exception {
         for (int i=0;i<allowedProfileFilenames.length;i++) {
             File f = new File(allowedProfileFilenames[i]);
             if (!f.exists()) return allowedProfileFilenames[i];
         }
         throw new Exception("No available profile-filenames left!");
+    }
+
+    public boolean isFilenameAvailable(String filename) {
+        return isValidFilename(filename) && !new File(filename).exists();
+    }
+
+    public static boolean isValidFilename(String filename) {
+        for (int i=0;i<allowedProfileFilenames.length;i++) {
+            File f = new File(allowedProfileFilenames[i]);
+            if (allowedProfileFilenames[i].equalsIgnoreCase(filename)) return true;
+        }
+        return false;
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("\n---------------- Cuddle-profile --------------------\n");
+        sb.append("Filename: "+fileOrigin+"\n");
+        sb.append("Torso-points:\n");
+        for (int i = 0; i < torsoPoints.length; i++) {
+            sb.append(" - Point "+ (i+1) + ": "+torsoPoints[i].toString()+"\n");
+        }
+        sb.append("\n");
+        if (legPoints != null) {
+            sb.append("Leg-points:\n");
+            for (int i = 0; i < legPoints.length; i++) {
+                sb.append(" Point "+ (i+1) + ": "+legPoints[i].toString());
+            }
+        }
+        else {
+            sb.append("No leg-points defined!\n");
+        }
+        sb.append("\n");
+        if (armPoints != null) {
+            sb.append("Arm-points:\n");
+            for (int i = 0; i < armPoints.length; i++) {
+                sb.append(" Point "+ (i+1) + ": "+armPoints[i].toString());
+            }
+        }
+        else {
+            sb.append("No arm-points defined!\n");
+        }
+        sb.append("\n-----------------------------------------------------\n");
+        return sb.toString();
     }
 }
