@@ -86,7 +86,7 @@ public class ProfileMenu {
         LCD.clear();
         LCD.drawString(heading, 0, 0, false);
         for (int i = 0; i < options.length; i++) {
-            LCD.drawString("- " + options[i], 0, lineOffset + i, select == i);
+            if (options[i] !=null && !options[i].trim().equals("")) LCD.drawString("- " + options[i], 0, lineOffset + i, select == i);
         }
     }
 
@@ -109,7 +109,7 @@ public class ProfileMenu {
 
         if (!CuddleProfile.canCreateNewProfiles()) {
             LCD.clear();
-            LCD.drawString("   ERROR   ", 0, 0, true);
+            LCD.drawString("   ERROR   ", 0, 0, false);
             LCD.drawString("No room for new profile (max is 5)", 0, 2, false);
             LCD.drawString("Delete one or more profiles.", 0, 3, false);
             Button.waitForAnyPress();
@@ -123,7 +123,7 @@ public class ProfileMenu {
             e.printStackTrace();
         }
 
-        showOkCancelMessage("NEW PROFILE", new String[]{"Name of new profile:",profileName}, false);
+        showOkCancelMessage("NEW PROFILE NAME:", new String[]{"",profileName}, false);
 
         XYZCoord[] torsoPoints = null;
         XYZCoord[] legPoints = null;
@@ -133,7 +133,7 @@ public class ProfileMenu {
         int mainSelect = 0;
         String heading = "    SET AREAS";
         int offset = 2;
-        String[] options = new String[]{"Torso", "Legs", "Arms"};
+        String[] options = new String[]{"Torso", "Legs", "Arms", "SAVE"};
 
         redraw(heading, offset, options, mainSelect);
         while (true) {
@@ -143,6 +143,20 @@ public class ProfileMenu {
                 if (mainSelect == 0) torsoPoints = profileSetTorsoPoints();
                 else if (mainSelect == 1) legPoints = profileSetLegPoints();
                 else if (mainSelect == 2) armPoints = profileSetArmPoints();
+                else if (mainSelect == 3) {
+                    if (CuddleProfile.validateTorsoPoints(torsoPoints)) {
+                        if (showOkCancelMessage("Save all points?", null, false)) {
+                            new CuddleProfile(torsoPoints, legPoints, armPoints).saveProfile(profileName, false);
+                            showTimedMessage("Profile saved!", null, false, 1000);
+                        }
+                        return;
+                    }
+                    else {
+                        if (showOkCancelMessage("Exit?", new String[]{"Exit ","without", "save?"}, false)) {
+                            return;
+                        }
+                    }
+                }
                 else throw new RuntimeException("Invalid choice! [" + mainSelect + "]");
                 redraw(heading, offset, options, mainSelect);
             }
@@ -158,13 +172,6 @@ public class ProfileMenu {
             }
             if (Button.ESCAPE.isDown()) {
                 while (Button.ESCAPE.isDown()) Thread.sleep(10);
-
-                if (CuddleProfile.validateTorsoPoints(torsoPoints)) {
-                    if (showOkCancelMessage("Save all points?", null, false)) {
-                        new CuddleProfile(torsoPoints, legPoints, armPoints).saveProfile(profileName, false);
-                        showTimedMessage("Profile saved!", null, false, 1000);
-                    }
-                }
                 break;
             }
         }
@@ -186,16 +193,9 @@ public class ProfileMenu {
                 while (Button.ENTER.isDown()) Thread.sleep(10);
                 selectXYZDirectionMenu();
 
-                if (showOkCancelMessage("Store as '" + options[mainSelect] + "' point?", new String[]{" - ENTER = yes", " - ESCAPE = no"}, false)) {
+                torsoPoints[mainSelect] = getCurrentPosition();
+                showTimedMessage("", new String[]{"", "Point stored as", options[mainSelect]}, false, 1000);
 
-                    //TODO verify that the point is within bounds
-
-                    torsoPoints[mainSelect] = getCurrentPosition();
-                    showTimedMessage("Point '" + options[mainSelect] + "' stored!", null, false, 1000);
-                }
-                else {
-                    showTimedMessage("Point '" + options[mainSelect] + "' NOT stored!", null, false, 1000);
-                }
                 redraw(heading, offset, options, mainSelect);
             }
             if (Button.LEFT.isDown()) {
@@ -215,14 +215,14 @@ public class ProfileMenu {
 
                     // TODO allow exit on escape
 
-                    if (!showOkCancelMessage("     Exit?", new String[]{"Not all torso-points", "have been set. ","Press Escape to exit", "point-setup or Enter", "to continue to set points."}, true)) {
+                    if (!showOkCancelMessage("     Exit?", new String[]{"Point missing!", "Press Esc to exit", "or Enter", "to stay."}, true)) {
                         return null;
                     }
                 }
                 else {
 
                     // TODO save abort and show profile filename
-                    showOkCancelMessage("Torso-points are now set!",null, false);
+                    showOkCancelMessage("",new String[]{"","Torso-points","are now set!"}, false);
                     return torsoPoints;
                 }
             }
@@ -247,10 +247,10 @@ public class ProfileMenu {
 
     private void showMessage(String heading, String[] msg, boolean dobeep) {
         LCD.clear();
-        LCD.drawString(heading, 0, 0, true);
+        LCD.drawString(heading, 0, 0, false);
         if (msg != null) {
             for (int i = 0; i < msg.length; i++) {
-                if (msg[i] != null) LCD.drawString(" -" + msg[i], 0, 2 + i, false);
+                if (msg[i] != null && !msg[i].trim().equals("")) LCD.drawString(" -" + msg[i], 0, 2 + i, false);
             }
         }
         if (dobeep) Sound.beep();
@@ -363,8 +363,14 @@ public class ProfileMenu {
                 redraw = false;
             }
 
+            if (Button.ENTER.isDown()) {
+                while (Button.ENTER.isDown()) Thread.sleep(10);
+                showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 1000);
+                break;
+            }
             if (Button.ESCAPE.isDown()) {
                 while (Button.ESCAPE.isDown()) Thread.sleep(10);
+                showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 1000);
                 break;
             }
             if (Button.LEFT.isDown()) {
