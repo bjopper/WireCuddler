@@ -2,6 +2,7 @@ package dk.bjop.wirecuddler.math;
 
 
 import dk.bjop.wirecuddler.WireCuddler;
+import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
 import lejos.nxt.comm.RConsole;
 
 /**
@@ -23,6 +24,11 @@ public class Utils {
             RConsole.println(s);
         }
     }
+
+    public static XYZCoord findMidpoint(XYZCoord p1, XYZCoord p2) {
+        return new XYZCoord((p1.x+p2.x)/2, (p1.y+p2.y)/2, (p1.z+p2.z)/2);
+    }
+
 
     /*public static double distance(XYZCoord p1, XYZCoord p2) {
         double dx   = p1.x - p2.x;         //horizontal difference

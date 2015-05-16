@@ -1,6 +1,8 @@
-package dk.bjop.wirecuddler.math;
+package dk.bjop.wirecuddler.math.geometry;
 
 import dk.bjop.wirecuddler.config.CalibValues;
+import dk.bjop.wirecuddler.math.Utils;
+import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
 
 /**
  * Created by bpeterse on 21-12-2014.

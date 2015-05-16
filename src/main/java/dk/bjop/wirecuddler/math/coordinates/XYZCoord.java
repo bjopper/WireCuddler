@@ -1,4 +1,6 @@
-package dk.bjop.wirecuddler.math;
+package dk.bjop.wirecuddler.math.coordinates;
+
+import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
 
 /**
  * Created by bpeterse on 20-09-2014.
@@ -13,6 +15,7 @@ public class XYZCoord {
         this.x = x;
         this.y = y;
         this.z = z;
+        if (Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z)) throw new RuntimeException("Error: One or more values are NaN!");
     }
 
     public String toString() {
@@ -66,5 +69,12 @@ public class XYZCoord {
 
     public boolean isValid() {
         return !Double.isNaN(x) && !Double.isNaN(y) && !Double.isNaN(z);
+    }
+
+    @Override
+    public boolean equals(Object p) {
+        if (!(p instanceof XYZCoord)) return false;
+        XYZCoord casted = (XYZCoord)p;
+        return casted.x == this.x && casted.z == this.z && casted.y == this.y;
     }
 }

@@ -2,8 +2,8 @@ package dk.bjop.wirecuddler.gui;
 
 import dk.bjop.wirecuddler.CuddleController;
 import dk.bjop.wirecuddler.math.Utils;
-import dk.bjop.wirecuddler.math.WT3Coord;
-import dk.bjop.wirecuddler.math.XYZCoord;
+import dk.bjop.wirecuddler.math.coordinates.WT3Coord;
+import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 import dk.bjop.wirecuddler.movement.moves.PointMove;

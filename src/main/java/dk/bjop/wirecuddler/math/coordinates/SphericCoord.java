@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler.math;
+package dk.bjop.wirecuddler.math.coordinates;
 
 /**
  * Created by bpeterse on 29-12-2014.

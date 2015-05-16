@@ -1,7 +1,7 @@
 package dk.bjop.wirecuddler.config;
 
 import dk.bjop.wirecuddler.math.Utils;
-import dk.bjop.wirecuddler.math.XYZCoord;
+import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
 
 import java.io.File;
 import java.io.FileInputStream;

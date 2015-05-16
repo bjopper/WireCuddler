@@ -1,6 +1,6 @@
 package dk.bjop.wirecuddler.movement.moveproducers;
 
-import dk.bjop.wirecuddler.math.XYZCoord;
+import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 import dk.bjop.wirecuddler.movement.moves.StraightLineMove;
 

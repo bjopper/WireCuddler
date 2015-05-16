@@ -1,7 +1,8 @@
 package dk.bjop.wirecuddler.movement.moveproducers;
 
-import dk.bjop.wirecuddler.math.WT3Coord;
-import dk.bjop.wirecuddler.math.XYZCoord;
+import dk.bjop.wirecuddler.config.CuddleProfile;
+import dk.bjop.wirecuddler.math.coordinates.WT3Coord;
+import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 import dk.bjop.wirecuddler.movement.moves.PointMove;
@@ -28,6 +29,10 @@ public class CuddleMoveProducerFactory {
 
     public static CuddleMoveProducer getAutoRandomBasedCMP() {
         return new CuddleMoveProducerGenerateRandomInRectangle();
+    }
+
+    public static CuddleMoveProducer getAutoRandomByProfile(CuddleProfile cp) {
+        return new CuddleMoveProducerRandomProfile(cp);
     }
 
     public static CuddleMoveProducer getOperatedCMP(MotorPathMove om) {

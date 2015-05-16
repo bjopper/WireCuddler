@@ -1,4 +1,7 @@
-package dk.bjop.wirecuddler.math;
+package dk.bjop.wirecuddler.math.coordinates;
+
+import dk.bjop.wirecuddler.math.Utils;
+import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
 
 /**
  * Created by bpeterse on 05-10-2014.

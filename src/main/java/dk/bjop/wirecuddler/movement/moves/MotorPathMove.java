@@ -1,6 +1,6 @@
 package dk.bjop.wirecuddler.movement.moves;
 
-import dk.bjop.wirecuddler.math.XYZCoord;
+import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
 
 /**
  * Created by bpeterse on 10-09-2014.

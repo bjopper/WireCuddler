@@ -1,7 +1,7 @@
 package dk.bjop.wirecuddler.movement;
 
 import dk.bjop.wirecuddler.math.Utils;
-import dk.bjop.wirecuddler.math.WT3Coord;
+import dk.bjop.wirecuddler.math.coordinates.WT3Coord;
 import dk.bjop.wirecuddler.motor.LookAheadCuddleMotorController;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducer;

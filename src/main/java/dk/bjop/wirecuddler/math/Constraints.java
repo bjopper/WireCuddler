@@ -1,5 +1,8 @@
 package dk.bjop.wirecuddler.math;
 
+import dk.bjop.wirecuddler.math.coordinates.WT3Coord;
+import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
+
 /**
  * Created by bpeterse on 03-01-2015.
  */

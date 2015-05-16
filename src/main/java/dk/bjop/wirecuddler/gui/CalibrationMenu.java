@@ -99,9 +99,9 @@ public class CalibrationMenu {
 
     private void redrawSingleMotorMenu(int motorSelect) {
         LCD.drawString("   SELECT MOTOR", 0, 0);
-        LCD.drawString("M1", 6, 2, motorSelect ==1);
-        LCD.drawString("M2", 6, 3, motorSelect ==2);
-        LCD.drawString("M3", 6, 4, motorSelect ==3);
+        LCD.drawString("Motor A", 2, 2, motorSelect ==1);
+        LCD.drawString("Motor B", 2, 3, motorSelect ==2);
+        LCD.drawString("Motor C", 2, 4, motorSelect ==3);
     }
 
     private NXTCuddleMotor getMotor(int index) {

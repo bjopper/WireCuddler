@@ -1,6 +1,6 @@
 package dk.bjop.wirecuddler.motor;
 
-import dk.bjop.wirecuddler.math.BaseGeometry;
+import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.sensors.EmergencyBreak;
 import dk.bjop.wirecuddler.sensors.EmergencyBreakListener;

@@ -1,8 +1,8 @@
 package dk.bjop.wirecuddler.movement.moves;
 
-import dk.bjop.wirecuddler.math.SphericCoord;
-import dk.bjop.wirecuddler.math.WT3Coord;
-import dk.bjop.wirecuddler.math.XYZCoord;
+import dk.bjop.wirecuddler.math.coordinates.SphericCoord;
+import dk.bjop.wirecuddler.math.coordinates.WT3Coord;
+import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 
 /**

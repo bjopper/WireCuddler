@@ -1,8 +1,9 @@
 package dk.bjop.wirecuddler;
 
 import dk.bjop.wirecuddler.config.CalibValues;
-import dk.bjop.wirecuddler.math.BaseGeometry;
-import dk.bjop.wirecuddler.math.WT3Coord;
+import dk.bjop.wirecuddler.config.CuddleProfile;
+import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
+import dk.bjop.wirecuddler.math.coordinates.WT3Coord;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.CuddleMoveController;
 import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducerFactory;
@@ -36,8 +37,19 @@ public class CuddleController {
 
     public void doCuddle() {
         ensureInitialized();
+
+        CuddleProfile cp = null;
+        String[] profiles = CuddleProfile.listExistingProfiles();
+        if (profiles[0] != null) {
+            cp = CuddleProfile.loadProfile(profiles[0]);
+        }
+        else {
+            throw new RuntimeException("Unable to start cuddling - no prfile available!");
+        }
+
         //cmc.attachMoveProducer(CuddleMoveProducerFactory.getListBasedCMP(mg));
-        cmc.runMoves(CuddleMoveProducerFactory.getAutoRandomBasedCMP(), false);
+        //cmc.runMoves(CuddleMoveProducerFactory.getAutoRandomBasedCMP(), false);
+        cmc.runMoves(CuddleMoveProducerFactory.getAutoRandomByProfile(cp), false);
     }
 
     public void manualMove(MotorPathMove move, boolean awaitMoveCompletion) {

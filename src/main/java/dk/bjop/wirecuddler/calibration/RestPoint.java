@@ -1,6 +1,6 @@
 package dk.bjop.wirecuddler.calibration;
 
-import dk.bjop.wirecuddler.math.BaseGeometry;
+import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.motor.NXTCuddleMotor;

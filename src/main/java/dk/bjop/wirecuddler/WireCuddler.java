@@ -2,12 +2,18 @@ package dk.bjop.wirecuddler;
 
 import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.gui.CuddleMenu;
-import dk.bjop.wirecuddler.math.BaseGeometry;
 import dk.bjop.wirecuddler.math.Utils;
+import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
 
 
 /**
  * Created by bpeterse on 21-06-2014.
+ *
+ *  Installing lejos snapshot, see http://lejos.sourceforge.net/forum/viewtopic.php?t=1828&highlight=snapshot  (required to avoid TinyVM 64k linker limit)   See lejos trunk rev 6817
+ *  If problem with "Bossa" port stuff, see: http://www.robotc.net/forums/viewtopic.php?f=1&t=6278&sid=bb8757e359d3bfdfcf574316b275cf0c&view=print
+ *
+ *  From 14/5-2015 running on lejos snapshot rev. 7036
+ *
  */
 public class WireCuddler {
 
@@ -35,8 +41,8 @@ public class WireCuddler {
             CalibValues.setDevMode(true);
 
             // Set dev parameters
-            //CalibValues inst = CalibValues.createCalibInstance(0, 0, Utils.cmToTacho(193), Utils.cmToTacho(195), Utils.cmToTacho(143), 0); // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
-            //inst.saveCalib();
+            CalibValues inst = CalibValues.createCalibInstance(0, 0, Utils.cmToTacho(193), Utils.cmToTacho(195), Utils.cmToTacho(143), 0); // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
+            inst.saveCalib();
         }
 
         if (CalibValues.calibrationFileExist()) CalibValues.loadCalib();
@@ -82,6 +88,27 @@ public class WireCuddler {
 
         terminateProgram(null);*/
 
+/*
+        // Plane-equation derive  testing
+        Plane plane = new Plane(new XYZCoord(10, 10, 25), new XYZCoord(30, 10, 10), new XYZCoord(20, 5, 10));
+
+        Utils.println(plane.toString());
+
+        Utils.println("Y for p1: " + plane.findY(10,25));
+        Utils.println("Y for p2: " + plane.findY(30,10));
+        Utils.println("Y for p3: " + plane.findY(20,10));
+
+        Utils.println("Y for TEST: " + plane.findY(0,0));
+        Utils.println("Y for TEST: " + plane.findY(50,50));
+
+        XYZCoord p1 = new XYZCoord(10,20,30);
+        XYZCoord p2 = new XYZCoord(2,4,6);
+        Utils.println("P1 midpoint test: " + p1.toString());
+        Utils.println("P2 midpoint test: " + p2.toString());
+        Utils.println("Midpoint is: "+ Utils.findMidpoint(p1, p2));
+
+        terminateProgram(null);*/
+
         new CuddleMenu().mainMenu();
     }
 
@@ -93,8 +120,9 @@ public class WireCuddler {
     }
 
     // This is the only known way to make sure the NXT shuts down the running program!? (and then lejos turns off by auto after a while)
-    public static void terminateProgram(String msg) {
-        throw new RuntimeException(msg == null ? "Terminating system." : msg);
+    public static void terminateProgram(String reason) {
+        Utils.println("\n*\n*\n*\n---------- TERMINATING SYSTEM NOW! REASON: '" + reason + "' ----------\n*\n*\n*\n");
+        throw new RuntimeException(reason == null ? "Terminating system." : "Terminating system. Reason: " + reason);
     }
 
 }
