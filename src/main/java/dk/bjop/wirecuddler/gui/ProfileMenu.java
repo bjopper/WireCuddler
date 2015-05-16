@@ -147,7 +147,7 @@ public class ProfileMenu {
                     if (CuddleProfile.validateTorsoPoints(torsoPoints)) {
                         if (showOkCancelMessage("Save all points?", null, false)) {
                             new CuddleProfile(torsoPoints, legPoints, armPoints).saveProfile(profileName, false);
-                            showTimedMessage("Profile saved!", null, false, 1000);
+                            showTimedMessage("Profile saved!", null, false, 2000);
                         }
                         return;
                     }
@@ -194,7 +194,7 @@ public class ProfileMenu {
                 selectXYZDirectionMenu();
 
                 torsoPoints[mainSelect] = getCurrentPosition();
-                showTimedMessage("", new String[]{"", "Point stored as", options[mainSelect]}, false, 1000);
+                showTimedMessage("", new String[]{"", "Point stored as", options[mainSelect]}, false, 2000);
 
                 redraw(heading, offset, options, mainSelect);
             }
@@ -365,12 +365,12 @@ public class ProfileMenu {
 
             if (Button.ENTER.isDown()) {
                 while (Button.ENTER.isDown()) Thread.sleep(10);
-                showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 1000);
+                showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 2000);
                 break;
             }
             if (Button.ESCAPE.isDown()) {
                 while (Button.ESCAPE.isDown()) Thread.sleep(10);
-                showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 1000);
+                showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 2000);
                 break;
             }
             if (Button.LEFT.isDown()) {

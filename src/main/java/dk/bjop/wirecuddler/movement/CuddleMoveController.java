@@ -83,16 +83,14 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         while (!terminate) {
 
             if (allThreadsWaiting()) {
-                if (moveAvailable()){
-                    try {
-                        currentMove = getNextMove();
-                        currentMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), System.currentTimeMillis());
-                        notifyAllMoveControllers();
-                    } catch (PosNotAvailableException e) {
-                        Utils.println(e.getMessage());
+                if (moveAvailable()) {
+                    MotorPathMove newMove = getNextMove();
+                    if (newMove != null) {
+                        newMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), System.currentTimeMillis());
+                        currentMove = newMove;
                     }
-                }
-                else {
+                    notifyAllMoveControllers();
+                } else {
                     if (objectsAwaitingMovesCompleted) notifyAllMovesCompleted();
                 }
             }
@@ -101,14 +99,11 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
                     long t = System.currentTimeMillis();
                     if (currentMove.isMoveDone(t)) {
                         if (moveAvailable()) {
-                            MotorPathMove newMove = null;
-                            try {
-                                newMove = getNextMove();
+                            MotorPathMove newMove = getNextMove();
+                            if (newMove != null) {
                                 newMove.initialize(new WT3Coord(mg.getTachoCounts()).toCartesian(), t);
-                                currentMove = newMove;
-                            } catch (PosNotAvailableException e) {
-                                e.printStackTrace();
                             }
+                            currentMove = newMove;
                         } else {
                             currentMove = null;
                         }
@@ -159,9 +154,9 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
      * @return the tacho-position the motor should be at the specified time
      */
     @Override
-    public int getTachoPositionAtTimeT(long t, LookAheadCuddleMotorController mpc) throws PosNotAvailableException {
-        if (currentMove != null) return currentMove.getExpectedTachoPosAtTimeT(t)[mpc.getControllerID().getIDNumber()-1]; // TODO make threadsafe
-        else throw new PosNotAvailableException("Current move is null!");
+    public Integer getTachoPositionAtTimeT(long t, LookAheadCuddleMotorController mpc)  {
+        if (currentMove != null) return new Integer(currentMove.getExpectedTachoPosAtTimeT(t)[mpc.getControllerID().getIDNumber()-1]); // TODO make threadsafe
+        else return null;
     }
 
     @Override
@@ -177,9 +172,9 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         }
     }
 
-    private MotorPathMove getNextMove() throws PosNotAvailableException {
+    private MotorPathMove getNextMove() {
         synchronized (cmpLock) {
-            if (!moveAvailable()) throw new PosNotAvailableException("Producer fresh out of moves!");
+            if (!moveAvailable()) return null;
             else return cmp.getNewMove();
         }
     }

@@ -1,6 +1,5 @@
 package dk.bjop.wirecuddler.motor;
 
-import dk.bjop.wirecuddler.movement.PosNotAvailableException;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.movement.TachoPositionController;
 
@@ -73,15 +72,12 @@ public class LookAheadCuddleMotorController extends Thread {
         while (true) {
             long now = System.currentTimeMillis();
 
-            int nextPerfectPos = 0;
-            int perfectCurPos = 0;
-            try {
-                nextPerfectPos = posCtrl.getTachoPositionAtTimeT(now + lookAheadMillis, this);
-                perfectCurPos = posCtrl.getTachoPositionAtTimeT(now, this);
-            } catch (PosNotAvailableException e) {
-                Utils.println(e.getMessage());
-                break;
-            }
+            Integer nextPerfPos = posCtrl.getTachoPositionAtTimeT(now + lookAheadMillis, this);
+            Integer perfCurPos = posCtrl.getTachoPositionAtTimeT(now, this);
+            if (nextPerfPos == null || perfCurPos == null) break;
+
+            int nextPerfectPos = nextPerfPos.intValue();
+            int perfectCurPos = perfCurPos.intValue();
 
             int currPos = m.getTachoCount();
 
