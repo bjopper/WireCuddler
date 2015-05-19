@@ -106,13 +106,8 @@ public class ProfileMenu {
     }
 
     private void profileCreateMenu() throws InterruptedException {
-
         if (!CuddleProfile.canCreateNewProfiles()) {
-            LCD.clear();
-            LCD.drawString("   ERROR   ", 0, 0, false);
-            LCD.drawString("No room for new profile (max is 5)", 0, 2, false);
-            LCD.drawString("Delete one or more profiles.", 0, 3, false);
-            Button.waitForAnyPress();
+            showMessage("  -ERROR-", new String[]{"Too many", "profiles!", "Delete some"}, true);
             return;
         }
 
@@ -147,6 +142,7 @@ public class ProfileMenu {
                     if (CuddleProfile.validateTorsoPoints(torsoPoints)) {
                         if (showOkCancelMessage("Save all points?", null, false)) {
                             new CuddleProfile(torsoPoints, legPoints, armPoints).saveProfile(profileName, false);
+                            Utils.println(CuddleProfile.loadProfile(profileName).toString());
                             showTimedMessage("Profile saved!", null, false, 2000);
                         }
                         return;
@@ -194,7 +190,7 @@ public class ProfileMenu {
                 selectXYZDirectionMenu();
 
                 torsoPoints[mainSelect] = getCurrentPosition();
-                showTimedMessage("", new String[]{"", "Point stored as", options[mainSelect]}, false, 2000);
+                showTimedMessage("", new String[]{"", "Point stored:", options[mainSelect]}, false, 2000);
 
                 redraw(heading, offset, options, mainSelect);
             }
@@ -229,10 +225,13 @@ public class ProfileMenu {
         }
     }
 
-    private boolean showOkCancelMessage(String heading, String[] msg, boolean dobeep) {
+    private boolean showOkCancelMessage(String heading, String[] msg, boolean dobeep) throws InterruptedException {
         showMessage(heading, msg, dobeep);
         Button.waitForAnyPress();
-        if (Button.readButtons() == Button.ID_ENTER) return true;
+        if (Button.readButtons() == Button.ID_ENTER) {
+            while (Button.ENTER.isDown()) Thread.sleep(10);
+            return true;
+        }
         else return false;
     }
 
@@ -409,7 +408,7 @@ public class ProfileMenu {
         throw new RuntimeException("Not implemented!");
     }
 
-    private String profileSelectMenu() throws InterruptedException {
+    public String profileSelectMenu() throws InterruptedException {
         String[] profileNames = CuddleProfile.listExistingProfiles();
         if (profileNames.length == 0) {
             showOkCancelMessage("No profiles found!", null, true);

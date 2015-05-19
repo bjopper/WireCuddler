@@ -35,17 +35,8 @@ public class CuddleController {
         cmc.stopController();
     }
 
-    public void doCuddle() {
+    public void doCuddle(CuddleProfile cp ) {
         ensureInitialized();
-
-        CuddleProfile cp = null;
-        String[] profiles = CuddleProfile.listExistingProfiles();
-        if (profiles[0] != null) {
-            cp = CuddleProfile.loadProfile(profiles[0]);
-        }
-        else {
-            throw new RuntimeException("Unable to start cuddling - no prfile available!");
-        }
 
         //cmc.attachMoveProducer(CuddleMoveProducerFactory.getListBasedCMP(mg));
         //cmc.runMoves(CuddleMoveProducerFactory.getAutoRandomBasedCMP(), false);

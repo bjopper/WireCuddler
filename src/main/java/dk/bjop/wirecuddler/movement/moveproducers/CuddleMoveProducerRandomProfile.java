@@ -1,7 +1,9 @@
 package dk.bjop.wirecuddler.movement.moveproducers;
 
 import dk.bjop.wirecuddler.config.CuddleProfile;
+import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
+import dk.bjop.wirecuddler.math.geometry.Plane;
 import dk.bjop.wirecuddler.movement.moves.MotorPathMove;
 import dk.bjop.wirecuddler.movement.moves.StraightLineMove;
 
@@ -21,10 +23,8 @@ public class CuddleMoveProducerRandomProfile implements CuddleMoveProducer {
     XYZCoord bottomRight = null;
     XYZCoord bottomLeft = null;
 
-    /*Line2D top;
-    Line2D bottom;
-    Line2D left;
-    Line2D right;*/
+    Plane cuddlePlane;
+
 
     private static Random rnd = new Random(System.currentTimeMillis()+1);
 
@@ -38,23 +38,15 @@ public class CuddleMoveProducerRandomProfile implements CuddleMoveProducer {
         bottomRight = torsoPoints[2];
         bottomLeft = torsoPoints[3];
 
-        /*top = new Line2D(topLeft, topRight);
-        bottom = new Line2D(bottomLeft, bottomRight);
-        left = new Line2D(topLeft, bottomLeft);
-        right = new Line2D(topRight, bottomRight);*/
+        // Get cuddle-plane
+        XYZCoord bottomMidpoint = Utils.findMidpoint(bottomRight, bottomLeft);
 
-        double topLineAvgHeight = (torsoPoints[0].y + torsoPoints[1].y) / 2d;
-        double bottomAvgLineHeight = (torsoPoints[2].y + torsoPoints[3].y) / 2d;
-
-        double heightDiff = topLineAvgHeight - bottomAvgLineHeight;
+        cuddlePlane = new Plane(topLeft, topRight, bottomMidpoint);
     }
 
     public MotorPathMove getNewMove() {
         XYZCoord target = getMoveTarget();
-
-        // And now...   the Y coordinate!!  Yiihaaaaa  :)
-        target.y = height;
-
+        target.y = cuddlePlane.findY(target.x, target.z);
         return new StraightLineMove(target);
     }
 
@@ -100,41 +92,6 @@ public class CuddleMoveProducerRandomProfile implements CuddleMoveProducer {
             case 4: target = getRandomPointOnLine(topLeft, bottomLeft);break;
         }
         return target;
-    }
-
-    private XYZCoord getMoveTargetPoint() {
-        int maxX = 130;
-        int minX = 70;
-        int maxZ = 60;
-        int minZ = 10;
-
-
-        int x = 0 ;
-        int z = 0;
-        int c;
-        // rnd 1-4    random.nextInt(max - min + 1) + min
-        Random rnd = new Random(System.currentTimeMillis()+1);
-
-        c = (rnd.nextInt(40)+10) / 10; // Weird...  rnd.nextInt(4)+1;  only output sequence 1 2 2 1 2 2 1 2 2 1 2 2 1 for ever???
-
-        if (c == 1) {
-            x = minX;
-            z = rnd.nextInt(maxZ - minZ + 1) + minZ;
-        }
-        else if (c == 2) {
-            x = maxX;
-            z = rnd.nextInt(maxZ - minZ + 1) + minZ;
-        }
-        else if (c == 3) {
-            z = minZ;
-            x = rnd.nextInt(maxX - minX + 1) + minX;
-        }
-        else if (c == 4) {
-            z = maxZ;
-            x = rnd.nextInt(maxX - minX + 1) + minX;
-        }
-
-        return new XYZCoord(x, height, z);
     }
 
 }

@@ -3,6 +3,7 @@ package dk.bjop.wirecuddler.gui;
 import dk.bjop.wirecuddler.CuddleController;
 import dk.bjop.wirecuddler.WireCuddler;
 import dk.bjop.wirecuddler.config.CalibValues;
+import dk.bjop.wirecuddler.config.CuddleProfile;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
 
@@ -98,7 +99,10 @@ public class CuddleMenu {
     private void cuddleStartStopMenu() throws InterruptedException {
         boolean redraw = true;
 
-        cc.doCuddle();
+        String profile = pm.profileSelectMenu();
+        if ( profile == null) return;
+
+        cc.doCuddle(CuddleProfile.loadProfile(profile));
 
         while (true) {
 

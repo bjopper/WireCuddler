@@ -1,5 +1,6 @@
 package dk.bjop.wirecuddler.config;
 
+import dk.bjop.wirecuddler.WireCuddler;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
 
@@ -175,6 +176,9 @@ public class CuddleProfile {
 
         instance = new CuddleProfile(tPoints, lPoints, aPoints);
         instance.setFileOrigin(filename);
+
+        if (WireCuddler.devMode) Utils.println(instance.toString());
+
         return getInstance();
     }
 
