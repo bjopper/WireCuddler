@@ -1,6 +1,4 @@
-package dk.bjop.wirecuddler.movement;
-
-import dk.bjop.wirecuddler.motor.LookAheadCuddleMotorController;
+package dk.bjop.wirecuddler.movement.movecontrol;
 
 /**
  * Created by bpeterse on 10-01-2015.

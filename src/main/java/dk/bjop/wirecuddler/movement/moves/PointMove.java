@@ -96,6 +96,11 @@ public class PointMove implements MotorPathMove {
     }
 
     @Override
+    public XYZCoord getTarget() {
+        return targetPos;
+    }
+
+    @Override
     public void setSpeed(float speed) {
         this.speedCmSec = speed;
     }

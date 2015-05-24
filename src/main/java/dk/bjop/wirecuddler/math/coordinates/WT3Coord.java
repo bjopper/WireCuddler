@@ -103,7 +103,7 @@ public class WT3Coord {
 
         debugPrint("------------ Location inference test of point on p2p3 -------------------");
 
-        double m2m3Dist = Utils.tachoToCm(tri.getCalibValues().p2p3tachoDist);  // b
+        double m2m3Dist = Utils.tachoToCm(tri.getCalibValues().p2p3distMm);  // b
 
 // Cosine relation... (Ref: http://da.wikipedia.org/wiki/Cosinusrelation) + http://www.studieportalen.dk/kompendier/matematik/formelsamling/trigonometri/begreber/hoejde-grundlinje
         double angleAtM3 =  Math.acos((m2m3Dist * m2m3Dist + wireLengths[2] * wireLengths[2] - wireLengths[1] * wireLengths[1]) / (2 * m2m3Dist * wireLengths[2]));  // A
@@ -136,7 +136,7 @@ public class WT3Coord {
 
         debugPrint("------------ Location inference test of point on p1p2 -------------------");
 
-        double m1m2Dist = Utils.tachoToCm(tri.getCalibValues().p1p2tachoDist);  // b
+        double m1m2Dist = Utils.tachoToCm(tri.getP1P2tachoDist());  // b
 
 // Cosine relation... (Ref: http://da.wikipedia.org/wiki/Cosinusrelation) + http://www.studieportalen.dk/kompendier/matematik/formelsamling/trigonometri/begreber/hoejde-grundlinje
         double angleAtM1 =  Math.acos((wireLengths[0] * wireLengths[0] + m1m2Dist*m1m2Dist - wireLengths[1] * wireLengths[1]) / (2 * wireLengths[0] * m1m2Dist));  // A
@@ -169,7 +169,7 @@ public class WT3Coord {
         debugPrint("------------ Location inference test X -------------------");
         for (int i=0;i<tachos.length;i++) debugPrint("#Tacho ["+(i+1)+"] = "+tachos[i] + " (cm: " + Utils.tachoToCm(tachos[i]) + ")");
 
-        double m1m3Dist = Utils.tachoToCm(tri.getCalibValues().p1p3tachoDist);  // b
+        double m1m3Dist = Utils.tachoToCm(tri.getP1P3tachoDist());  // b
 
         // Cosine relation... (Ref: http://da.wikipedia.org/wiki/Cosinusrelation) + http://www.studieportalen.dk/kompendier/matematik/formelsamling/trigonometri/begreber/hoejde-grundlinje
         double angleAtM1 = Math.acos((m1m3Dist * m1m3Dist + wireLengths[0] * wireLengths[0] - wireLengths[2] * wireLengths[2]) / (2 * m1m3Dist * wireLengths[0]));  // A

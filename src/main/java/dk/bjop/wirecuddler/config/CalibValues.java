@@ -3,26 +3,34 @@ package dk.bjop.wirecuddler.config;
 import dk.bjop.wirecuddler.math.Utils;
 
 import java.io.*;
+import java.util.Properties;
 
 /**
  * Created by bpeterse on 05-11-2014.
  */
 public class CalibValues {
-    public static final String default_calibFile_dev = "dev_calib.bin";
-    public static final String default_calibFile_prod = "prod_calib.bin";
+    private static final String default_calibFile_dev = "dev_calib.bin";
+    private static final String default_calibFile_prod = "prod_calib.bin";
+
+    private static String P1_P2_DIST_MM = "p1p2DistMm";
+    private static String P1_P3_DIST_MM = "p1p3DistMm";
+    private static String P2_P3_DIST_MM = "p2p3DistMm";
+    private static String P1_P2_HEIGHTDIFF_MM = "p1p2HeightDiffMm";
+    private static String P1_P3_HEIGHTDIFF_MM = "p1p3HeightDiffMm";
+    private static String RESTPOINT_INDEX = "restpointIndex";
 
     private static boolean isInDevMode = false;
 
-    public String fileOrigin = null;
+    private String fileOrigin = null;
 
-    public double p1p2heightDiffCm = 0;
-    public double p1p3heightDiffCm = 0;
+    private int p1p2heightDiffMm = 0;
+    private int p1p3heightDiffMm = 0;
 
-    public int p1p2tachoDist = -1;
-    public int p1p3tachoDist = -1;
-    public int p2p3tachoDist = -1;
+    private int p1p2distMm = -1;
+    private int p1p3distMm = -1;
+    private int p2p3distMm = -1;
 
-    public int restpoint = -1; // motor-index MOTORPORT.A = 0, B = 1, C = 2
+    private int restpoint = -1; // motor-index MOTORPORT.A = 0, B = 1, C = 2
 
     //public static int cuddlePlaneHeights[] = new int[3]; // Three point that define the plane...
     private static CalibValues instance = null;
@@ -32,48 +40,46 @@ public class CalibValues {
         return instance;
     }
 
-    private CalibValues(double p1p2heightDiffCm, double p1p3heightDiffCm, int p1p2tachoDist, int p1p3tachoDist, int p2p3tachoDist, int restpoint, String fileOrigin) {
-        this.p1p2heightDiffCm = p1p2heightDiffCm;
-        this.p1p3heightDiffCm = p1p3heightDiffCm;
-        this.p1p2tachoDist = p1p2tachoDist;
-        this.p1p3tachoDist = p1p3tachoDist;
-        this.p2p3tachoDist = p2p3tachoDist;
+    private CalibValues(int p1p2heightDiffMm, int p1p3heightDiffMm, int p1p2DistMm, int p1p3DistMm, int p2p3DistMm, int restpoint, String fileOrigin) {
+        this.p1p2heightDiffMm = p1p2heightDiffMm;
+        this.p1p3heightDiffMm = p1p3heightDiffMm;
+        this.p1p2distMm = p1p2DistMm;
+        this.p1p3distMm = p1p3DistMm;
+        this.p2p3distMm = p2p3DistMm;
         this.restpoint = restpoint;
         this.fileOrigin = fileOrigin;
     }
 
     public void saveCalib() {
+
+        Properties p = new Properties();
+        p.setProperty(P1_P2_DIST_MM,""+p1p2distMm);
+        p.setProperty(P1_P3_DIST_MM, ""+p1p3distMm);
+        p.setProperty(P2_P3_DIST_MM, ""+p2p3distMm);
+        p.setProperty(P1_P2_HEIGHTDIFF_MM, ""+p1p2heightDiffMm);
+        p.setProperty(P1_P3_HEIGHTDIFF_MM, ""+p1p3heightDiffMm);
+        p.setProperty(RESTPOINT_INDEX, ""+restpoint);
+
         String filename =getFilename();
         FileOutputStream out = null; // declare outside the try block
         File data = new File(filename);
-
         try {
             out = new FileOutputStream(data);
-        } catch(IOException e) {
-            System.err.println("Failed to create output stream");
-            System.exit(1);
-        }
-
-        DataOutputStream dataOut = new DataOutputStream(out);
-        try {
-            dataOut.writeDouble(p1p2heightDiffCm);
-            dataOut.writeDouble(p1p3heightDiffCm);
-            dataOut.writeInt(p1p2tachoDist);
-            dataOut.writeInt(p1p3tachoDist);
-            dataOut.writeInt(p2p3tachoDist);
-            dataOut.writeInt(restpoint);
-            out.flush();
+            p.store(out, "Calibration data");
             out.close(); // flush the buffer and write the file
-            this.fileOrigin = filename;
-            Utils.println("Calibration data saved!" + toString());
+            Utils.println("Calibration data saved to file: '" + filename + "'\n" + toString());
         } catch (IOException e) {
-            System.err.println("Failed to write to output stream");
+            Utils.println(e.getMessage());
         }
     }
 
-    public static CalibValues createCalibInstance(double p1p2heightDiffCm, double p1p3heightDiffCm, int p1p2tachoDist, int p1p3tachoDist, int p2p3tachoDist, int restpointIndex) {
-        instance = new CalibValues(p1p2heightDiffCm, p1p3heightDiffCm, p1p2tachoDist, p1p3tachoDist, p2p3tachoDist, restpointIndex, null);
+    public static CalibValues setNewCalibInstance(int p1p2heightDiffMm, int p1p3heightDiffMm, int p1p2distMm, int p1p3distMm, int p2p3distMm, int restpointIndex) {
+        instance = new CalibValues(p1p2heightDiffMm, p1p3heightDiffMm, p1p2distMm, p1p3distMm, p2p3distMm, restpointIndex, null);
         return getInstance();
+    }
+
+    public static CalibValues createCalibInstance(int p1p2heightDiffMm, int p1p3heightDiffMm, int p1p2distMm, int p1p3distMm, int p2p3distMm, int restpointIndex) {
+        return new CalibValues(p1p2heightDiffMm, p1p3heightDiffMm, p1p2distMm, p1p3distMm, p2p3distMm, restpointIndex, null);
     }
 
     public static boolean calibrationFileExist() {
@@ -97,62 +103,66 @@ public class CalibValues {
         File data = new File(filename);
         Utils.println("Trying to load calib from file: '" + filename + "'");
 
+        Properties p = new Properties();
         try {
-            InputStream is = new FileInputStream(data);
-            DataInputStream din = new DataInputStream(is);
-
-            double p1p2heightDiffCm = din.readDouble();
-            double p1p3heightDiffCm = din.readDouble();
-            int p1p2tachoDist = din.readInt();
-            int p1p3tachoDist = din.readInt();
-            int p2p3tachoDist = din.readInt();
-            int restpoint = din.readInt();
-
-            instance = new CalibValues(p1p2heightDiffCm, p1p3heightDiffCm, p1p2tachoDist, p1p3tachoDist, p2p3tachoDist, restpoint, filename);
-
-            din.close();
-            Utils.println("Calibration data loaded!" + instance.toString());
+            FileInputStream is = new FileInputStream(data);
+            p.load(is);
+            is.close();
+            Utils.println("Calibration data loaded!");
+            instance = new CalibValues(getIntProperty(P1_P2_HEIGHTDIFF_MM, p),
+                    getIntProperty(P1_P3_HEIGHTDIFF_MM, p),
+                    getIntProperty(P1_P2_DIST_MM, p),
+                    getIntProperty(P1_P3_DIST_MM, p),
+                    getIntProperty(P2_P3_DIST_MM, p),
+                    getIntProperty(RESTPOINT_INDEX, p),
+                    filename);
         } catch (IOException ioe) {
             Utils.println("Read Exception");
         }
+
         return getInstance();
+    }
+
+    private static int getIntProperty(String key, Properties p) {
+        String v = p.getProperty(key);
+        if (v == null) throw new RuntimeException("ERROR Unable to load property: '" + key + "' from file.");
+        return Integer.parseInt(v);
     }
 
     public String toString() {
         String s="-------------------------------------------------------------\n";
         s=s+"Calib filename: '" + fileOrigin + "'\n";
-        s=s+"p1p2heightDiffCm = " + p1p2heightDiffCm + " cm\n";
-        s=s+"p1p3heightDiffCm = " + p1p3heightDiffCm + " cm\n";
-        s=s+"p1p2tachoDist = " + p1p2tachoDist + " (" + Utils.tachoToCm(p1p2tachoDist) + " cm)\n";
-        s=s+"p1p3tachoDist = " + p1p3tachoDist + " (" + Utils.tachoToCm(p1p3tachoDist) + " cm)\n";
-        s=s+"p2p3tachoDist = " + p2p3tachoDist + " (" + Utils.tachoToCm(p2p3tachoDist) + " cm)\n";
+        s=s+"p1p2heightDiffMm = " + p1p2heightDiffMm + " mm\n";
+        s=s+"p1p3heightDiffMm = " + p1p3heightDiffMm + " mm\n";
+        s=s+"p1p2distMm = " + p1p2distMm + " mm\n";
+        s=s+"p1p3distMm = " + p1p3distMm + " mm\n";
+        s=s+"p2p3distMm = " + p2p3distMm + " mm\n";
         s=s+"restpoint = P" + (restpoint+1) + "\n";
         s=s+"-------------------------------------------------------------\n";
         return s;
     }
 
-    public double getP1P2heightDiffCm() {
-        return p1p2heightDiffCm;
+    public int getP1P2heightDiffMm() {
+        return p1p2heightDiffMm;
     }
 
-    public double getP1P3heightDiffCm() {
-        return p1p3heightDiffCm;
+    public int getP1P3heightDiffMm() {
+        return p1p3heightDiffMm;
     }
 
-    public int getP1P2tachoDist() {
-        return p1p2tachoDist;
+    public int getP1P2distMm() {
+        return p1p2distMm;
     }
 
-    public int getP1P3tachoDist() {
-        return p1p3tachoDist;
+    public int getP1P3distMm() {
+        return p1p3distMm;
     }
 
-    public int getP2P3tachoDist() {
-        return p2p3tachoDist;
+    public int getP2P3distMm() {
+        return p2p3distMm;
     }
 
-    public int getRestpoint() {
+    public int getRestpointIndex() {
         return restpoint;
     }
-
 }

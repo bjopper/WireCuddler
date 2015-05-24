@@ -38,7 +38,7 @@ public class MotorGroup implements EmergencyBreakListener{
         this.resetAllTachoCounters();
 
         // TODO fix these hardcoded settings
-        this.setTachoCountOffsets(180, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist()); // Will set position flag to known!
+        this.setTachoCountOffsets(180, tri.getP1P2tachoDist(), tri.getP1P3tachoDist()); // Will set position flag to known!
         this.initialPosition = this.getTachoCounts();
 
         // TODO What is this braking for?

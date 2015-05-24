@@ -91,17 +91,19 @@ public class ProfileMenu {
     }
 
     private void profileDeleteMenu() throws InterruptedException {
-        profileSelectMenu();
-        throw new RuntimeException("Not implemented!");
+        String profileName = profileSelectMenu("DELETE PROFILE");
+        if (profileName == null) return;
+        CuddleProfile.deleteProfile(profileName);
+        showOkCancelMessage("",new String[]{"Profile", "deleted!"}, false);
     }
 
     private void profileEditMenu() throws InterruptedException {
-        profileSelectMenu();
+        profileSelectMenu("EDIT PROFILE");
         throw new RuntimeException("Not implemented!");
     }
 
     private void profileSwitchMenu() throws InterruptedException {
-        profileSelectMenu();
+        profileSelectMenu("SWITCH PROFILE");
         throw new RuntimeException("Not implemented!");
     }
 
@@ -408,14 +410,14 @@ public class ProfileMenu {
         throw new RuntimeException("Not implemented!");
     }
 
-    public String profileSelectMenu() throws InterruptedException {
+    public String profileSelectMenu(String heading) throws InterruptedException {
         String[] profileNames = CuddleProfile.listExistingProfiles();
         if (profileNames.length == 0) {
             showOkCancelMessage("No profiles found!", null, true);
             return null;
         }
         int selection = 0;
-        drawProfileSelectMenu(selection, profileNames);
+        drawProfileSelectMenu(heading, selection, profileNames);
         while (true) {
             if (Button.ENTER.isDown()) {
                 while (Button.ENTER.isDown()) Thread.sleep(10);
@@ -423,12 +425,12 @@ public class ProfileMenu {
             }
             if (Button.LEFT.isDown()) {
                 selection = getPrevIndex(0, profileNames.length, selection);
-                drawProfileSelectMenu(selection, profileNames);
+                drawProfileSelectMenu(heading, selection, profileNames);
                 while (Button.LEFT.isDown()) Thread.sleep(10);
             }
             if (Button.RIGHT.isDown()) {
                 selection = getNextIndex(0, profileNames.length, selection);
-                drawProfileSelectMenu(selection, profileNames);
+                drawProfileSelectMenu(heading, selection, profileNames);
                 while (Button.RIGHT.isDown()) Thread.sleep(10);
             }
             if (Button.ESCAPE.isDown()) {
@@ -438,8 +440,9 @@ public class ProfileMenu {
         }
     }
 
-    private void drawProfileSelectMenu(int selectedIndex, String[] profileNames) {
+    private void drawProfileSelectMenu(String heading, int selectedIndex, String[] profileNames) {
         LCD.clear();
+        LCD.drawString(heading, 0, 0 , false);
         if (profileNames != null) {
             for (int i = 0; i < profileNames.length; i++) {
                 if (profileNames[i] != null) LCD.drawString("-" + profileNames[i], 0, 2 + i, i==selectedIndex);

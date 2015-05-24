@@ -11,4 +11,5 @@ public interface MotorPathMove {
     public void setSpeed(float speed);
     public boolean isMoveDone(long t);
     public void setMoveTerminate();
+    public XYZCoord getTarget();
 }

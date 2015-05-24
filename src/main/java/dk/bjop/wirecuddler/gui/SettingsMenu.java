@@ -11,53 +11,67 @@ public class SettingsMenu {
 
     private CuddleController cc;
 
+    ProfileMenu pm;
+    CalibrationMenu cm;
+
     public SettingsMenu(CuddleController cc) {
         this.cc = cc;
+        pm = new ProfileMenu(cc);
+        cm = new CalibrationMenu(cc);
     }
 
+    public int getNextIndex(int min, int max, int cur) {
+        if (cur == max-1) return min;
+        else return ++cur;
+    }
+
+    public int getPrevIndex(int min, int max, int cur) {
+        if (cur == min) return max-1;
+        else return --cur;
+    }
 
     public void startMenu() throws InterruptedException {
-
-        boolean redraw = true;
+        Thread.sleep(500);
         int mainSelect = 0;
 
-        String[] options = new String[]{"Profile", "Store current point"};
+        String heading="  SETTINGS MENU   ";
+        int offset = 2;
+        String[] options = new String[]{"Profiles", "Calibration"};
 
+        redraw(heading, offset, options, mainSelect);
         while (true) {
 
-            if (redraw) {
-                LCD.clear();
-                for (int i = 0; i < options.length; i++) {
-                    LCD.drawString(options[i], 0, i, mainSelect == i);
-                }
-                redraw = false;
-            }
-
             if (Button.ENTER.isDown()) {
-                if (mainSelect == 0) throw new RuntimeException("Not implemented!");
-                if (mainSelect == 1) throw new RuntimeException("Not implemented!");
                 while (Button.ENTER.isDown()) Thread.sleep(10);
-                redraw = true;
+                if (mainSelect == 0) pm.startMenu();
+                else if (mainSelect == 1) cm.startMenu();
+                else throw new RuntimeException("Invalid choice! [" + mainSelect + "]");
+                redraw(heading, offset, options, mainSelect);
             }
             if (Button.LEFT.isDown()) {
-                mainSelect--;
+                mainSelect = getPrevIndex(0, options.length, mainSelect);
+                redraw(heading, offset, options, mainSelect);
                 while (Button.LEFT.isDown()) Thread.sleep(10);
-                redraw = true;
             }
             if (Button.RIGHT.isDown()) {
-                mainSelect++;
+                mainSelect = getNextIndex(0, options.length, mainSelect);
+                redraw(heading, offset, options, mainSelect);
                 while (Button.RIGHT.isDown()) Thread.sleep(10);
-                redraw = true;
             }
             if (Button.ESCAPE.isDown()) {
                 while (Button.ESCAPE.isDown()) Thread.sleep(10);
                 break;
             }
-
-            if (mainSelect < 0) mainSelect = options.length - 1;
-            if (mainSelect == options.length) mainSelect = 0;
         }
-
     }
+
+    private void redraw(String heading, int lineOffset, String[] options, int select) {
+        LCD.clear();
+        LCD.drawString(heading, 0, 0, false);
+        for (int i = 0; i < options.length; i++) {
+            if (options[i] !=null && !options[i].trim().equals("")) LCD.drawString("- " + options[i], 0, lineOffset + i, select == i);
+        }
+    }
+
 
 }

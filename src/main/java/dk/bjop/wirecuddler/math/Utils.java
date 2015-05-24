@@ -49,15 +49,15 @@ public class Utils {
         return 100;
     }*/
 
-    /*public static XYZCoord[] getCartesianPoints(double p1p2distCm, double p1p3distCm, double p2p3distCm, double p1p2heightDiffCm, double p1p3heightDiffCm) {
+    /*public static XYZCoord[] getCartesianPoints(double p1p2distCm, double p1p3distCm, double p2p3distCm, double p1p2heightDiffMm, double p1p3heightDiffMm) {
         // We create a triangular area from the three point we can infer from the params.
         // In a cartesian 2D coordinate system p1 and p3 are considered located on the x-axis, and p2 in the first quadrant between p1 and p3 wrt x. (ingen stumpe vinkler)
         // p1 is at height zero. p2 and p3 are at heights relative to p1 with a positive value og p2 if it is located higher than p1 and negative value if located lower.
 
         // Project triangular area onto xz-plane
-        double p1p2distXcm = Math.sqrt(Math.pow(p1p2distCm, 2) - Math.pow(p1p2heightDiffCm,2));
-        double p1p3distXcm = Math.sqrt(Math.pow(p1p3distCm, 2) - Math.pow(p1p3heightDiffCm,2));
-        double p2p3distXcm = Math.sqrt(Math.pow(p2p3distCm, 2) - Math.pow(Math.max(p1p2heightDiffCm, p1p3heightDiffCm)-Math.min(p1p2heightDiffCm, p1p3heightDiffCm),2));
+        double p1p2distXcm = Math.sqrt(Math.pow(p1p2distCm, 2) - Math.pow(p1p2heightDiffMm,2));
+        double p1p3distXcm = Math.sqrt(Math.pow(p1p3distCm, 2) - Math.pow(p1p3heightDiffMm,2));
+        double p2p3distXcm = Math.sqrt(Math.pow(p2p3distCm, 2) - Math.pow(Math.max(p1p2heightDiffMm, p1p3heightDiffMm)-Math.min(p1p2heightDiffMm, p1p3heightDiffMm),2));
 
         // Find angles of the projected triangular area using the projected values. Cosine-relation...
         double p1AngleDeg = Math.toDegrees( Math.acos( Math.toRadians(Math.pow(p1p3distXcm, 2) + Math.pow(p1p2distXcm, 2) - Math.pow(p2p3distXcm, 2)) / (2 * p1p3distXcm * p1p2distXcm)));
@@ -66,8 +66,8 @@ public class Utils {
 
         // Build std cartesian coordinates of the points
         return new XYZCoord[] { new XYZCoord(0, 0, 0),
-                new XYZCoord(Math.cos(Math.toRadians(p1AngleDeg))*p1p2distXcm, p1p2heightDiffCm, Math.sin(Math.toRadians(p1AngleDeg))*p1p2distXcm),
-                new XYZCoord(p1p3distXcm, p1p3heightDiffCm, 0)};
+                new XYZCoord(Math.cos(Math.toRadians(p1AngleDeg))*p1p2distXcm, p1p2heightDiffMm, Math.sin(Math.toRadians(p1AngleDeg))*p1p2distXcm),
+                new XYZCoord(p1p3distXcm, p1p3heightDiffMm, 0)};
     }*/
 
 }

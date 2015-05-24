@@ -92,7 +92,7 @@ public class RestPoint {
                             BaseGeometry tri = BaseGeometry.getInstance();
 
                             mgp.resetAllTachoCounters();
-                            mgp.setTachoCountOffsets(360, tri.getCalibValues().getP1P2tachoDist(), tri.getCalibValues().getP1P3tachoDist());
+                            mgp.setTachoCountOffsets(360, tri.getP1P2tachoDist(), tri.getP1P3tachoDist());
 
                             continue;
                         }

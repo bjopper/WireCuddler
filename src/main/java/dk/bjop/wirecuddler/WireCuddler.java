@@ -3,7 +3,7 @@ package dk.bjop.wirecuddler;
 import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.gui.CuddleMenu;
 import dk.bjop.wirecuddler.math.Utils;
-import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
+import lejos.nxt.LCD;
 
 
 /**
@@ -12,7 +12,7 @@ import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
  *  Installing lejos snapshot, see http://lejos.sourceforge.net/forum/viewtopic.php?t=1828&highlight=snapshot  (required to avoid TinyVM 64k linker limit)   See lejos trunk rev 6817
  *  If problem with "Bossa" port stuff, see: http://www.robotc.net/forums/viewtopic.php?f=1&t=6278&sid=bb8757e359d3bfdfcf574316b275cf0c&view=print
  *
- *  From 14/5-2015 running on lejos snapshot rev. 7036
+ *  From 14/5-2015 running on lejos snapshot rev. 7036. Has a bug that means you cannot catch exceptions!?
  *
  */
 public class WireCuddler {
@@ -41,7 +41,7 @@ public class WireCuddler {
             CalibValues.setDevMode(true);
 
             // Set dev parameters
-            CalibValues inst = CalibValues.createCalibInstance(0, 0, Utils.cmToTacho(193), Utils.cmToTacho(195), Utils.cmToTacho(143), 0); // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
+            CalibValues inst = CalibValues.setNewCalibInstance(0, 0, 1930, 1950, 1430, 0); // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
             inst.saveCalib();
         }
 
@@ -110,19 +110,24 @@ public class WireCuddler {
         terminateProgram(null);*/
 
 
+       // new ValueSelect().selectValueMenu("  P1 - P2 dist");
+        //terminateProgram("Testing...");
 
         new CuddleMenu().mainMenu();
     }
 
 
-    private static double getOrigoToPointAngle(float x, float y) {
-        CalibValues cv = BaseGeometry.getInstance().getCalibValues();
+    /*private static double getOrigoToPointAngle(float x, float y) {
+        CalibValues cv = BaseGeometry.getInstance().getp1
         cv.getP1P3heightDiffCm();
         return Math.tan(y/x);
-    }
+    }*/
 
     // This is the only known way to make sure the NXT shuts down the running program!? (and then lejos turns off by auto after a while)
     public static void terminateProgram(String reason) {
+        LCD.clear();
+        LCD.drawString(" SHUTDOWN!!!", 0, 4, false);
+
         Utils.println("\n*\n*\n*\n---------- TERMINATING SYSTEM NOW! REASON: '" + reason + "' ----------\n*\n*\n*\n");
         throw new RuntimeException(reason == null ? "Terminating system." : "Terminating system. Reason: " + reason);
     }

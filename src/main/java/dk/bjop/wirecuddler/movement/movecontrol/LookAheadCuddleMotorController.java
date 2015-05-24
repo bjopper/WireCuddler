@@ -1,7 +1,7 @@
-package dk.bjop.wirecuddler.motor;
+package dk.bjop.wirecuddler.movement.movecontrol;
 
 import dk.bjop.wirecuddler.math.Utils;
-import dk.bjop.wirecuddler.movement.TachoPositionController;
+import dk.bjop.wirecuddler.motor.NXTCuddleMotor;
 
 /**
  * Created by bpeterse on 13-09-2014.

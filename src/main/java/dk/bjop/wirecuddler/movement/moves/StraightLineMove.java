@@ -96,5 +96,10 @@ public class StraightLineMove implements MotorPathMove {
         this.forceMoveEnd = true;
     }
 
+    @Override
+    public XYZCoord getTarget() {
+        return targetPos;
+    }
+
 
 }

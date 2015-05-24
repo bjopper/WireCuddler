@@ -26,11 +26,27 @@ public class BaseGeometry {
     private final double piHalf = Math.PI / 2d;
 
     XYZCoord[] trianglePoints;
-    CalibValues cv;
+    //CalibValues cv;
 
-    double p1p2distXcm;
-    double p1p3distXcm;
-    double p2p3distXcm;
+    final int p1p2distMm;
+    final int p1p3distMm;
+    final int p2p3distMm;
+    final int p1p2heightDiffMm;
+    final int p1p3heightDiffMm;
+
+    final double p1p2distCm;
+    final double p1p3distCm;
+    final double p2p3distCm;
+    final double p1p2heightDiffCm;
+    final double p1p3heightDiffCm;
+
+    final int p1p2tachoDist;
+    final int p1p3tachoDist;
+    final int p2p3tachoDist;
+
+    //double p1p2distXcm;
+    //double p1p3distXcm;
+    //double p2p3distXcm;
 
     // The triangle projected down unto the XZ-plane.
     double projectedP1P2distXcm;
@@ -53,14 +69,29 @@ public class BaseGeometry {
     double p1p2OrthoSlope;
 
     private BaseGeometry(CalibValues cv) {
-        this.cv = cv;
+        this.p1p2distMm = cv.getP1P2distMm();
+        this.p1p3distMm = cv.getP1P3distMm();
+        this.p2p3distMm = cv.getP2P3distMm();
+        this.p1p2heightDiffMm = cv.getP1P2heightDiffMm();
+        this.p1p3heightDiffMm = cv.getP1P3heightDiffMm();
+
+        this.p1p2distCm = p1p2distMm/10d;
+        this.p1p3distCm = p1p3distMm/10d;
+        this.p2p3distCm = p2p3distMm/10d;
+        this.p1p2heightDiffCm = p1p2heightDiffMm/10d;
+        this.p1p3heightDiffCm = p1p3heightDiffMm/10d;
+
+        this.p1p2tachoDist = Utils.cmToTacho(p1p2distCm);
+        this.p1p3tachoDist = Utils.cmToTacho(p1p3distCm);
+        this.p2p3tachoDist = Utils.cmToTacho(p2p3distCm);
+
 
         // Temporarily constrain triangle. Require:
         // P1 height = P3 height
         // P2 height >= P1 height
        // if (cv.getP1P3heightDiffCm() != 0) throw new RuntimeException("Violation of (temporary) constraint: P1 and P3 are currently required to be at same height.");
-        if (cv.getP1P2heightDiffCm() < 0) throw new RuntimeException("Violation of constraint: P2 is required to have a height >= P1");
-        if (cv.getP1P3heightDiffCm() < 0) throw new RuntimeException("Violation of constraint: P3 is required to have a height >= P1");
+        if (p1p2heightDiffCm < 0) throw new RuntimeException("Violation of constraint: P2 is required to have a height >= P1");
+        if (p1p3heightDiffCm < 0) throw new RuntimeException("Violation of constraint: P3 is required to have a height >= P1");
 // TODO implemnt constraints
 
 
@@ -78,9 +109,9 @@ public class BaseGeometry {
         debugPrint(getTrianglePointsString());
 
         debugPrint("\n-------------- Point distances (given by config) -----------------");
-        debugPrint("p1p2tachoDist CM: " + Utils.cmToTacho(p1p2distXcm) + " (cm: " + p1p2distXcm + ")");
-        debugPrint("p1p3tachoDist CM: " + Utils.cmToTacho(p1p3distXcm) + " (cm: " + p1p3distXcm + ")");
-        debugPrint("p2p3tachoDist CM: " + Utils.cmToTacho(p2p3distXcm) + " (cm: " + p2p3distXcm + ")");
+        debugPrint("p1p2distMm CM: " + Utils.cmToTacho(p1p2distCm) + " (cm: " + p1p2distCm + ")");
+        debugPrint("p1p3distMm CM: " + Utils.cmToTacho(p1p3distCm) + " (cm: " + p1p3distCm + ")");
+        debugPrint("p2p3distMm CM: " + Utils.cmToTacho(p2p3distCm) + " (cm: " + p2p3distCm + ")");
 
         debugPrint("\n-------------- Triangle angles -----------------");
         debugPrint("p1AngleDeg: " + Math.toDegrees(p1AngleDeg));
@@ -105,32 +136,29 @@ public class BaseGeometry {
     }
 
     private void calcHeightDiffAngles() {
-        p1p3AngleDeg = Math.asin(cv.getP1P3heightDiffCm() / p1p3distXcm);
-        p1p2AngleDeg = Math.asin(cv.getP1P2heightDiffCm() / p1p2distXcm);
+        p1p3AngleDeg = Math.asin(p1p3heightDiffCm / p1p3distCm);
+        p1p2AngleDeg = Math.asin(p1p2heightDiffCm / p1p2distCm);
     }
 
     private double getP2P3HeightDiffCm() {
-        return Math.max(cv.getP1P2heightDiffCm(), cv.getP1P3heightDiffCm()) - Math.min(cv.getP1P2heightDiffCm(), cv.getP1P3heightDiffCm());
+        return Math.max(p1p2heightDiffCm, p1p3heightDiffCm) - Math.min(p1p2heightDiffCm, p1p3heightDiffCm);
     }
 
     private void calcProjectedDistances() {
-        projectedP1P3distXcm = Math.sqrt(p1p3distXcm*p1p3distXcm - cv.getP1P3heightDiffCm()*cv.getP1P3heightDiffCm());
-        projectedP1P2distXcm = Math.sqrt(p1p2distXcm*p1p2distXcm - cv.getP1P2heightDiffCm()*cv.getP1P2heightDiffCm());
+        projectedP1P3distXcm = Math.sqrt(p1p3distCm*p1p3distCm - p1p3heightDiffCm*p1p3heightDiffCm);
+        projectedP1P2distXcm = Math.sqrt(p1p2distCm*p1p2distCm - p1p2heightDiffCm*p1p2heightDiffCm);
         double p2p3heightDiffCm = getP2P3HeightDiffCm();
-        projectedP2P3distXcm = Math.sqrt(p2p3distXcm*p2p3distXcm - p2p3heightDiffCm*p2p3heightDiffCm);
+        projectedP2P3distXcm = Math.sqrt(p2p3distCm*p2p3distCm - p2p3heightDiffCm*p2p3heightDiffCm);
 
         //projectedLengthMultiplierX = projectedP1P3distXcm / p1p3distXcm;
         //projectedLengthMultiplierZ = projectedP1P2distXcm / p1p2distXcm;
     }
 
     private void calcTriangleValues() {
-        p1p2distXcm = Utils.tachoToCm(cv.p1p2tachoDist);
-        p1p3distXcm = Utils.tachoToCm(cv.p1p3tachoDist);
-        p2p3distXcm = Utils.tachoToCm(cv.p2p3tachoDist);
 
         // Find angles. Cosine-relation...
-        p1AngleDeg = Math.acos((Math.pow(p1p3distXcm, 2) + Math.pow(p1p2distXcm, 2) - Math.pow(p2p3distXcm, 2)) / (2 * p1p3distXcm * p1p2distXcm));
-        p2AngleDeg = Math.acos((Math.pow(p2p3distXcm, 2) + Math.pow(p1p2distXcm, 2) - Math.pow(p1p3distXcm, 2)) / (2 * p2p3distXcm * p1p2distXcm));
+        p1AngleDeg = Math.acos((Math.pow(p1p3distCm, 2) + Math.pow(p1p2distCm, 2) - Math.pow(p2p3distCm, 2)) / (2 * p1p3distCm * p1p2distCm));
+        p2AngleDeg = Math.acos((Math.pow(p2p3distCm, 2) + Math.pow(p1p2distCm, 2) - Math.pow(p1p3distCm, 2)) / (2 * p2p3distCm * p1p2distCm));
         p3AngleDeg = Math.PI - (p1AngleDeg + p2AngleDeg);
     }
 
@@ -138,8 +166,8 @@ public class BaseGeometry {
         // Build std cartesian coordinates of the points
 
         XYZCoord p1 = new XYZCoord(0, 0, 0);
-        XYZCoord p2 = new XYZCoord(Math.cos(p1AngleDeg)*p1p2distXcm, cv.p1p2heightDiffCm, Math.sin(p1AngleDeg)*p1p2distXcm);
-        XYZCoord p3 = new XYZCoord(p1p3distXcm * Math.sin(piHalf - p1p3AngleDeg), cv.p1p3heightDiffCm, 0);
+        XYZCoord p2 = new XYZCoord(Math.cos(p1AngleDeg)*p1p2distCm,p1p2heightDiffCm, Math.sin(p1AngleDeg)*p1p2distCm);
+        XYZCoord p3 = new XYZCoord(p1p3distCm * Math.sin(piHalf - p1p3AngleDeg), p1p3heightDiffCm, 0);
 
         trianglePoints =  new XYZCoord[] {p1, p2, p3};
     }
@@ -175,28 +203,28 @@ public class BaseGeometry {
         return trianglePoints[2];
     }
 
-    public double getP1P3tachoDist() {
-        return cv.p1p3tachoDist;
+    public int getP1P3tachoDist() {
+        return p1p3tachoDist;
     }
 
-    public double getP1P2tachoDist() {
-        return cv.p1p2tachoDist;
+    public int getP1P2tachoDist() {
+        return p1p2tachoDist;
     }
 
-    public double getP2P3tachoDist() {
-        return cv.p2p3tachoDist;
+    public int getP2P3tachoDist() {
+        return p2p3tachoDist;
     }
 
     public double getP2P3Dist() {
-        return p2p3distXcm;
+        return p2p3distCm;
     }
 
     public double getP1P3Dist() {
-        return p1p3distXcm;
+        return p1p3distCm;
     }
 
     public double getP1P2Dist() {
-        return p1p2distXcm;
+        return p1p2distCm;
     }
 
     public double getAngleAtP1() {
@@ -223,9 +251,6 @@ public class BaseGeometry {
         return uz * projectedLengthMultiplierZ;
     }*/
 
-    public CalibValues getCalibValues() {
-        return cv;
-    }
 
     public String getTrianglePointsString() {
         String s = "----- Triangle points -----\n";

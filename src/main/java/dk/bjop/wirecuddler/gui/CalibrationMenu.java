@@ -1,9 +1,11 @@
 package dk.bjop.wirecuddler.gui;
 
 import dk.bjop.wirecuddler.CuddleController;
-import dk.bjop.wirecuddler.motor.NXTCuddleMotor;
+import dk.bjop.wirecuddler.config.CalibValues;
+import dk.bjop.wirecuddler.math.Utils;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
+import lejos.nxt.Sound;
 
 /**
  * Created by bpeterse on 28-12-2014.
@@ -34,8 +36,8 @@ public class CalibrationMenu {
         redrawStartMenu(mainSelect);
         while (true) {
             if (Button.ENTER.isDown()) {
-                if (mainSelect == 0 ) selectMotorMenu();
-                if (mainSelect == 1 ) autoCalibrate();
+                if (mainSelect == 0 ) runCalibWizard();
+                if (mainSelect == 1 ) toRestpoint();
                 redrawStartMenu(mainSelect);
             }
             if (Button.ESCAPE.isDown()) {
@@ -60,128 +62,73 @@ public class CalibrationMenu {
     private void redrawStartMenu(int select) {
         LCD.clear();
         LCD.drawString("   CALIBRATION", 0, 0);
-        LCD.drawString(" - Manual", 0, 3, select==0);
-        LCD.drawString(" - Automatic", 0, 4, select==1);
+        LCD.drawString(" - Calibrate", 0, 3, select==0);
+        LCD.drawString(" - Find restpoint", 0, 4, select==1);
     }
 
-    private void selectMotorMenu() throws InterruptedException {
-        LCD.clear();
-        int motorSelect = 1;
-        Thread.sleep(menuWaitAfterButtonPress);
-        redrawSingleMotorMenu(motorSelect);
-        while (true) {
-
-            if (Button.ENTER.isDown()) {
-                switch (motorSelect) {
-                    case 1:
-                    case 2:
-                    case 3: motorMove(motorSelect);break;
-                }
-                LCD.clear();
-                redrawSingleMotorMenu(motorSelect);
-            }
-            if (Button.ESCAPE.isDown()) {
-                while (Button.ESCAPE.isDown()) Thread.sleep(10);
-                break;
-            }
-            if (Button.LEFT.isDown()) {
-                motorSelect = getPrevIndex(1, 4, motorSelect);
-                redrawSingleMotorMenu(motorSelect);
-                while (Button.LEFT.isDown()) Thread.sleep(10);
-            }
-            if (Button.RIGHT.isDown()) {
-                motorSelect = getNextIndex(1, 4, motorSelect);
-                redrawSingleMotorMenu(motorSelect);
-                while (Button.RIGHT.isDown()) Thread.sleep(10);
-            }
-        }
-    }
-
-    private void redrawSingleMotorMenu(int motorSelect) {
-        LCD.drawString("   SELECT MOTOR", 0, 0);
-        LCD.drawString("Motor A", 4, 2, motorSelect ==1);
-        LCD.drawString("Motor B", 4, 3, motorSelect ==2);
-        LCD.drawString("Motor C", 4, 4, motorSelect ==3);
-    }
-
-    private NXTCuddleMotor getMotor(int index) {
-        switch (index) {
-            case 1: return new NXTCuddleMotor(NXTCuddleMotor.MotorID.M1);
-            case 2: return new NXTCuddleMotor(NXTCuddleMotor.MotorID.M2);
-            case 3: return new NXTCuddleMotor(NXTCuddleMotor.MotorID.M3);
-        }
-        return null;
-    }
-
-    private void motorMove(int motor) throws InterruptedException {
-        LCD.clear();
-        LCD.drawString("-M"+(motor)+" CONTROL-", 2, 0, true);
-        Thread.sleep(menuWaitAfterButtonPress);
-
-        NXTCuddleMotor m = getMotor(motor);
-
-
-        boolean leftWasDownLastTime=false;
-        boolean rightWasDownLastTime=false;
-        int acc = 100;
-        int decc = 400;
-        int maxSpeed = 900;
-
-        while (true) {
-            LCD.drawString("Tacho: "+m.getTachoCount(),3,4);
-
-            if (Button.ESCAPE.isDown()) {
-                m.setSpeed(1);
-                m.setAcceleration(decc);
-                m.stop();
-                m.flt();
-                while (Button.ESCAPE.isDown()) Thread.sleep(10);
-                break;
-            }
-            if (Button.LEFT.isDown()) {
-                if (!leftWasDownLastTime) {
-                    m.setAcceleration(acc);
-                    m.setSpeed(maxSpeed);
-                    m.forward();
-                    leftWasDownLastTime = true;
-                }
-            }
-            else {
-                if (leftWasDownLastTime) {
-                    // Just released...
-                    m.setSpeed(1);
-                    m.setAcceleration(decc);
-                    m.stop();
-                    //m.flt();
-                }
-                leftWasDownLastTime = false;
-            }
-            if (Button.RIGHT.isDown()) {
-                if (!rightWasDownLastTime) {
-                    m.setAcceleration(acc);
-                    m.setSpeed(maxSpeed);
-                    m.backward();
-                    rightWasDownLastTime = true;
-                }
-            }
-            else {
-                if (rightWasDownLastTime) {
-                    // Just released...
-                    m.setSpeed(1);
-                    m.setAcceleration(decc);
-                    m.stop();
-                    //m.flt();
-                }
-                rightWasDownLastTime = false;
-            }
-
-        }
-    }
-
-    private void autoCalibrate() {
+    private void toRestpoint() {
        /* TriangleMeasurer t = new TriangleMeasurer();
         t.moveToRestPoint(mgrp);*/
         cc.moveToRestpoint();
+    }
+
+    private void runCalibWizard() throws InterruptedException{
+        showOkCancelMessage("",new String[]{"Set all values.","Units are mm"}, false);
+
+        int maxValue = 10000;
+
+        Integer p1p2Dist = new ValueSelect().selectValueMenu("  P1 - P2 dist", 0, maxValue);
+        if (p1p2Dist == null) throw new RuntimeException("err");
+
+        Integer p1p3Dist = new ValueSelect().selectValueMenu("  P1 - P3 dist", 0, maxValue);
+        if (p1p2Dist == null) throw new RuntimeException("err");
+
+        Integer p2p3Dist = new ValueSelect().selectValueMenu("  P2 - P3 dist", 0, maxValue);
+        if (p1p2Dist == null) throw new RuntimeException("err");
+
+        Integer p1p2HeightDiff = new ValueSelect().selectValueMenu("P1-P2 height-diff", 0, maxValue);
+        if (p1p2Dist == null) throw new RuntimeException("err");
+
+        Integer p1p3HeightDiff = new ValueSelect().selectValueMenu("P1-P3 height-diff", 0, maxValue);
+        if (p1p2Dist == null) throw new RuntimeException("err");
+
+        CalibValues cv = CalibValues.createCalibInstance(p1p2HeightDiff, p1p3HeightDiff, p1p2Dist, p1p3Dist, p2p3Dist, 1);
+        cv.saveCalib();
+
+        Utils.println("Calibration wizard result:");
+        Utils.println(cv.toString());
+
+        showOkCancelMessage("",new String[]{"Calibration","complete.", "Data has ","been saved."}, false);
+    }
+
+    private boolean showOkCancelMessage(String heading, String[] msg, boolean dobeep) throws InterruptedException {
+        showMessage(heading, msg, dobeep);
+        Button.waitForAnyPress();
+        if (Button.readButtons() == Button.ID_ENTER) {
+            while (Button.ENTER.isDown()) Thread.sleep(10);
+            return true;
+        }
+        else return false;
+    }
+
+    private void showTimedMessage(String heading, String[] msg, boolean dobeep, long millis) {
+        showMessage(heading, msg, dobeep);
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showMessage(String heading, String[] msg, boolean dobeep) {
+        LCD.clear();
+        LCD.drawString(heading, 0, 0, false);
+        if (msg != null) {
+            for (int i = 0; i < msg.length; i++) {
+                if (msg[i] != null && !msg[i].trim().equals("")) LCD.drawString(msg[i], 0, 2 + i, false);
+            }
+        }
+        if (dobeep) Sound.beep();
     }
 
 }

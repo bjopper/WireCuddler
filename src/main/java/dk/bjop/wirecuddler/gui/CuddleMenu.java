@@ -15,7 +15,8 @@ public class CuddleMenu {
     final int menuWaitAfterButtonPress = 500;
 
     CuddleController cc;
-    CalibrationMenu cm;
+   // CalibrationMenu cm;
+    MotorAdjustMenu mam;
     //CuddlePointMenu cpm;
     ProfileMenu pm;
     SettingsMenu sm;
@@ -26,8 +27,9 @@ public class CuddleMenu {
         // M1-M3: 13428
         // M3-M2: 10537
         cc = new CuddleController();
-        cm = new CalibrationMenu(cc);
+        //cm = new CalibrationMenu(cc);
         //cpm = new CuddlePointMenu(cc);
+        mam = new MotorAdjustMenu(cc);
         pm = new ProfileMenu(cc);
         sm = new SettingsMenu(cc);
     }
@@ -39,7 +41,8 @@ public class CuddleMenu {
                     CalibValues.loadCalib();
                     startupMenu();
                 } else {
-                    cm.startMenu();
+                    //cm.startMenu();
+                    throw new RuntimeException("No calib found!!!");
                 }
             }
             else {
@@ -63,7 +66,7 @@ public class CuddleMenu {
         LCD.drawString("    MAIN MENU", 0, 0, false);
         LCD.drawString(" - Cuddle", 0, 2, select==0);
         LCD.drawString(" - Settings", 0, 3, select==1);
-        LCD.drawString(" - Calibration", 0, 4, select==2);
+        LCD.drawString(" - Motor adjust", 0, 4, select==2);
         LCD.drawString(" - Exit", 0, 5, select==3);
     }
 
@@ -77,8 +80,8 @@ public class CuddleMenu {
             if (Button.ENTER.isDown()) {
                 while (Button.ENTER.isDown()) Thread.sleep(10);
                 if (mainSelect == 0 ) cuddleStartStopMenu();
-                if (mainSelect == 1 ) pm.startMenu();
-                if (mainSelect == 2 ) cm.startMenu();
+                if (mainSelect == 1 ) sm.startMenu();
+                if (mainSelect == 2 ) mam.startMenu();
                 if (mainSelect == 3 ) WireCuddler.terminateProgram("Termination requested by user!");
 
                 redraw(mainSelect);
@@ -99,7 +102,7 @@ public class CuddleMenu {
     private void cuddleStartStopMenu() throws InterruptedException {
         boolean redraw = true;
 
-        String profile = pm.profileSelectMenu();
+        String profile = pm.profileSelectMenu(" SELECT PROFILE");
         if ( profile == null) return;
 
         cc.doCuddle(CuddleProfile.loadProfile(profile));
