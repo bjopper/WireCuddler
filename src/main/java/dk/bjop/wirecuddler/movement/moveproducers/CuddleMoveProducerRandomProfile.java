@@ -58,8 +58,8 @@ public class CuddleMoveProducerRandomProfile implements CuddleMoveProducer {
     private XYZCoord getRandomPointOnLine(XYZCoord p1, XYZCoord p2) {
         if (p1.equals(p2)) throw new RuntimeException("Error: points are equal!?");
 
-        Utils.println("P1: "+p1.toString());
-        Utils.println("P2: "+p2.toString());
+        //Utils.println("P1: "+p1.toString());
+        //Utils.println("P2: "+p2.toString());
 
         double maxX = Math.max(p1.x, p2.x);
         double minX = Math.min(p1.x, p2.x);
@@ -79,18 +79,18 @@ public class CuddleMoveProducerRandomProfile implements CuddleMoveProducer {
         }
 
         double zDiff = p2.z - p1.z;
-        Utils.println("zDiff: "+zDiff);
+        //Utils.println("zDiff: "+zDiff);
         double slope = (zDiff) / (p2.x - p1.x);
-        Utils.println("xDiff: "+xDiff);
-        Utils.println("slope value: "+slope);
+        //Utils.println("xDiff: "+xDiff);
+        //Utils.println("slope value: "+slope);
         double rndxxx = rnd.nextDouble();
-        Utils.println("rndxxx: "+rndxxx);
+        //Utils.println("rndxxx: "+rndxxx);
         double rndX = rndxxx * (p2.x - p1.x);
-        Utils.println("rndX: "+rndX);
-        Utils.println("p1.z: "+p1.z);
+        //Utils.println("rndX: "+rndX);
+        //Utils.println("p1.z: "+p1.z);
 
         double zAdd = rndX * slope;
-        Utils.println("zAdd: "+zAdd);
+        //Utils.println("zAdd: "+zAdd);
 
         return new XYZCoord(rndX + minX, 0, p1.z + zAdd);
     }

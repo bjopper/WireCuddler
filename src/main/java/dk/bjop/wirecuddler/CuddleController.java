@@ -2,10 +2,8 @@ package dk.bjop.wirecuddler;
 
 import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.config.CuddleProfile;
-import dk.bjop.wirecuddler.math.Utils;
-import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
-import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
 import dk.bjop.wirecuddler.math.coordinates.WT3Coord;
+import dk.bjop.wirecuddler.math.geometry.BaseGeometry;
 import dk.bjop.wirecuddler.motor.MotorGroup;
 import dk.bjop.wirecuddler.movement.movecontrol.CuddleMoveController;
 import dk.bjop.wirecuddler.movement.moveproducers.CuddleMoveProducer;
@@ -35,6 +33,8 @@ public class CuddleController {
     }
 
     public void stopCuddle() {
+        cmc.runMove(new PointMove(new WT3Coord(MotorGroup.getInstance().getInitialPosition()).toCartesian()), false);
+        cmc.waitForAllMovesCompleted();
         cmc.stopController();
     }
 
@@ -46,7 +46,7 @@ public class CuddleController {
 
         CuddleMoveProducer cmp = CuddleMoveProducerFactory.getAutoRandomByProfile(cp);
 
-        XYZCoord pos = new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian();
+       /* XYZCoord pos = new WT3Coord(MotorGroup.getInstance().getTachoCounts()).toCartesian();
         for (int i = 0;i<20;i++) {
             Utils.println("----------------------------------------------------------\n");
             MotorPathMove m = cmp.getNewMove();
@@ -54,9 +54,9 @@ public class CuddleController {
             Utils.println(m.getTarget().toString());
         }
 
-        WireCuddler.terminateProgram("Testing CMP");
+        WireCuddler.terminateProgram("Testing CMP");*/
 
-        cmc.runMoves(CuddleMoveProducerFactory.getAutoRandomByProfile(cp), false);
+        cmc.runMoves(cmp, false);
     }
 
     public void manualMove(MotorPathMove move, boolean awaitMoveCompletion) {

@@ -69,7 +69,7 @@ public class LookAheadCuddleMotorController extends Thread {
         long errorSum = 0;
         int obsCount = 0;
 
-        while (true) {
+        while (!stopRequested) {
             long now = System.currentTimeMillis();
 
             Integer nextPerfPos = posCtrl.getTachoPositionAtTimeT(now + lookAheadMillis, this);

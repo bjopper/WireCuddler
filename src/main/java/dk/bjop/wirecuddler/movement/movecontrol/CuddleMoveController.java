@@ -39,22 +39,22 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
     }
 
 
-    public void runMoves(CuddleMoveProducer cmp, boolean waitForCurrentMoveCompletion) {
+    public void runMoves(CuddleMoveProducer cmp, boolean waitForActiveMoveCompletion) {
        if (!this.isAlive() || terminate) throw new RuntimeException("CuddleMoveController has not been started!");
-        if (!waitForCurrentMoveCompletion && currentMove != null) currentMove.setMoveTerminate();
+        if (!waitForActiveMoveCompletion && currentMove != null) currentMove.setMoveTerminate();
         synchronized (cmpLock) {
             this.cmp = cmp;
         }
     }
 
-    public void runMoves(ArrayList<MotorPathMove> moves, boolean waitForCurrentMoveCompletion) {
-        runMoves(new CuddleMoveProducerByList(moves), waitForCurrentMoveCompletion);
+    public void runMoves(ArrayList<MotorPathMove> moves, boolean waitForActiveMoveCompletion) {
+        runMoves(new CuddleMoveProducerByList(moves), waitForActiveMoveCompletion);
     }
 
-    public void runMove(MotorPathMove m, boolean waitForCurrentMoveCompletion) {
+    public void runMove(MotorPathMove m, boolean waitForActiveMoveCompletion) {
         ArrayList<MotorPathMove> moves = new ArrayList<MotorPathMove>();
         moves.add(0,m);
-        runMoves(moves, waitForCurrentMoveCompletion);
+        runMoves(moves, waitForActiveMoveCompletion);
     }
 
     public void terminateRunningMoves() {
@@ -120,7 +120,7 @@ public class CuddleMoveController extends Thread implements TachoPositionControl
         Utils.println("Stopping LookaheadCuddleMotorController threads...");
         for (int i = 0; i < mpcs.length; i++) {
             mpcs[i].setStopRequested();
-            mpcs[i].interrupt();
+            //mpcs[i].interrupt(); change!!!! (bug i lejos trunk means we cannot catch exceptions. )
         }
         Utils.println("Initial tachos were: "+new WT3Coord(mg.getInitialPosition()).toString());
         Utils.println("Current tachos are: "+new WT3Coord(mg.getTachoCounts()).toString());
