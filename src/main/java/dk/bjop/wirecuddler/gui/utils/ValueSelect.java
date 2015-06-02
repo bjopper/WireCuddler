@@ -12,8 +12,8 @@ public class ValueSelect {
 
     }
 
-    public Integer selectValueMenu(String heading, int min, int max) throws InterruptedException{
-        int count = 0;
+    public Integer selectValueMenu(String heading, int min, int max, int defValue) throws InterruptedException{
+        int count = defValue;
         draw(heading,count);
         while (true) {
             if (Button.ENTER.isDown()) {

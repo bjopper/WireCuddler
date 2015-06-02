@@ -3,6 +3,7 @@ package dk.bjop.wirecuddler.gui;
 import dk.bjop.wirecuddler.CuddleController;
 import dk.bjop.wirecuddler.config.CuddleProfile;
 import dk.bjop.wirecuddler.gui.utils.Messages;
+import dk.bjop.wirecuddler.gui.utils.ValueSelect;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.coordinates.WT3Coord;
 import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
@@ -135,6 +136,7 @@ public class ProfileMenu {
             torsoPoints = cp.getTorsoPoints();
             legPoints = cp.getLegPoints();
             armPoints = cp.getArmPoints();
+            speed = cp.getSpeed();
         }
         else {
             torsoPoints = new XYZCoord[4];
@@ -153,7 +155,7 @@ public class ProfileMenu {
                 if (mainSelect == 0) torsoPoints = profileSetTorsoPoints(torsoPoints);
                 else if (mainSelect == 1) legPoints = profileSetLegPoints();
                 else if (mainSelect == 2) armPoints = profileSetArmPoints();
-                else if (mainSelect == 3) speed = profileSetSpeed();
+                else if (mainSelect == 3) speed = profileSetSpeed(speed);
                 else if (mainSelect == 4) {
                     if (CuddleProfile.validateTorsoPoints(torsoPoints)) {
                         if (Messages.showOkCancelMessage("Save all points?", null, false)) {
@@ -195,9 +197,10 @@ public class ProfileMenu {
         }
     }
 
-    private int profileSetSpeed() throws InterruptedException{
-        Messages.showOkCancelMessage("SET SPEED", new String[]{"Speed set to 2"}, false);
-        return 4;
+    private int profileSetSpeed(int curVal) throws InterruptedException{
+        int speed = new ValueSelect().selectValueMenu("SET SPEED",1,10, curVal);
+        Messages.showOkCancelMessage("Speed set to "+speed, null, false);
+        return speed;
     }
 
     private XYZCoord[] profileSetTorsoPoints(XYZCoord[] torsoPoints) throws InterruptedException {

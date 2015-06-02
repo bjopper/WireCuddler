@@ -78,19 +78,19 @@ public class CalibrationMenu {
 
         int maxValue = 10000;
 
-        Integer p1p2Dist = new ValueSelect().selectValueMenu("   A - B dist", 0, maxValue);
+        Integer p1p2Dist = new ValueSelect().selectValueMenu("   A - B dist", 0, maxValue, 0);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
-        Integer p1p3Dist = new ValueSelect().selectValueMenu("   A - C dist", 0, maxValue);
+        Integer p1p3Dist = new ValueSelect().selectValueMenu("   A - C dist", 0, maxValue, 0);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
-        Integer p2p3Dist = new ValueSelect().selectValueMenu("   B - C dist", 0, maxValue);
+        Integer p2p3Dist = new ValueSelect().selectValueMenu("   B - C dist", 0, maxValue, 0);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
-        Integer p1p2HeightDiff = new ValueSelect().selectValueMenu("A-B height-diff", 0, maxValue);
+        Integer p1p2HeightDiff = new ValueSelect().selectValueMenu("A-B height-diff", 0, maxValue, 0);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
-        Integer p1p3HeightDiff = new ValueSelect().selectValueMenu("A-C height-diff", 0, maxValue);
+        Integer p1p3HeightDiff = new ValueSelect().selectValueMenu("A-C height-diff", 0, maxValue, 0);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
         CalibValues cv = CalibValues.createCalibInstance(p1p2HeightDiff, p1p3HeightDiff, p1p2Dist, p1p3Dist, p2p3Dist, 1);

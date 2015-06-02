@@ -47,7 +47,9 @@ public class CuddleMoveProducerRandomProfile implements CuddleMoveProducer {
     public MotorPathMove getNewMove() {
         XYZCoord target = getMoveTarget();
         target.y = cuddlePlane.findY(target.x, target.z);
-        return new StraightLineMove(target);
+        MotorPathMove m = new StraightLineMove(target);
+        m.setSpeed(cp.getSpeed());
+        return m;
     }
 
     @Override
