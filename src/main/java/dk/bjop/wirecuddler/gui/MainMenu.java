@@ -1,5 +1,6 @@
 package dk.bjop.wirecuddler.gui;
 
+import dk.bjop.wirecuddler.AutoStopper;
 import dk.bjop.wirecuddler.CuddleController;
 import dk.bjop.wirecuddler.WireCuddler;
 import dk.bjop.wirecuddler.config.CalibValues;
@@ -22,6 +23,8 @@ public class MainMenu {
     ProfileMenu pm;
     SettingsMenu sm;
 
+    AutoStopper autoStopThread;
+
 
     public MainMenu() {
         // M2-M1: 13114
@@ -33,6 +36,9 @@ public class MainMenu {
         mam = new MotorAdjustMenu(cc);
         pm = new ProfileMenu(cc);
         sm = new SettingsMenu(cc);
+
+        autoStopThread = new AutoStopper(30, cc);
+        autoStopThread.start();
     }
 
     public void mainMenu() throws InterruptedException {

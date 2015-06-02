@@ -163,6 +163,7 @@ public class ProfileMenu {
                                 new CuddleProfile(torsoPoints, legPoints, armPoints, speed).saveProfile(profileName, false);
                             }
                             else {
+                                cp.setSpeed(speed);
                                 cp.saveProfile(profileName, true);
                             }
 
