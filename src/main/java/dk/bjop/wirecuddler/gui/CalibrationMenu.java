@@ -2,10 +2,11 @@ package dk.bjop.wirecuddler.gui;
 
 import dk.bjop.wirecuddler.CuddleController;
 import dk.bjop.wirecuddler.config.CalibValues;
+import dk.bjop.wirecuddler.gui.utils.Messages;
+import dk.bjop.wirecuddler.gui.utils.ValueSelect;
 import dk.bjop.wirecuddler.math.Utils;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
-import lejos.nxt.Sound;
 
 /**
  * Created by bpeterse on 28-12-2014.
@@ -73,23 +74,23 @@ public class CalibrationMenu {
     }
 
     private void runCalibWizard() throws InterruptedException{
-        showOkCancelMessage("",new String[]{"Set all values.","Units are mm"}, false);
+        Messages.showOkCancelMessage("",new String[]{"Set all values.","Units are mm"}, false);
 
         int maxValue = 10000;
 
-        Integer p1p2Dist = new ValueSelect().selectValueMenu("  P1 - P2 dist", 0, maxValue);
+        Integer p1p2Dist = new ValueSelect().selectValueMenu("   A - B dist", 0, maxValue);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
-        Integer p1p3Dist = new ValueSelect().selectValueMenu("  P1 - P3 dist", 0, maxValue);
+        Integer p1p3Dist = new ValueSelect().selectValueMenu("   A - C dist", 0, maxValue);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
-        Integer p2p3Dist = new ValueSelect().selectValueMenu("  P2 - P3 dist", 0, maxValue);
+        Integer p2p3Dist = new ValueSelect().selectValueMenu("   B - C dist", 0, maxValue);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
-        Integer p1p2HeightDiff = new ValueSelect().selectValueMenu("P1-P2 height-diff", 0, maxValue);
+        Integer p1p2HeightDiff = new ValueSelect().selectValueMenu("A-B height-diff", 0, maxValue);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
-        Integer p1p3HeightDiff = new ValueSelect().selectValueMenu("P1-P3 height-diff", 0, maxValue);
+        Integer p1p3HeightDiff = new ValueSelect().selectValueMenu("A-C height-diff", 0, maxValue);
         if (p1p2Dist == null) throw new RuntimeException("err");
 
         CalibValues cv = CalibValues.createCalibInstance(p1p2HeightDiff, p1p3HeightDiff, p1p2Dist, p1p3Dist, p2p3Dist, 1);
@@ -98,37 +99,11 @@ public class CalibrationMenu {
         Utils.println("Calibration wizard result:");
         Utils.println(cv.toString());
 
-        showOkCancelMessage("",new String[]{"Calibration","complete.", "Data has ","been saved."}, false);
+        Messages.showOkCancelMessage("",new String[]{"Calibration","complete.", "Data has ","been saved."}, false);
     }
 
-    private boolean showOkCancelMessage(String heading, String[] msg, boolean dobeep) throws InterruptedException {
-        showMessage(heading, msg, dobeep);
-        Button.waitForAnyPress();
-        if (Button.readButtons() == Button.ID_ENTER) {
-            while (Button.ENTER.isDown()) Thread.sleep(10);
-            return true;
-        }
-        else return false;
-    }
 
-    private void showTimedMessage(String heading, String[] msg, boolean dobeep, long millis) {
-        showMessage(heading, msg, dobeep);
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
-    private void showMessage(String heading, String[] msg, boolean dobeep) {
-        LCD.clear();
-        LCD.drawString(heading, 0, 0, false);
-        if (msg != null) {
-            for (int i = 0; i < msg.length; i++) {
-                if (msg[i] != null && !msg[i].trim().equals("")) LCD.drawString(msg[i], 0, 2 + i, false);
-            }
-        }
-        if (dobeep) Sound.beep();
-    }
+
 
 }

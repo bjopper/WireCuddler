@@ -1,7 +1,7 @@
 package dk.bjop.wirecuddler;
 
 import dk.bjop.wirecuddler.config.CalibValues;
-import dk.bjop.wirecuddler.gui.CuddleMenu;
+import dk.bjop.wirecuddler.gui.MainMenu;
 import dk.bjop.wirecuddler.math.Utils;
 import lejos.nxt.LCD;
 
@@ -27,6 +27,7 @@ public class WireCuddler {
 
 
     public static final boolean devMode = true;
+    public static boolean useRConsole = true;
 
     public static boolean isDevMode() {
         return devMode;
@@ -41,11 +42,14 @@ public class WireCuddler {
             CalibValues.setDevMode(true);
 
             // Set dev parameters
-            CalibValues inst = CalibValues.setNewCalibInstance(0, 0, 1930, 1950, 1430, 0); // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
-            inst.saveCalib();
+            //CalibValues inst = CalibValues.setNewCalibInstance(0, 0, 1810, 2770, 2850, 0); // Afstande: M1-M2: 193cm   M1-M3: 195cm   M2-M3: 143cm
+            //inst.saveCalib();
         }
 
-        if (CalibValues.calibrationFileExist()) CalibValues.loadCalib();
+        if (CalibValues.calibrationFileExist())  {
+            CalibValues.loadCalib();
+            Utils.println(CalibValues.getInstance().toString());
+        }
 
 
         // Profile testing...
@@ -110,10 +114,12 @@ public class WireCuddler {
         terminateProgram(null);*/
 
 
+
+
        // new ValueSelect().selectValueMenu("  P1 - P2 dist");
         //terminateProgram("Testing...");
 
-        new CuddleMenu().mainMenu();
+        new MainMenu().mainMenu();
     }
 
 

@@ -13,7 +13,7 @@ import dk.bjop.wirecuddler.motor.MotorGroup;
 public class PointMove implements MotorPathMove {
     boolean forceMoveEnd = false;
 
-    float speedCmSec = 4;
+    float speedCmSec = 6;
 
     XYZCoord startPos = null;
     XYZCoord targetPos = null;

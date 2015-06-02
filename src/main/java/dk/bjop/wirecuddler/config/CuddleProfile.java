@@ -29,27 +29,31 @@ public class CuddleProfile {
     private static final String ARMS_LEFT = "arms:left";
     private static final String ARMS_RIGHT = "arms:right";
 
+    private static final String SPEED = "SPEED";
+
     private String fileOrigin = null;
 
 
     private XYZCoord[] torsoPoints = null;
     private XYZCoord[] legPoints = null;
     private XYZCoord[] armPoints = null;
-
+    private int speed;
+    private static String DEF_SPEED = "2";
 
 
 
     private static CuddleProfile instance = null;
 
-    public CuddleProfile(XYZCoord[] torsoPoints, XYZCoord[] legPoints, XYZCoord[] armPoints) {
+    public CuddleProfile(XYZCoord[] torsoPoints, XYZCoord[] legPoints, XYZCoord[] armPoints, int speed) {
         setTorsoPoints(torsoPoints);
         setLegPoints(legPoints);
         setArmPoints(armPoints);
+        setSpeed(speed);
     }
 
-    public static CuddleProfile createInstance(XYZCoord[] torsoPoints, XYZCoord[] legPoints, XYZCoord[] armPoints) {
+    public static CuddleProfile createInstance(XYZCoord[] torsoPoints, XYZCoord[] legPoints, XYZCoord[] armPoints, int speed) {
         //if (instance != null) throw new RuntimeException("Cannot create new instance - an instance already exist!");
-        instance = new CuddleProfile(torsoPoints, legPoints, armPoints);
+        instance = new CuddleProfile(torsoPoints, legPoints, armPoints, speed);
         return getInstance();
     }
 
@@ -71,6 +75,10 @@ public class CuddleProfile {
     public void setArmPoints(XYZCoord[] armPoints) {
         if (!validateArmPoints(armPoints)) throw new RuntimeException("If arm-points array is defined none of its entries may be null");
         this.armPoints = armPoints;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
     public static boolean validateTorsoPoints(XYZCoord[] tPoints) {
@@ -109,6 +117,10 @@ public class CuddleProfile {
 
     public XYZCoord[] getArmPoints() {
         return armPoints;
+    }
+
+    public int getSpeed() {
+        return speed;
     }
 
     public boolean hasLegPoints() {
@@ -173,8 +185,9 @@ public class CuddleProfile {
             aPoints[1] = deserializeCoordPoint(p.getProperty(ARMS_RIGHT));
         }
 
+        int speed = Integer.parseInt(p.getProperty(SPEED, DEF_SPEED));
 
-        instance = new CuddleProfile(tPoints, lPoints, aPoints);
+        instance = new CuddleProfile(tPoints, lPoints, aPoints, speed);
         instance.setFileOrigin(filename);
 
         if (WireCuddler.devMode) Utils.println(instance.toString());
@@ -192,6 +205,11 @@ public class CuddleProfile {
         else {
             Utils.println("Cannot delete '" + filename + "' - file does not exist!");
         }
+    }
+
+    public static boolean profileExist(String profileName) {
+        File f = new File(profileName);
+        return f.exists();
     }
 
 
@@ -220,6 +238,8 @@ public class CuddleProfile {
             p.setProperty(ARMS_LEFT, serializeCoordPoint(armPoints[0]));
             p.setProperty(ARMS_RIGHT, serializeCoordPoint(armPoints[1]));
         }
+
+        p.setProperty(SPEED, ""+speed);
 
 
         FileOutputStream out = null;
@@ -319,6 +339,7 @@ public class CuddleProfile {
         StringBuffer sb = new StringBuffer();
         sb.append("\n---------------- Cuddle-profile --------------------\n");
         sb.append("Filename: "+fileOrigin+"\n");
+        sb.append("Speed: "+speed+"\n");
         sb.append("Torso-points:\n");
         for (int i = 0; i < torsoPoints.length; i++) {
             sb.append(" - Point "+ (i+1) + ": "+torsoPoints[i].toString()+"\n");

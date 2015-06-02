@@ -20,8 +20,13 @@ public class Utils {
     }
 
     public static void println(String s) {
-        if (WireCuddler.isDevMode() && RConsole.isOpen()) {
-            RConsole.println(s);
+        if (WireCuddler.useRConsole) {
+            if (WireCuddler.isDevMode() && RConsole.isOpen()) {
+                RConsole.println(s);
+            }
+        }
+        else {
+            // Ignore all output
         }
     }
 

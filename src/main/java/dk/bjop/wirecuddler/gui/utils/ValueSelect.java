@@ -1,4 +1,4 @@
-package dk.bjop.wirecuddler.gui;
+package dk.bjop.wirecuddler.gui.utils;
 
 import lejos.nxt.Button;
 import lejos.nxt.LCD;

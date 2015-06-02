@@ -2,6 +2,7 @@ package dk.bjop.wirecuddler.gui;
 
 import dk.bjop.wirecuddler.CuddleController;
 import dk.bjop.wirecuddler.config.CuddleProfile;
+import dk.bjop.wirecuddler.gui.utils.Messages;
 import dk.bjop.wirecuddler.math.Utils;
 import dk.bjop.wirecuddler.math.coordinates.WT3Coord;
 import dk.bjop.wirecuddler.math.coordinates.XYZCoord;
@@ -11,7 +12,6 @@ import dk.bjop.wirecuddler.movement.moves.PointMove;
 import dk.bjop.wirecuddler.movement.moves.StraightAcceleratingMove;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
-import lejos.nxt.Sound;
 
 /**
  * Created by bpeterse on 25-04-2015.
@@ -57,8 +57,21 @@ public class ProfileMenu {
             if (Button.ENTER.isDown()) {
                 while (Button.ENTER.isDown()) Thread.sleep(10);
                 if (mainSelect == 0) profileSwitchMenu();
-                else if (mainSelect == 1) profileCreateMenu();
-                else if (mainSelect == 2) profileEditMenu();
+                else if (mainSelect == 1) {
+                    if (!CuddleProfile.canCreateNewProfiles()) {
+                        Messages.showMessage("  -ERROR-", new String[]{"Too many", "profiles!", "Delete some"}, true);
+                        return;
+                    }
+
+                    String profileName = null;
+                    try {
+                        profileName = CuddleProfile.getFirstAvailableFilename();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    profileEditCreateMenu(profileName);
+                }
+                else if (mainSelect == 2) profileEditCreateMenu(profileSelectMenu("EDIT PROFILE"));
                 else if (mainSelect == 3) profileDeleteMenu();
                 else throw new RuntimeException("Invalid choice! [" + mainSelect + "]");
             }
@@ -94,12 +107,7 @@ public class ProfileMenu {
         String profileName = profileSelectMenu("DELETE PROFILE");
         if (profileName == null) return;
         CuddleProfile.deleteProfile(profileName);
-        showOkCancelMessage("",new String[]{"Profile", "deleted!"}, false);
-    }
-
-    private void profileEditMenu() throws InterruptedException {
-        profileSelectMenu("EDIT PROFILE");
-        throw new RuntimeException("Not implemented!");
+        Messages.showOkCancelMessage("", new String[]{"Profile", "deleted!"}, false);
     }
 
     private void profileSwitchMenu() throws InterruptedException {
@@ -107,50 +115,62 @@ public class ProfileMenu {
         throw new RuntimeException("Not implemented!");
     }
 
-    private void profileCreateMenu() throws InterruptedException {
-        if (!CuddleProfile.canCreateNewProfiles()) {
-            showMessage("  -ERROR-", new String[]{"Too many", "profiles!", "Delete some"}, true);
-            return;
-        }
+    private void profileEditCreateMenu(String profileName) throws InterruptedException {
+        cc.initialize();
 
-        String profileName = null;
-        try {
-            profileName = CuddleProfile.getFirstAvailableFilename();
-        } catch (Exception e) {
-            e.printStackTrace();
+        CuddleProfile cp = null;
+        if (CuddleProfile.profileExist(profileName)) {
+            cp = CuddleProfile.loadProfile(profileName);
         }
-
-        showOkCancelMessage("NEW PROFILE NAME:", new String[]{"",profileName}, false);
+        else {
+            Messages.showOkCancelMessage("NEW PROFILE NAME:", new String[]{"",profileName}, false);
+        }
 
         XYZCoord[] torsoPoints = null;
         XYZCoord[] legPoints = null;
         XYZCoord[] armPoints = null;
+        int speed = 4;
 
+        if (cp != null) {
+            torsoPoints = cp.getTorsoPoints();
+            legPoints = cp.getLegPoints();
+            armPoints = cp.getArmPoints();
+        }
+        else {
+            torsoPoints = new XYZCoord[4];
+        }
 
         int mainSelect = 0;
         String heading = "    SET AREAS";
         int offset = 2;
-        String[] options = new String[]{"Torso", "Legs", "Arms", "SAVE"};
+        String[] options = new String[]{"Torso", "Legs", "Arms", "Speed", "   -SAVE-"};
 
         redraw(heading, offset, options, mainSelect);
         while (true) {
 
             if (Button.ENTER.isDown()) {
                 while (Button.ENTER.isDown()) Thread.sleep(10);
-                if (mainSelect == 0) torsoPoints = profileSetTorsoPoints();
+                if (mainSelect == 0) torsoPoints = profileSetTorsoPoints(torsoPoints);
                 else if (mainSelect == 1) legPoints = profileSetLegPoints();
                 else if (mainSelect == 2) armPoints = profileSetArmPoints();
-                else if (mainSelect == 3) {
+                else if (mainSelect == 3) speed = profileSetSpeed();
+                else if (mainSelect == 4) {
                     if (CuddleProfile.validateTorsoPoints(torsoPoints)) {
-                        if (showOkCancelMessage("Save all points?", null, false)) {
-                            new CuddleProfile(torsoPoints, legPoints, armPoints).saveProfile(profileName, false);
+                        if (Messages.showOkCancelMessage("Save all points?", null, false)) {
+                            if (cp == null) {
+                                new CuddleProfile(torsoPoints, legPoints, armPoints, speed).saveProfile(profileName, false);
+                            }
+                            else {
+                                cp.saveProfile(profileName, true);
+                            }
+
                             Utils.println(CuddleProfile.loadProfile(profileName).toString());
-                            showTimedMessage("Profile saved!", null, false, 2000);
+                            Messages.showTimedMessage("Profile saved!", null, false, 2000);
                         }
                         return;
                     }
                     else {
-                        if (showOkCancelMessage("Exit?", new String[]{"Exit ","without", "save?"}, false)) {
+                        if (Messages.showOkCancelMessage("Exit?", new String[]{"Exit ","without", "save?"}, false)) {
                             return;
                         }
                     }
@@ -175,9 +195,12 @@ public class ProfileMenu {
         }
     }
 
-    private XYZCoord[] profileSetTorsoPoints() throws InterruptedException {
-        XYZCoord[] torsoPoints = new XYZCoord[4];
+    private int profileSetSpeed() throws InterruptedException{
+        Messages.showOkCancelMessage("SET SPEED", new String[]{"Speed set to 2"}, false);
+        return 4;
+    }
 
+    private XYZCoord[] profileSetTorsoPoints(XYZCoord[] torsoPoints) throws InterruptedException {
 
         int mainSelect = 0;
         String heading = "Set torso points";
@@ -189,10 +212,15 @@ public class ProfileMenu {
 
             if (Button.ENTER.isDown()) {
                 while (Button.ENTER.isDown()) Thread.sleep(10);
+                if (torsoPoints[mainSelect] != null) {
+                    doPositionMoveWithInfo(new PointMove(torsoPoints[mainSelect]));
+                    positionChanged = true;
+                }
+
                 selectXYZDirectionMenu();
 
                 torsoPoints[mainSelect] = getCurrentPosition();
-                showTimedMessage("", new String[]{"", "Point stored:", options[mainSelect]}, false, 2000);
+                Messages.showTimedMessage("", new String[]{"", "Point stored:", options[mainSelect]}, false, 2000);
 
                 redraw(heading, offset, options, mainSelect);
             }
@@ -213,48 +241,18 @@ public class ProfileMenu {
 
                     // TODO allow exit on escape
 
-                    if (!showOkCancelMessage("     Exit?", new String[]{"Point missing!", "Press Esc to exit", "or Enter", "to stay."}, true)) {
+                    if (!Messages.showOkCancelMessage("     Exit?", new String[]{"Point missing!", "Press Esc to exit", "or Enter", "to stay."}, true)) {
                         return null;
                     }
                 }
                 else {
 
                     // TODO save abort and show profile filename
-                    showOkCancelMessage("",new String[]{"","Torso-points","are now set!"}, false);
+                    Messages.showOkCancelMessage("", new String[]{"", "Torso-points", "are now set!"}, false);
                     return torsoPoints;
                 }
             }
         }
-    }
-
-    private boolean showOkCancelMessage(String heading, String[] msg, boolean dobeep) throws InterruptedException {
-        showMessage(heading, msg, dobeep);
-        Button.waitForAnyPress();
-        if (Button.readButtons() == Button.ID_ENTER) {
-            while (Button.ENTER.isDown()) Thread.sleep(10);
-            return true;
-        }
-        else return false;
-    }
-
-    private void showTimedMessage(String heading, String[] msg, boolean dobeep, long millis) {
-        showMessage(heading, msg, dobeep);
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void showMessage(String heading, String[] msg, boolean dobeep) {
-        LCD.clear();
-        LCD.drawString(heading, 0, 0, false);
-        if (msg != null) {
-            for (int i = 0; i < msg.length; i++) {
-                if (msg[i] != null && !msg[i].trim().equals("")) LCD.drawString(" -" + msg[i], 0, 2 + i, false);
-            }
-        }
-        if (dobeep) Sound.beep();
     }
 
     private void selectXYZDirectionMenu() throws InterruptedException {
@@ -338,20 +336,21 @@ public class ProfileMenu {
         return Math.round(n *precision) /precision;
     }
 
-    private void directionMove(int cartesianDirection) throws InterruptedException {
-
-        // TODO ennforce boundaries!
-
-        cc.initialize();
+    private void doPositionMoveWithInfo(MotorPathMove move) {
         Utils.println("Moving, and waiting...");
+        LCD.clear();
+        LCD.drawString("Positioning...", 0, 3);
+        LCD.drawString("Please wait...", 0, 4);
+        cc.manualMove(move, true);
+        Utils.println("Done!");
+    }
+
+    private void directionMove(int cartesianDirection) throws InterruptedException {
         if (!positionChanged) {
-            LCD.clear();
-            LCD.drawString("Positioning...",0,3);
-            LCD.drawString("Please wait...",0,4);
-            cc.manualMove(new PointMove(new XYZCoord(10, 10, 10)),true);
+            Utils.println("Moving to 10,10,10");
+            doPositionMoveWithInfo(new PointMove(new XYZCoord(10, 10, 10)));
             positionChanged = true;
         }
-        Utils.println("Done!");
 
         LCD.clear();
         redrawDirectionMove(cartesianDirection, getCurrentPosition());
@@ -366,12 +365,12 @@ public class ProfileMenu {
 
             if (Button.ENTER.isDown()) {
                 while (Button.ENTER.isDown()) Thread.sleep(10);
-                showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 2000);
+               // Messages.showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 2000);
                 break;
             }
             if (Button.ESCAPE.isDown()) {
                 while (Button.ESCAPE.isDown()) Thread.sleep(10);
-                showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 2000);
+               // Messages.showTimedMessage("", new String[]{"", "", "Position saved!"}, false, 1000);
                 break;
             }
             if (Button.LEFT.isDown()) {
@@ -413,7 +412,7 @@ public class ProfileMenu {
     public String profileSelectMenu(String heading) throws InterruptedException {
         String[] profileNames = CuddleProfile.listExistingProfiles();
         if (profileNames.length == 0) {
-            showOkCancelMessage("No profiles found!", null, true);
+            Messages.showOkCancelMessage("No profiles found!", null, true);
             return null;
         }
         int selection = 0;

@@ -4,13 +4,14 @@ import dk.bjop.wirecuddler.CuddleController;
 import dk.bjop.wirecuddler.WireCuddler;
 import dk.bjop.wirecuddler.config.CalibValues;
 import dk.bjop.wirecuddler.config.CuddleProfile;
+import dk.bjop.wirecuddler.gui.utils.Messages;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
 
 /**
  * Created by bpeterse on 03-11-2014.
  */
-public class CuddleMenu {
+public class MainMenu {
 
     final int menuWaitAfterButtonPress = 500;
 
@@ -22,7 +23,7 @@ public class CuddleMenu {
     SettingsMenu sm;
 
 
-    public CuddleMenu() {
+    public MainMenu() {
         // M2-M1: 13114
         // M1-M3: 13428
         // M3-M2: 10537
@@ -67,10 +68,14 @@ public class CuddleMenu {
         LCD.drawString(" - Cuddle", 0, 2, select==0);
         LCD.drawString(" - Settings", 0, 3, select==1);
         LCD.drawString(" - Motor adjust", 0, 4, select==2);
-        LCD.drawString(" - Exit", 0, 5, select==3);
+        LCD.drawString(" - About", 0, 5, select==3);
+        LCD.drawString(" - Exit", 0, 6, select==4);
     }
 
     private void startupMenu() throws InterruptedException{
+
+        // TODO move all message methods into guiUtils package!
+
         boolean redraw = true;
         int mainSelect = 0;
         redraw(mainSelect);
@@ -82,21 +87,26 @@ public class CuddleMenu {
                 if (mainSelect == 0 ) cuddleStartStopMenu();
                 if (mainSelect == 1 ) sm.startMenu();
                 if (mainSelect == 2 ) mam.startMenu();
-                if (mainSelect == 3 ) WireCuddler.terminateProgram("Termination requested by user!");
+                if (mainSelect == 3 ) dispVersionAuthorInfo();
+                if (mainSelect == 4 ) WireCuddler.terminateProgram("Termination requested by user!");
 
                 redraw(mainSelect);
             }
             if (Button.LEFT.isDown()) {
-                mainSelect = getPrevIndex(0, 4, mainSelect);
+                mainSelect = getPrevIndex(0, 5, mainSelect);
                 redraw(mainSelect);
                 while (Button.LEFT.isDown()) Thread.sleep(10);
             }
             if (Button.RIGHT.isDown()) {
-                mainSelect = getNextIndex(0, 4, mainSelect);
+                mainSelect = getNextIndex(0, 5, mainSelect);
                 redraw(mainSelect);
                 while (Button.RIGHT.isDown()) Thread.sleep(10);
             }
         }
+    }
+
+    private void dispVersionAuthorInfo() throws InterruptedException {
+        Messages.showOkCancelMessage(" WIRECUDDLER", new String[]{"", "Version: 0.1 beta", "Author: BSP"}, false);
     }
 
     private void cuddleStartStopMenu() throws InterruptedException {
